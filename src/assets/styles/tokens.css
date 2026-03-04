@@ -1,0 +1,22 @@
+/* Design tokens for Video Diario */
+:root {
+  --vd-spacing-xs: 0.25rem;
+  --vd-spacing-sm: 0.5rem;
+  --vd-spacing-md: 1rem;
+  --vd-spacing-lg: 1.5rem;
+  --vd-spacing-xl: 2rem;
+  --vd-spacing-2xl: 3rem;
+
+  --vd-radius-sm: 0.375rem;
+  --vd-radius-md: 0.5rem;
+  --vd-radius-lg: 0.75rem;
+  --vd-radius-xl: 1rem;
+  --vd-radius-full: 9999px;
+
+  --vd-font-display: "Fredoka", sans-serif;
+  --vd-font-body: "Nunito", sans-serif;
+
+  --vd-shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.08);
+  --vd-shadow-md: 0 4px 12px hsl(0 0% 0% / 0.1);
+  --vd-shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.12);
+}
