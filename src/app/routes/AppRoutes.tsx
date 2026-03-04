@@ -1,32 +1,40 @@
 import { Routes, Route } from "react-router-dom";
-import Index from "@/pages/Index";
+import { DiaryHome } from "@/features/diary/DiaryHome";
+import { RecordSelector } from "@/features/diary/RecordSelector";
+import { RecordVideo } from "@/features/diary/RecordVideo";
+import { RecordAudio } from "@/features/diary/RecordAudio";
+import { EntryDetail } from "@/features/diary/EntryDetail";
+import { PhotoList } from "@/features/dailyPhoto/PhotoList";
+import { PhotoCapture } from "@/features/dailyPhoto/PhotoCapture";
+import { PhotoDetail } from "@/features/dailyPhoto/PhotoDetail";
+import { TimelapsePlayer } from "@/features/dailyPhoto/TimelapsePlayer";
+import { PackStore } from "@/features/store/PackStore";
+import { SettingsPage } from "@/features/settings/SettingsPage";
+import { AdminLock } from "@/features/admin/AdminLock";
+import { AdminDashboard } from "@/features/admin/AdminDashboard";
+import { AdminProfiles } from "@/features/admin/AdminProfiles";
+import { AdminContent } from "@/features/admin/AdminContent";
+import { AdminSettings } from "@/features/admin/AdminSettings";
 import NotFound from "@/pages/NotFound";
-
-// Feature pages — stubbed for now
-const CameraPage = () => (
-  <div className="flex min-h-screen items-center justify-center pb-16">
-    <p className="text-muted-foreground">📷 Cámara — próximamente</p>
-  </div>
-);
-
-const TimelapsePage = () => (
-  <div className="flex min-h-screen items-center justify-center pb-16">
-    <p className="text-muted-foreground">⏱ Timelapse — próximamente</p>
-  </div>
-);
-
-const SettingsPage = () => (
-  <div className="flex min-h-screen items-center justify-center pb-16">
-    <p className="text-muted-foreground">⚙️ Ajustes — próximamente</p>
-  </div>
-);
 
 export const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<Index />} />
-    <Route path="/camera" element={<CameraPage />} />
-    <Route path="/timelapse" element={<TimelapsePage />} />
+    <Route path="/" element={<DiaryHome />} />
+    <Route path="/record" element={<RecordSelector />} />
+    <Route path="/record/video" element={<RecordVideo />} />
+    <Route path="/record/audio" element={<RecordAudio />} />
+    <Route path="/entry/:id" element={<EntryDetail />} />
+    <Route path="/daily-photo" element={<PhotoList />} />
+    <Route path="/daily-photo/capture" element={<PhotoCapture />} />
+    <Route path="/daily-photo/timelapse" element={<TimelapsePlayer />} />
+    <Route path="/daily-photo/:id" element={<PhotoDetail />} />
+    <Route path="/store" element={<PackStore />} />
     <Route path="/settings" element={<SettingsPage />} />
+    <Route path="/admin-lock" element={<AdminLock />} />
+    <Route path="/admin" element={<AdminDashboard />} />
+    <Route path="/admin/profiles" element={<AdminProfiles />} />
+    <Route path="/admin/content" element={<AdminContent />} />
+    <Route path="/admin/settings" element={<AdminSettings />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
