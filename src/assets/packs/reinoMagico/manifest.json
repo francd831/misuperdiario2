@@ -1,0 +1,24 @@
+{
+  "id": "reinoMagico",
+  "name": "Reino Mágico",
+  "description": "Un mundo encantado lleno de magia y fantasía",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "270 60% 50%",
+    "secondary": "300 40% 90%",
+    "accent": "330 70% 60%",
+    "background": "270 20% 98%",
+    "foreground": "270 50% 10%",
+    "glow": "270 80% 70%"
+  },
+  "stickers": ["estrella.png", "corona.png", "varita.png", "unicornio.png"],
+  "frames": ["marco-magico.png", "marco-estrellas.png"],
+  "sounds": {
+    "shutter": "shutter.mp3",
+    "magic": "magic.mp3"
+  },
+  "intro": "intro/intro.mp4",
+  "preview": "preview/preview.png"
+}
