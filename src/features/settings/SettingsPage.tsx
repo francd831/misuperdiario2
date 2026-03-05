@@ -9,7 +9,7 @@ import { Settings, Palette, Volume2, HardDrive, Shield } from "lucide-react";
 import { LongPress } from "@/app/components/LongPress";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
 import { pinService } from "@/core/auth/pinService";
-import { packRegistry } from "@/core/packs/packRegistry";
+import { usePack } from "@/core/packs/PackContext";
 import { dbList } from "@/core/storage/indexeddb";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,18 +17,20 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profileName, setProfileName] = useState("");
+  const { activePack: activePackObj } = usePack();
   const [activePack, setActivePack] = useState("");
   const [storageInfo, setStorageInfo] = useState("");
   const [newPin, setNewPin] = useState("");
   const [ambientSound, setAmbientSound] = useState(false);
 
   useEffect(() => {
+    if (activePackObj) setActivePack(activePackObj.name);
+  }, [activePackObj]);
+
+  useEffect(() => {
     const load = async () => {
       const profile = await profileRepository.getById("default");
       if (profile) setProfileName(profile.name);
-      const pack = await packRegistry.getActivePack();
-      setActivePack(pack.name);
-      // Estimate storage
       const entries = await dbList("entries");
       const photos = await dbList("daily_photos");
       setStorageInfo(`${entries.length} entradas · ${photos.length} fotos`);
