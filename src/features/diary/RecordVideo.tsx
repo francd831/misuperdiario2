@@ -137,9 +137,9 @@ export function RecordVideo() {
   // Post-recording save form
   if (blob) {
     return (
-      <div className="flex min-h-screen flex-col gap-4 px-4 pb-24 pt-4">
-        <h2 className="text-xl font-bold">Guardar grabación</h2>
-        <div className="relative rounded-xl">
+      <div className="flex min-h-screen flex-col pb-24">
+        <h2 className="px-4 pt-4 text-xl font-bold">Guardar grabación</h2>
+        <div className="px-4 pt-4">
           <OverlayLayer
             overlays={overlays}
             selectedId={selectedId}
@@ -153,30 +153,34 @@ export function RecordVideo() {
               className="w-full rounded-xl"
             />
           </OverlayLayer>
-          <OverlayTray
-            selectedId={selectedId}
-            onAdd={addOverlay}
-            onDelete={deleteSelected}
+        </div>
+        <OverlayTray
+          selectedId={selectedId}
+          onAdd={addOverlay}
+          onDelete={deleteSelected}
+        />
+        <div className="px-4 pt-4">
+          <Input
+            placeholder="Título (opcional)"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-        <Input
-          placeholder="Título (opcional)"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 px-4 pt-2">
           <Switch checked={isCapsule} onCheckedChange={setIsCapsule} id="capsule" />
           <Label htmlFor="capsule">Guardar como cápsula del tiempo</Label>
         </div>
         {isCapsule && (
-          <Input
-            type="date"
-            value={unlockDate}
-            onChange={(e) => setUnlockDate(e.target.value)}
-            min={new Date().toISOString().slice(0, 10)}
-          />
+          <div className="px-4 pt-2">
+            <Input
+              type="date"
+              value={unlockDate}
+              onChange={(e) => setUnlockDate(e.target.value)}
+              min={new Date().toISOString().slice(0, 10)}
+            />
+          </div>
         )}
-        <div className="flex gap-2">
+        <div className="flex gap-2 px-4 pt-2">
           <Button
             variant="outline"
             className="flex-1"
@@ -243,12 +247,13 @@ export function RecordVideo() {
         )}
       </div>
 
-      {/* Overlay tray at bottom */}
+      {/* Keyboard-style overlay tray */}
       <OverlayTray
         selectedId={selectedId}
         onAdd={addOverlay}
         onDelete={deleteSelected}
         collapsed
+        fixed
       />
     </div>
   );

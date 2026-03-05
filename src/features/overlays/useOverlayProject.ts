@@ -13,11 +13,20 @@ export function useOverlayProject(
   const [overlays, setOverlays] = useState<OverlayProject>(initial);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initializedRef = useRef(false);
+  const initialJsonRef = useRef<string>("");
 
-  // Sync when initial changes (e.g. route change)
+  // Sync when initial changes (e.g. route change) – compare by JSON to avoid loops
   useEffect(() => {
-    setOverlays(initial);
-    setSelectedId(null);
+    const json = JSON.stringify(initial);
+    if (json !== initialJsonRef.current) {
+      initialJsonRef.current = json;
+      if (initializedRef.current) {
+        setOverlays(initial);
+        setSelectedId(null);
+      }
+      initializedRef.current = true;
+    }
   }, [initial]);
 
   // Debounced persist
@@ -40,19 +49,25 @@ export function useOverlayProject(
 
   const addOverlay = useCallback(
     (item: OverlayItem) => {
-      const next = [...overlays, item];
-      update(next);
+      setOverlays((prev) => {
+        const next = [...prev, item];
+        scheduleSave(next);
+        return next;
+      });
       setSelectedId(item.id);
     },
-    [overlays, update],
+    [scheduleSave],
   );
 
   const deleteSelected = useCallback(() => {
     if (!selectedId) return;
-    const next = removeById(overlays, selectedId);
-    update(next);
+    setOverlays((prev) => {
+      const next = removeById(prev, selectedId);
+      scheduleSave(next);
+      return next;
+    });
     setSelectedId(null);
-  }, [overlays, selectedId, update]);
+  }, [selectedId, scheduleSave]);
 
   return {
     overlays,

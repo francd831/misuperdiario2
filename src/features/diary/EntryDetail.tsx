@@ -24,7 +24,6 @@ export function EntryDetail() {
     if (id) entryRepository.getById(id).then((e) => setEntry((e as ExtendedEntry) ?? null));
   }, [id]);
 
-  // Build initial overlay project (migrate legacy if needed)
   const initialOverlays: OverlayProject =
     (entry as any)?.overlayProject ??
     (entry?.stickerOverlays?.length
@@ -60,8 +59,8 @@ export function EntryDetail() {
     : entry.videoUrl || entry.audioUrl;
 
   return (
-    <div className="flex min-h-screen flex-col gap-4 px-4 pb-24 pt-4">
-      <div className="flex items-center gap-3">
+    <div className="flex min-h-screen flex-col pb-24">
+      <div className="flex items-center gap-3 px-4 pt-4">
         <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -71,7 +70,7 @@ export function EntryDetail() {
       </div>
 
       {!unlocked ? (
-        <Card>
+        <Card className="mx-4 mt-4">
           <CardContent className="flex flex-col items-center gap-4 py-12">
             <Lock className="h-16 w-16 text-muted-foreground" />
             <p className="text-lg font-semibold">Cápsula del tiempo bloqueada</p>
@@ -84,41 +83,44 @@ export function EntryDetail() {
           </CardContent>
         </Card>
       ) : (
-        <div className="relative rounded-xl">
-          {entry.type === "video" && mediaUrl ? (
-            <OverlayLayer
-              overlays={overlays}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              onChange={setOverlays}
-              className="rounded-xl"
-            >
-              <video src={mediaUrl} controls className="w-full rounded-xl" />
-            </OverlayLayer>
-          ) : entry.type === "audio" && mediaUrl ? (
-            <OverlayLayer
-              overlays={overlays}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              onChange={setOverlays}
-              className="rounded-xl bg-card p-6"
-            >
-              <audio src={mediaUrl} controls className="w-full" />
-            </OverlayLayer>
-          ) : (
-            <p className="text-muted-foreground">Sin contenido multimedia</p>
-          )}
+        <>
+          {/* Media with overlays */}
+          <div className="px-4 pt-4">
+            {entry.type === "video" && mediaUrl ? (
+              <OverlayLayer
+                overlays={overlays}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onChange={setOverlays}
+                className="rounded-xl"
+              >
+                <video src={mediaUrl} controls className="w-full rounded-xl" />
+              </OverlayLayer>
+            ) : entry.type === "audio" && mediaUrl ? (
+              <OverlayLayer
+                overlays={overlays}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onChange={setOverlays}
+                className="rounded-xl bg-card p-6"
+              >
+                <audio src={mediaUrl} controls className="w-full" />
+              </OverlayLayer>
+            ) : (
+              <p className="text-muted-foreground">Sin contenido multimedia</p>
+            )}
+          </div>
 
-          {/* Overlay Tray – in-place, no separate screen */}
+          {/* Keyboard-style tray below media */}
           <OverlayTray
             selectedId={selectedId}
             onAdd={addOverlay}
             onDelete={deleteSelected}
           />
-        </div>
+        </>
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 px-4 pt-4">
         <p className="text-sm text-muted-foreground">
           {new Date(entry.createdAt).toLocaleDateString("es", {
             weekday: "long",
@@ -136,7 +138,7 @@ export function EntryDetail() {
       </div>
 
       {unlocked && (
-        <div className="flex gap-2">
+        <div className="flex gap-2 px-4 pt-2">
           <Button
             variant="destructive"
             className="gap-2"

@@ -99,9 +99,9 @@ export function PhotoCapture() {
   // After capture – preview with overlays
   if (photo) {
     return (
-      <div className="flex min-h-screen flex-col gap-4 px-4 pb-24 pt-4">
-        <h2 className="text-xl font-bold">Tu foto de hoy</h2>
-        <div className="relative rounded-xl">
+      <div className="flex min-h-screen flex-col pb-24">
+        <h2 className="px-4 pt-4 text-xl font-bold">Tu foto de hoy</h2>
+        <div className="px-4 pt-4">
           <OverlayLayer
             overlays={overlays}
             selectedId={selectedId}
@@ -111,18 +111,20 @@ export function PhotoCapture() {
           >
             <img src={preview} alt="Preview" className="w-full rounded-xl" />
           </OverlayLayer>
-          <OverlayTray
-            selectedId={selectedId}
-            onAdd={addOverlay}
-            onDelete={deleteSelected}
+        </div>
+        <OverlayTray
+          selectedId={selectedId}
+          onAdd={addOverlay}
+          onDelete={deleteSelected}
+        />
+        <div className="px-4 pt-4">
+          <Input
+            placeholder="Caption (opcional)"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
           />
         </div>
-        <Input
-          placeholder="Caption (opcional)"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-        />
-        <div className="flex gap-2">
+        <div className="flex gap-2 px-4 pt-2">
           <Button
             variant="outline"
             className="flex-1 gap-1"
@@ -169,7 +171,7 @@ export function PhotoCapture() {
       </div>
 
       {/* Capture button */}
-      <div className="absolute bottom-24 left-0 right-0 z-40 flex justify-center">
+      <div className="absolute bottom-48 left-0 right-0 z-40 flex justify-center">
         <button
           onClick={capture}
           className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white/20 shadow-lg"
@@ -178,12 +180,13 @@ export function PhotoCapture() {
         </button>
       </div>
 
-      {/* Overlay tray */}
+      {/* Keyboard-style overlay tray */}
       <OverlayTray
         selectedId={selectedId}
         onAdd={addOverlay}
         onDelete={deleteSelected}
         collapsed
+        fixed
       />
     </div>
   );
