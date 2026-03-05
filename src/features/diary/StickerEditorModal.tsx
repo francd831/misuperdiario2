@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { stickerService, type StickerConfig } from "@/core/media/stickers/stickerService";
+import { usePack } from "@/core/packs/PackContext";
+import { stickerService } from "@/core/media/stickers/stickerService";
 import type { StickerOverlay } from "@/core/storage/indexeddb";
 import type { ExtendedEntry } from "./types";
 
@@ -13,12 +14,8 @@ interface Props {
 
 export function StickerEditorModal({ entry, onClose, onSave }: Props) {
   const [overlays, setOverlays] = useState<StickerOverlay[]>(entry.stickerOverlays ?? []);
-  const [stickers, setStickers] = useState<StickerConfig[]>([]);
   const [dragging, setDragging] = useState<number | null>(null);
-
-  useEffect(() => {
-    stickerService.getAvailableStickers().then(setStickers);
-  }, []);
+  const { stickers } = usePack();
 
   const addSticker = (stickerId: string) => {
     setOverlays((prev) => [
@@ -71,22 +68,25 @@ export function StickerEditorModal({ entry, onClose, onSave }: Props) {
           ))}
         </div>
 
-        {/* Sticker picker */}
-        <div className="flex flex-wrap gap-2">
-          {stickers.length > 0 ? (
-            stickers.map((s) => (
+        {/* Pack stickers from assets */}
+        {stickers.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <p className="w-full text-xs font-medium text-muted-foreground">Stickers del pack</p>
+            {stickers.map((url, i) => (
               <button
-                key={s.stickerId}
-                onClick={() => addSticker(s.stickerId)}
-                className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-2xl hover:bg-secondary/80"
+                key={i}
+                onClick={() => addSticker(`pack-sticker-${i}`)}
+                className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary hover:bg-secondary/80 overflow-hidden"
               >
-                ⭐
+                <img src={url} alt="sticker" className="h-10 w-10 object-contain" />
               </button>
-            ))
-          ) : (
-            <p className="text-sm text-muted-foreground">No hay stickers disponibles en este pack</p>
-          )}
-          {/* Default stickers */}
+            ))}
+          </div>
+        )}
+
+        {/* Default emoji stickers */}
+        <div className="flex flex-wrap gap-2">
+          <p className="w-full text-xs font-medium text-muted-foreground">Emojis</p>
           {["⭐", "❤️", "🎉", "🌈", "🦄", "🎵"].map((emoji) => (
             <button
               key={emoji}
