@@ -1,8 +1,4 @@
-import { useState, useEffect } from "react";
-import { packRegistry } from "@/core/packs/packRegistry";
-import { entitlementService } from "@/core/entitlements/entitlementService";
-import { themeEngine } from "@/core/theming/themeEngine";
-import type { PackManifest } from "@/core/packs/types";
+import { usePack } from "@/core/packs/PackContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,32 +6,17 @@ import { Lock, Check, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function PackStore() {
-  const [packs, setPacks] = useState<PackManifest[]>([]);
-  const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
-  const [activeId, setActiveId] = useState("");
+  const { packs, unlockedIds, activePack, activatePack, unlockPack } = usePack();
   const { toast } = useToast();
 
-  const load = async () => {
-    setPacks(packRegistry.listPacks());
-    const ids = await entitlementService.listUnlocked();
-    setUnlocked(new Set(ids));
-    const active = await packRegistry.getActivePack();
-    setActiveId(active.id);
-  };
-
-  useEffect(() => { load(); }, []);
-
   const handleUnlock = async (packId: string) => {
-    await entitlementService.unlock(packId);
+    await unlockPack(packId);
     toast({ title: "¡Pack desbloqueado!", description: "Ya puedes activarlo." });
-    load();
   };
 
-  const handleActivate = async (pack: PackManifest) => {
-    await packRegistry.setActivePack(pack.id);
-    if (pack.theme) themeEngine.applyTokens(pack.theme as any);
-    setActiveId(pack.id);
-    toast({ title: "Pack activado", description: `Ahora usas "${pack.name}"` });
+  const handleActivate = async (packId: string) => {
+    await activatePack(packId);
+    toast({ title: "Pack activado", description: "El tema se ha aplicado." });
   };
 
   return (
@@ -45,8 +26,8 @@ export function PackStore() {
 
       {packs.map((pack) => {
         const isFree = pack.free;
-        const isUnlocked = isFree || unlocked.has(pack.id);
-        const isActive = pack.id === activeId;
+        const isUnlocked = isFree || unlockedIds.has(pack.id);
+        const isActive = pack.id === activePack?.id;
 
         return (
           <Card key={pack.id} className={`overflow-hidden transition-shadow ${isActive ? "ring-2 ring-primary" : ""}`}>
@@ -68,7 +49,7 @@ export function PackStore() {
                   <Sparkles className="h-4 w-4" /> Desbloquear (simulado)
                 </Button>
               ) : !isActive ? (
-                <Button variant="outline" onClick={() => handleActivate(pack)}>Activar</Button>
+                <Button variant="outline" onClick={() => handleActivate(pack.id)}>Activar</Button>
               ) : (
                 <Button variant="ghost" disabled>Activo actualmente</Button>
               )}
