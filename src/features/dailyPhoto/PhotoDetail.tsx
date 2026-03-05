@@ -73,8 +73,8 @@ export function PhotoDetail() {
   const photoUrl = URL.createObjectURL(photo.blob);
 
   return (
-    <div className="flex min-h-screen flex-col gap-4 px-4 pb-24 pt-4">
-      <div className="flex items-center gap-3">
+    <div className="flex min-h-screen flex-col pb-24">
+      <div className="flex items-center gap-3 px-4 pt-4">
         <Button variant="ghost" size="icon" onClick={() => navigate("/daily-photo")}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -87,8 +87,8 @@ export function PhotoDetail() {
         </h1>
       </div>
 
-      {/* Photo with overlay engine in-place */}
-      <div className="relative rounded-xl">
+      {/* Photo with overlay engine */}
+      <div className="px-4 pt-4">
         <OverlayLayer
           overlays={overlays}
           selectedId={selectedId}
@@ -98,15 +98,16 @@ export function PhotoDetail() {
         >
           <img src={photoUrl} alt={photo.date} className="w-full rounded-xl" />
         </OverlayLayer>
-
-        <OverlayTray
-          selectedId={selectedId}
-          onAdd={addOverlay}
-          onDelete={deleteSelected}
-        />
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Keyboard-style tray below the photo */}
+      <OverlayTray
+        selectedId={selectedId}
+        onAdd={addOverlay}
+        onDelete={deleteSelected}
+      />
+
+      <div className="flex items-center gap-2 px-4 pt-4">
         <Button
           variant="ghost"
           size="icon"
@@ -133,13 +134,15 @@ export function PhotoDetail() {
         </Button>
       </div>
 
-      <Button
-        variant="destructive"
-        className="gap-2"
-        onClick={() => setShowDelete(true)}
-      >
-        <Trash2 className="h-4 w-4" /> Eliminar
-      </Button>
+      <div className="px-4 pt-2">
+        <Button
+          variant="destructive"
+          className="gap-2"
+          onClick={() => setShowDelete(true)}
+        >
+          <Trash2 className="h-4 w-4" /> Eliminar
+        </Button>
+      </div>
 
       <ConfirmDialog
         open={showDelete}
