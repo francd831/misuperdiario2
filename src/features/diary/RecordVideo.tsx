@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Circle, Square } from "lucide-react";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { settingsRepository } from "@/core/storage/repositories/settingsRepository";
+import { OverlayLayer } from "@/features/overlays/OverlayLayer";
+import { OverlayTray } from "@/features/overlays/OverlayTray";
+import { useOverlayProject } from "@/features/overlays/useOverlayProject";
 import type { ExtendedEntry } from "./types";
 
 const MAX_SECONDS_DEFAULT = 300;
@@ -26,6 +29,10 @@ export function RecordVideo() {
   const [unlockDate, setUnlockDate] = useState("");
   const [permError, setPermError] = useState("");
   const [maxSeconds, setMaxSeconds] = useState(MAX_SECONDS_DEFAULT);
+
+  // Overlay engine – active during recording & preview
+  const { overlays, selectedId, setSelectedId, setOverlays, addOverlay, deleteSelected } =
+    useOverlayProject([]);
 
   useEffect(() => {
     settingsRepository.get().then((s) => {
@@ -58,10 +65,14 @@ export function RecordVideo() {
 
   useEffect(() => {
     if (!recording) return;
-    const id = setInterval(() => setElapsed((e) => {
-      if (e + 1 >= maxSeconds) stopRecording();
-      return e + 1;
-    }), 1000);
+    const id = setInterval(
+      () =>
+        setElapsed((e) => {
+          if (e + 1 >= maxSeconds) stopRecording();
+          return e + 1;
+        }),
+      1000,
+    );
     return () => clearInterval(id);
   }, [recording, maxSeconds]);
 
@@ -69,7 +80,9 @@ export function RecordVideo() {
     if (!streamRef.current) return;
     chunksRef.current = [];
     const recorder = new MediaRecorder(streamRef.current, { mimeType: "video/webm" });
-    recorder.ondataavailable = (e) => { if (e.data.size) chunksRef.current.push(e.data); };
+    recorder.ondataavailable = (e) => {
+      if (e.data.size) chunksRef.current.push(e.data);
+    };
     recorder.onstop = () => {
       const b = new Blob(chunksRef.current, { type: "video/webm" });
       setBlob(b);
@@ -102,6 +115,8 @@ export function RecordVideo() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+    // Store overlayProject alongside entry
+    (entry as any).overlayProject = overlays;
     await entryRepository.save(entry as any);
     navigate("/");
   };
@@ -112,52 +127,129 @@ export function RecordVideo() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6">
         <p className="text-center text-destructive">{permError}</p>
-        <Button variant="outline" onClick={() => navigate(-1)}>Volver</Button>
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          Volver
+        </Button>
       </div>
     );
   }
 
+  // Post-recording save form
   if (blob) {
     return (
       <div className="flex min-h-screen flex-col gap-4 px-4 pb-24 pt-4">
         <h2 className="text-xl font-bold">Guardar grabación</h2>
-        <video src={URL.createObjectURL(blob)} controls className="w-full rounded-xl" />
-        <Input placeholder="Título (opcional)" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <div className="relative rounded-xl">
+          <OverlayLayer
+            overlays={overlays}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onChange={setOverlays}
+            className="rounded-xl"
+          >
+            <video
+              src={URL.createObjectURL(blob)}
+              controls
+              className="w-full rounded-xl"
+            />
+          </OverlayLayer>
+          <OverlayTray
+            selectedId={selectedId}
+            onAdd={addOverlay}
+            onDelete={deleteSelected}
+          />
+        </div>
+        <Input
+          placeholder="Título (opcional)"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
         <div className="flex items-center gap-3">
           <Switch checked={isCapsule} onCheckedChange={setIsCapsule} id="capsule" />
           <Label htmlFor="capsule">Guardar como cápsula del tiempo</Label>
         </div>
         {isCapsule && (
-          <Input type="date" value={unlockDate} onChange={(e) => setUnlockDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} />
+          <Input
+            type="date"
+            value={unlockDate}
+            onChange={(e) => setUnlockDate(e.target.value)}
+            min={new Date().toISOString().slice(0, 10)}
+          />
         )}
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={() => { setBlob(null); startCamera(); }}>Repetir</Button>
-          <Button className="flex-1" onClick={save}>Guardar</Button>
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => {
+              setBlob(null);
+              startCamera();
+            }}
+          >
+            Repetir
+          </Button>
+          <Button className="flex-1" onClick={save}>
+            Guardar
+          </Button>
         </div>
       </div>
     );
   }
 
+  // Live recording view with overlay engine
   return (
     <div className="relative flex min-h-screen flex-col bg-black">
-      <video ref={videoRef} className="flex-1 object-cover" muted playsInline />
-      <div className="absolute left-4 top-4">
-        <Button variant="ghost" size="icon" className="text-white" onClick={() => { streamRef.current?.getTracks().forEach(t => t.stop()); navigate(-1); }}>
+      <OverlayLayer
+        overlays={overlays}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        onChange={setOverlays}
+        className="flex-1"
+      >
+        <video ref={videoRef} className="h-full w-full object-cover" muted playsInline />
+      </OverlayLayer>
+
+      <div className="absolute left-4 top-4 z-40">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-white"
+          onClick={() => {
+            streamRef.current?.getTracks().forEach((t) => t.stop());
+            navigate(-1);
+          }}
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
       </div>
-      <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-3">
-        <p className="rounded-full bg-black/50 px-4 py-1 text-lg font-mono text-white">{fmt(elapsed)} / {fmt(maxSeconds)}</p>
+
+      <div className="absolute bottom-28 left-0 right-0 z-40 flex flex-col items-center gap-3">
+        <p className="rounded-full bg-black/50 px-4 py-1 text-lg font-mono text-white">
+          {fmt(elapsed)} / {fmt(maxSeconds)}
+        </p>
         {!recording ? (
-          <button onClick={startRecording} className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive shadow-lg">
+          <button
+            onClick={startRecording}
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive shadow-lg"
+          >
             <Circle className="h-8 w-8 text-white" fill="white" />
           </button>
         ) : (
-          <button onClick={stopRecording} className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive shadow-lg">
+          <button
+            onClick={stopRecording}
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive shadow-lg"
+          >
             <Square className="h-6 w-6 text-white" fill="white" />
           </button>
         )}
       </div>
+
+      {/* Overlay tray at bottom */}
+      <OverlayTray
+        selectedId={selectedId}
+        onAdd={addOverlay}
+        onDelete={deleteSelected}
+        collapsed
+      />
     </div>
   );
 }
