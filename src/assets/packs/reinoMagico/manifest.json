@@ -6,19 +6,42 @@
   "author": "Video Diario",
   "free": false,
   "theme": {
-    "primary": "270 60% 50%",
-    "secondary": "300 40% 90%",
-    "accent": "330 70% 60%",
-    "background": "270 20% 98%",
-    "foreground": "270 50% 10%",
-    "glow": "270 80% 70%"
+    "tokens": {
+      "--color-primary": "270 60% 50%",
+      "--color-secondary": "300 40% 90%",
+      "--color-accent": "330 70% 60%",
+      "--color-background": "270 20% 98%",
+      "--color-foreground": "270 50% 10%",
+      "--color-glow": "270 80% 70%"
+    }
   },
-  "stickers": ["estrella.png", "corona.png", "varita.png", "unicornio.png"],
-  "frames": ["marco-magico.png", "marco-estrellas.png"],
-  "sounds": {
-    "shutter": "shutter.mp3",
-    "magic": "magic.mp3"
+  "stickers": {
+    "autoLoad": true,
+    "folder": "stickers",
+    "categories": [
+      {
+        "id": "default",
+        "name": "Principales",
+        "items": [
+          "stickers/estrella.png",
+          "stickers/corona.png",
+          "stickers/varita.png",
+          "stickers/unicornio.png"
+        ]
+      }
+    ]
   },
+  "frames": [
+    { "key": "marco-magico", "file": "frames/marco-magico.png" },
+    { "key": "marco-estrellas", "file": "frames/marco-estrellas.png" }
+  ],
+  "sounds": [
+    { "key": "shutter", "file": "sounds/shutter.mp3", "type": "effect" },
+    { "key": "magic", "file": "sounds/magic.mp3", "type": "ambience" }
+  ],
   "intro": "intro/intro.mp4",
-  "preview": "preview/preview.png"
+  "preview": {
+    "cover": "preview/preview.png",
+    "accent": "var(--color-accent)"
+  }
 }
