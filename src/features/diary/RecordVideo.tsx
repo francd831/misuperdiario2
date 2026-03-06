@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,6 +121,14 @@ export function RecordVideo() {
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
+  const recordedVideoUrl = useMemo(() => (blob ? URL.createObjectURL(blob) : ""), [blob]);
+
+  useEffect(() => {
+    return () => {
+      if (recordedVideoUrl) URL.revokeObjectURL(recordedVideoUrl);
+    };
+  }, [recordedVideoUrl]);
+
   if (permError) {
     return (
       <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-6">
@@ -146,7 +154,7 @@ export function RecordVideo() {
             className="rounded-xl"
           >
             <video
-              src={URL.createObjectURL(blob)}
+              src={recordedVideoUrl}
               controls
               className="w-full rounded-xl"
             />

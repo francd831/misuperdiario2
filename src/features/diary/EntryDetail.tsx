@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,18 @@ export function EntryDetail() {
   const { overlays, selectedId, setSelectedId, setOverlays, addOverlay, deleteSelected } =
     useOverlayProject(initialOverlays, persist);
 
+  const mediaUrl = useMemo(
+    () =>
+      entry?.mediaBlob ? URL.createObjectURL(entry.mediaBlob) : entry?.videoUrl || entry?.audioUrl,
+    [entry?.mediaBlob, entry?.videoUrl, entry?.audioUrl],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (mediaUrl?.startsWith("blob:")) URL.revokeObjectURL(mediaUrl);
+    };
+  }, [mediaUrl]);
+
   if (!entry) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -53,10 +65,6 @@ export function EntryDetail() {
     await entryRepository.remove(entry.id);
     navigate("/");
   };
-
-  const mediaUrl = entry.mediaBlob
-    ? URL.createObjectURL(entry.mediaBlob)
-    : entry.videoUrl || entry.audioUrl;
 
   return (
     <div className="flex min-h-screen flex-col pb-24">
