@@ -29,6 +29,7 @@ export function OverlayLayer({
   // All pointer state tracked at container level to support multi-touch
   const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
   const activeIdRef = useRef<string | null>(null);
+  const didDragRef = useRef(false);
   const dragRef = useRef<{
     origX: number;
     origY: number;
@@ -79,7 +80,9 @@ export function OverlayLayer({
 
       onSelect(item.id);
       activeIdRef.current = item.id;
+      didDragRef.current = false;
       pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId);
 
       if (pointersRef.current.size === 1) {
         dragRef.current = {
@@ -121,6 +124,7 @@ export function OverlayLayer({
         const rect = containerRef.current.getBoundingClientRect();
         const dx = ((e.clientX - dragRef.current.startX) / rect.width) * 100;
         const dy = ((e.clientY - dragRef.current.startY) / rect.height) * 100;
+        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) didDragRef.current = true;
         patchOverlay(activeIdRef.current, {
           x: Math.max(0, Math.min(100, dragRef.current.origX + dx)),
           y: Math.max(0, Math.min(100, dragRef.current.origY + dy)),
@@ -128,6 +132,7 @@ export function OverlayLayer({
       }
 
       if (pinchRef.current && pointersRef.current.size === 2) {
+        didDragRef.current = true;
         const pts = Array.from(pointersRef.current.values());
         const dx = pts[1].x - pts[0].x;
         const dy = pts[1].y - pts[0].y;
@@ -214,8 +219,16 @@ export function OverlayLayer({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      onClick={() => interactive && onSelect(null)}
+      onClick={(e) => {
+        if (!interactive) return;
+        if (didDragRef.current) { didDragRef.current = false; return; }
+        onSelect(null);
+      }}
     >
+      {/* Transparent overlay to capture touch on video/media elements */}
+      {interactive && overlays.length > 0 && (
+        <div className="absolute inset-0 z-[2]" style={{ pointerEvents: selectedId ? "auto" : "none" }} />
+      )}
       {children}
 
       {/* Frame overlay */}
