@@ -242,6 +242,7 @@ export function OverlayLayer({
             }`}
             style={{ pointerEvents: interactive ? "auto" : "none" }}
             onPointerDown={(e) => handleItemPointerDown(e, item)}
+            onClick={(e) => e.stopPropagation()}
           >
             {resolveAsset(item)}
           </div>
@@ -256,6 +257,7 @@ export function OverlayLayer({
             className="absolute inset-0 z-[1]"
             style={{ pointerEvents: interactive ? "auto" : "none" }}
             onPointerDown={(e) => handleItemPointerDown(e, item)}
+            onClick={(e) => e.stopPropagation()}
           >
             {resolveAsset(item)}
           </div>
@@ -280,6 +282,7 @@ export function OverlayLayer({
               pointerEvents: interactive ? "auto" : "none",
             }}
             onPointerDown={(e) => handleItemPointerDown(e, item)}
+            onClick={(e) => e.stopPropagation()}
           >
             {resolveAsset(item)}
           </div>
