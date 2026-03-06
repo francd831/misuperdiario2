@@ -9,15 +9,11 @@ interface Props {
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   onChange: (updated: OverlayProject) => void;
-  children?: ReactNode; // media element (video/img/camera)
-  interactive?: boolean; // default true
+  children?: ReactNode;
+  interactive?: boolean;
   className?: string;
 }
 
-/**
- * Renders overlay items on top of media content.
- * Handles single-pointer drag + two-pointer pinch/rotate.
- */
 export function OverlayLayer({
   overlays,
   selectedId,
@@ -30,22 +26,26 @@ export function OverlayLayer({
   const containerRef = useRef<HTMLDivElement>(null);
   const { activePack, stickers, frames } = usePack();
 
-  // ─── Pointer state ────────────────────────────────
+  // All pointer state tracked at container level to support multi-touch
   const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const activeIdRef = useRef<string | null>(null);
   const dragRef = useRef<{
-    id: string;
     origX: number;
     origY: number;
     startX: number;
     startY: number;
   } | null>(null);
   const pinchRef = useRef<{
-    id: string;
     initDist: number;
     initScale: number;
     initAngle: number;
     initRot: number;
   } | null>(null);
+
+  const getItem = useCallback(
+    (id: string | null) => (id ? overlays.find((o) => o.id === id) : undefined),
+    [overlays],
+  );
 
   const patchOverlay = useCallback(
     (id: string, patch: Partial<OverlayItem["transform"]>) => {
@@ -54,21 +54,35 @@ export function OverlayLayer({
     [overlays, onChange],
   );
 
-  // ─── Pointer handlers on individual items ─────────
-  const handlePointerDown = useCallback(
+  // Initiate pinch from current two pointers
+  const initPinch = useCallback(() => {
+    const item = getItem(activeIdRef.current);
+    if (!item || pointersRef.current.size < 2) return;
+    const pts = Array.from(pointersRef.current.values());
+    const dx = pts[1].x - pts[0].x;
+    const dy = pts[1].y - pts[0].y;
+    pinchRef.current = {
+      initDist: Math.hypot(dx, dy) || 1,
+      initScale: item.transform.scale,
+      initAngle: Math.atan2(dy, dx),
+      initRot: item.transform.rotation,
+    };
+    dragRef.current = null;
+  }, [getItem]);
+
+  // Called when a sticker/text element is touched
+  const handleItemPointerDown = useCallback(
     (e: React.PointerEvent, item: OverlayItem) => {
       if (!interactive) return;
       e.preventDefault();
       e.stopPropagation();
-      onSelect(item.id);
-      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
 
+      onSelect(item.id);
+      activeIdRef.current = item.id;
       pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
       if (pointersRef.current.size === 1) {
-        // single pointer → drag
         dragRef.current = {
-          id: item.id,
           origX: item.transform.x,
           origY: item.transform.y,
           startX: e.clientX,
@@ -76,33 +90,38 @@ export function OverlayLayer({
         };
         pinchRef.current = null;
       } else if (pointersRef.current.size === 2) {
-        // two pointers → pinch+rotate
-        dragRef.current = null;
-        const pts = Array.from(pointersRef.current.values());
-        const dx = pts[1].x - pts[0].x;
-        const dy = pts[1].y - pts[0].y;
-        pinchRef.current = {
-          id: item.id,
-          initDist: Math.hypot(dx, dy),
-          initScale: item.transform.scale,
-          initAngle: Math.atan2(dy, dx),
-          initRot: item.transform.rotation,
-        };
+        initPinch();
       }
     },
-    [interactive, onSelect],
+    [interactive, onSelect, initPinch],
+  );
+
+  // Container-level pointer down captures second finger even if it lands outside the sticker
+  const handleContainerPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!interactive) return;
+      // Only track if we already have an active overlay (first finger is on it)
+      if (activeIdRef.current && pointersRef.current.size >= 1) {
+        e.preventDefault();
+        pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pointersRef.current.size === 2) {
+          initPinch();
+        }
+      }
+    },
+    [interactive, initPinch],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!interactive || !containerRef.current) return;
+      if (!interactive || !containerRef.current || !activeIdRef.current) return;
       pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
       if (dragRef.current && pointersRef.current.size === 1) {
         const rect = containerRef.current.getBoundingClientRect();
         const dx = ((e.clientX - dragRef.current.startX) / rect.width) * 100;
         const dy = ((e.clientY - dragRef.current.startY) / rect.height) * 100;
-        patchOverlay(dragRef.current.id, {
+        patchOverlay(activeIdRef.current, {
           x: Math.max(0, Math.min(100, dragRef.current.origX + dx)),
           y: Math.max(0, Math.min(100, dragRef.current.origY + dy)),
         });
@@ -116,7 +135,7 @@ export function OverlayLayer({
         const angle = Math.atan2(dy, dx);
         const scaleRatio = dist / pinchRef.current.initDist;
         const rotDelta = ((angle - pinchRef.current.initAngle) * 180) / Math.PI;
-        patchOverlay(pinchRef.current.id, {
+        patchOverlay(activeIdRef.current, {
           scale: Math.max(0.2, Math.min(5, pinchRef.current.initScale * scaleRatio)),
           rotation: pinchRef.current.initRot + rotDelta,
         });
@@ -130,15 +149,27 @@ export function OverlayLayer({
     if (pointersRef.current.size === 0) {
       dragRef.current = null;
       pinchRef.current = null;
+      activeIdRef.current = null;
+    } else if (pointersRef.current.size === 1 && activeIdRef.current) {
+      // Went from 2 fingers back to 1 → resume drag from current position
+      const item = overlays.find((o) => o.id === activeIdRef.current);
+      if (item) {
+        const pt = Array.from(pointersRef.current.values())[0];
+        dragRef.current = {
+          origX: item.transform.x,
+          origY: item.transform.y,
+          startX: pt.x,
+          startY: pt.y,
+        };
+        pinchRef.current = null;
+      }
     }
-  }, []);
+  }, [overlays]);
 
-  // ─── Resolve asset to renderable ──────────────────
   const resolveAsset = (item: OverlayItem): ReactNode => {
     const { type, assetRef } = item;
 
     if (type === "sticker") {
-      // Emoji?
       if (!assetRef.key.startsWith("stickers/")) {
         return <span className="text-3xl leading-none select-none">{assetRef.key}</span>;
       }
@@ -166,7 +197,6 @@ export function OverlayLayer({
       );
     }
 
-    // background – rendered as img covering area
     if (type === "background") {
       const url = activePack ? packLoader.getPackAssetUrl(activePack.id, assetRef.key) : undefined;
       if (url) return <img src={url} alt="" className="h-full w-full object-cover" draggable={false} />;
@@ -180,15 +210,15 @@ export function OverlayLayer({
     <div
       ref={containerRef}
       className={`relative overflow-hidden touch-none ${className}`}
+      onPointerDown={handleContainerPointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onClick={() => interactive && onSelect(null)}
     >
-      {/* Media content */}
       {children}
 
-      {/* Frame overlay (always full-size, behind stickers) */}
+      {/* Frame overlay */}
       {overlays
         .filter((o) => o.type === "frame")
         .map((item) => (
@@ -198,13 +228,13 @@ export function OverlayLayer({
               interactive && selectedId === item.id ? "ring-2 ring-primary/50 rounded" : ""
             }`}
             style={{ pointerEvents: interactive ? "auto" : "none" }}
-            onPointerDown={(e) => handlePointerDown(e, item)}
+            onPointerDown={(e) => handleItemPointerDown(e, item)}
           >
             {resolveAsset(item)}
           </div>
         ))}
 
-      {/* Background overlay (behind everything) */}
+      {/* Background overlay */}
       {overlays
         .filter((o) => o.type === "background")
         .map((item) => (
@@ -212,7 +242,7 @@ export function OverlayLayer({
             key={item.id}
             className="absolute inset-0 z-[1]"
             style={{ pointerEvents: interactive ? "auto" : "none" }}
-            onPointerDown={(e) => handlePointerDown(e, item)}
+            onPointerDown={(e) => handleItemPointerDown(e, item)}
           >
             {resolveAsset(item)}
           </div>
@@ -236,7 +266,7 @@ export function OverlayLayer({
               zIndex: item.zIndex + (selectedId === item.id ? 100 : 0),
               pointerEvents: interactive ? "auto" : "none",
             }}
-            onPointerDown={(e) => handlePointerDown(e, item)}
+            onPointerDown={(e) => handleItemPointerDown(e, item)}
           >
             {resolveAsset(item)}
           </div>

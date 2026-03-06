@@ -30,7 +30,6 @@ export function RecordVideo() {
   const [permError, setPermError] = useState("");
   const [maxSeconds, setMaxSeconds] = useState(MAX_SECONDS_DEFAULT);
 
-  // Overlay engine – active during recording & preview
   const { overlays, selectedId, setSelectedId, setOverlays, addOverlay, deleteSelected } =
     useOverlayProject([]);
 
@@ -43,7 +42,7 @@ export function RecordVideo() {
   const startCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: true,
       });
       streamRef.current = stream;
@@ -115,7 +114,6 @@ export function RecordVideo() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    // Store overlayProject alongside entry
     (entry as any).overlayProject = overlays;
     await entryRepository.save(entry as any);
     navigate("/");
@@ -125,7 +123,7 @@ export function RecordVideo() {
 
   if (permError) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-6">
         <p className="text-center text-destructive">{permError}</p>
         <Button variant="outline" onClick={() => navigate(-1)}>
           Volver
@@ -137,7 +135,7 @@ export function RecordVideo() {
   // Post-recording save form
   if (blob) {
     return (
-      <div className="flex min-h-screen flex-col pb-24">
+      <div className="flex min-h-[100dvh] flex-col pb-24">
         <h2 className="px-4 pt-4 text-xl font-bold">Guardar grabación</h2>
         <div className="px-4 pt-4">
           <OverlayLayer
@@ -199,61 +197,72 @@ export function RecordVideo() {
     );
   }
 
-  // Live recording view with overlay engine
+  // Live recording – fullscreen with integrated controls
   return (
-    <div className="relative flex min-h-screen flex-col bg-black">
-      <OverlayLayer
-        overlays={overlays}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        onChange={setOverlays}
-        className="flex-1"
-      >
-        <video ref={videoRef} className="h-full w-full object-cover" muted playsInline />
-      </OverlayLayer>
-
-      <div className="absolute left-4 top-4 z-40">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white"
-          onClick={() => {
-            streamRef.current?.getTracks().forEach((t) => t.stop());
-            navigate(-1);
-          }}
+    <div className="fixed inset-0 flex flex-col bg-black">
+      {/* Camera fills all available space */}
+      <div className="relative flex-1 min-h-0">
+        <OverlayLayer
+          overlays={overlays}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          onChange={setOverlays}
+          className="h-full w-full"
         >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+          <video
+            ref={videoRef}
+            className="h-full w-full object-cover"
+            muted
+            playsInline
+          />
+        </OverlayLayer>
+
+        {/* Back button */}
+        <div className="absolute left-3 top-3 z-40">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white bg-black/30 rounded-full"
+            onClick={() => {
+              streamRef.current?.getTracks().forEach((t) => t.stop());
+              navigate(-1);
+            }}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Timer + record/stop button – integrated inside the camera */}
+        <div className="absolute bottom-6 left-0 right-0 z-40 flex flex-col items-center gap-3">
+          {recording && (
+            <p className="rounded-full bg-black/50 px-4 py-1 text-lg font-mono text-white">
+              {fmt(elapsed)} / {fmt(maxSeconds)}
+            </p>
+          )}
+          {!recording ? (
+            <button
+              onClick={startRecording}
+              className="flex h-18 w-18 items-center justify-center rounded-full bg-destructive shadow-lg active:scale-90 transition-transform"
+            >
+              <Circle className="h-8 w-8 text-white" fill="white" />
+            </button>
+          ) : (
+            <button
+              onClick={stopRecording}
+              className="flex h-18 w-18 items-center justify-center rounded-full bg-destructive shadow-lg animate-pulse active:scale-90 transition-transform"
+            >
+              <Square className="h-6 w-6 text-white" fill="white" />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="absolute bottom-28 left-0 right-0 z-40 flex flex-col items-center gap-3">
-        <p className="rounded-full bg-black/50 px-4 py-1 text-lg font-mono text-white">
-          {fmt(elapsed)} / {fmt(maxSeconds)}
-        </p>
-        {!recording ? (
-          <button
-            onClick={startRecording}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive shadow-lg"
-          >
-            <Circle className="h-8 w-8 text-white" fill="white" />
-          </button>
-        ) : (
-          <button
-            onClick={stopRecording}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive shadow-lg"
-          >
-            <Square className="h-6 w-6 text-white" fill="white" />
-          </button>
-        )}
-      </div>
-
-      {/* Keyboard-style overlay tray */}
+      {/* Overlay tray sits below the camera */}
       <OverlayTray
         selectedId={selectedId}
         onAdd={addOverlay}
         onDelete={deleteSelected}
         collapsed
-        fixed
       />
     </div>
   );

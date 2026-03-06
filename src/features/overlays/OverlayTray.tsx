@@ -14,11 +14,9 @@ interface Props {
   onDelete: () => void;
   /** Whether to start collapsed */
   collapsed?: boolean;
-  /** For camera/capture screens: use fixed positioning at bottom */
-  fixed?: boolean;
 }
 
-export function OverlayTray({ selectedId, onAdd, onDelete, collapsed: initialCollapsed, fixed }: Props) {
+export function OverlayTray({ selectedId, onAdd, onDelete, collapsed: initialCollapsed }: Props) {
   const [collapsed, setCollapsed] = useState(initialCollapsed ?? true);
   const [tab, setTab] = useState<Tab>("stickers");
   const { stickers, frames, activePack } = usePack();
@@ -44,12 +42,8 @@ export function OverlayTray({ selectedId, onAdd, onDelete, collapsed: initialCol
     onAdd(createOverlay("text", { packId, key: "text" }, { text: "Texto", fontSize: 28 }));
   };
 
-  const positionClasses = fixed
-    ? "fixed bottom-0 left-0 right-0 z-50"
-    : "relative z-30";
-
   return (
-    <div className={`${positionClasses} flex flex-col bg-background/95 backdrop-blur-md border-t border-border rounded-t-2xl transition-all`}>
+    <div className="relative z-30 flex flex-col bg-background/95 backdrop-blur-md border-t border-border rounded-t-2xl transition-all">
       {/* Toggle bar */}
       <button
         onClick={() => setCollapsed(!collapsed)}
