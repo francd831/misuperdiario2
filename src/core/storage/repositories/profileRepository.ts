@@ -5,6 +5,8 @@ export interface Profile {
   name: string;
   avatar?: string;
   pin?: string;
+  role?: "admin" | "user";
+  activePackId?: string;
   createdAt: string;
   updatedAt: string;
 }
