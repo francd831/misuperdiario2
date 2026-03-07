@@ -31,14 +31,23 @@
       }
     ]
   },
-  "frames": [
+    "frames": [
     { "key": "marco-magico", "file": "frames/marco-magico.png" },
     { "key": "marco-estrellas", "file": "frames/marco-estrellas.png" }
   ],
+  "framesAuto": {
+    "autoLoad": true,
+    "folder": "frames"
+  },
   "sounds": [
     { "key": "shutter", "file": "sounds/shutter.mp3", "type": "effect" },
     { "key": "magic", "file": "sounds/magic.mp3", "type": "ambience" }
   ],
+  "soundsAuto": {
+    "autoLoad": true,
+    "folder": "sounds",
+    "defaultType": "effect"
+  },
   "intro": "intro/intro.mp4",
   "preview": {
     "cover": "preview/preview.png",
