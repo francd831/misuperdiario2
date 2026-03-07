@@ -39,6 +39,18 @@ export function RecordSelector() {
             </div>
           </CardContent>
         </Card>
+
+        <Card className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => navigate("/record/text")}>
+          <CardContent className="flex items-center gap-4 p-6">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary">
+              <PenLine className="h-8 w-8 text-secondary-foreground" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold">Escribir texto</p>
+              <p className="text-sm text-muted-foreground">Escribe o dicta con tu voz</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

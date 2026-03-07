@@ -3,6 +3,7 @@ import { DiaryHome } from "@/features/diary/DiaryHome";
 import { RecordSelector } from "@/features/diary/RecordSelector";
 import { RecordVideo } from "@/features/diary/RecordVideo";
 import { RecordAudio } from "@/features/diary/RecordAudio";
+import { RecordText } from "@/features/diary/RecordText";
 import { EntryDetail } from "@/features/diary/EntryDetail";
 import { PhotoList } from "@/features/dailyPhoto/PhotoList";
 import { PhotoCapture } from "@/features/dailyPhoto/PhotoCapture";
@@ -23,6 +24,7 @@ export const AppRoutes = () => (
     <Route path="/record" element={<RecordSelector />} />
     <Route path="/record/video" element={<RecordVideo />} />
     <Route path="/record/audio" element={<RecordAudio />} />
+    <Route path="/record/text" element={<RecordText />} />
     <Route path="/entry/:id" element={<EntryDetail />} />
     <Route path="/daily-photo" element={<PhotoList />} />
     <Route path="/daily-photo/capture" element={<PhotoCapture />} />

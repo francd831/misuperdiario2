@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Video, Mic, Lock, Plus, Search } from "lucide-react";
+import { Video, Mic, Lock, Plus, Search, PenLine } from "lucide-react";
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
 
