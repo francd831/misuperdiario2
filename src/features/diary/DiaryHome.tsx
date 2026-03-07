@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Video, Mic, Lock, Plus, Search } from "lucide-react";
+import { Video, Mic, Lock, Plus, Search, PenLine } from "lucide-react";
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
 
@@ -27,6 +27,7 @@ export function DiaryHome() {
     }
     if (filter === "video") list = list.filter((e) => e.type === "video");
     if (filter === "audio") list = list.filter((e) => e.type === "audio");
+    if (filter === "text") list = list.filter((e) => e.type === "text");
     if (filter === "capsule") list = list.filter((e) => e.isLocked);
     return list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [entries, search, filter]);
@@ -60,6 +61,7 @@ export function DiaryHome() {
           <TabsTrigger value="all" className="flex-1">Todo</TabsTrigger>
           <TabsTrigger value="video" className="flex-1">Vídeo</TabsTrigger>
           <TabsTrigger value="audio" className="flex-1">Voz</TabsTrigger>
+          <TabsTrigger value="text" className="flex-1">Texto</TabsTrigger>
           <TabsTrigger value="capsule" className="flex-1">🔒</TabsTrigger>
         </TabsList>
       </Tabs>
@@ -90,6 +92,8 @@ export function DiaryHome() {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                     {entry.isLocked && !isUnlocked(entry) ? (
                       <Lock className="h-5 w-5 text-primary" />
+                    ) : entry.type === "text" ? (
+                      <PenLine className="h-5 w-5 text-primary" />
                     ) : entry.type === "audio" ? (
                       <Mic className="h-5 w-5 text-primary" />
                     ) : (
@@ -99,8 +103,8 @@ export function DiaryHome() {
                   <div className="flex-1 overflow-hidden">
                     <p className="truncate font-medium">{entry.title || entry.note || "Sin título"}</p>
                     <p className="text-xs text-muted-foreground">
-                      {entry.duration ? `${Math.floor(entry.duration / 60)}:${String(Math.floor(entry.duration % 60)).padStart(2, "0")}` : ""}
-                      {entry.type === "video" ? " · Vídeo" : " · Audio"}
+                      {entry.duration ? `${Math.floor(entry.duration / 60)}:${String(Math.floor(entry.duration % 60)).padStart(2, "0")} · ` : ""}
+                      {entry.type === "video" ? "Vídeo" : entry.type === "audio" ? "Audio" : "Texto"}
                     </p>
                   </div>
                   {entry.isLocked && !isUnlocked(entry) && (
