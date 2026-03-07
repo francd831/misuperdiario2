@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Mic, MicOff, Save } from "lucide-react";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
+import { useProfile } from "@/core/auth/ProfileContext";
 import type { ExtendedEntry } from "./types";
 
 /** Check browser support for Web Speech API */
@@ -17,6 +18,7 @@ function getSpeechRecognition(): any {
 
 export function RecordText() {
   const navigate = useNavigate();
+  const { activeProfile } = useProfile();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [isCapsule, setIsCapsule] = useState(false);
@@ -89,7 +91,7 @@ export function RecordText() {
     const id = crypto.randomUUID();
     const entry: ExtendedEntry = {
       id,
-      profileId: "default",
+      profileId: activeProfile?.id ?? "default",
       date: new Date().toISOString().slice(0, 10),
       type: "text",
       title: title || undefined,
