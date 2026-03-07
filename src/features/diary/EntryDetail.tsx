@@ -114,17 +114,25 @@ export function EntryDetail() {
               >
                 <audio src={mediaUrl} controls className="w-full" />
               </OverlayLayer>
+            ) : entry.type === "text" ? (
+              <div className="rounded-xl bg-card p-6">
+                <p className="whitespace-pre-wrap text-base leading-relaxed">
+                  {entry.note || "Sin contenido"}
+                </p>
+              </div>
             ) : (
               <p className="text-muted-foreground">Sin contenido multimedia</p>
             )}
           </div>
 
-          {/* Keyboard-style tray below media */}
-          <OverlayTray
-            selectedId={selectedId}
-            onAdd={addOverlay}
-            onDelete={deleteSelected}
-          />
+          {/* Keyboard-style tray below media (not for text) */}
+          {entry.type !== "text" && (
+            <OverlayTray
+              selectedId={selectedId}
+              onAdd={addOverlay}
+              onDelete={deleteSelected}
+            />
+          )}
         </>
       )}
 
