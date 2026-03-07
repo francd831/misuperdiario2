@@ -31,13 +31,13 @@
       }
     ]
   },
-    "frames": [
-    { "key": "marco-magico", "file": "frames/marco-magico.png" },
-    { "key": "marco-estrellas", "file": "frames/marco-estrellas.png" }
-  ],
-  "framesAuto": {
+  "frames": {
     "autoLoad": true,
-    "folder": "frames"
+    "folder": "frames",
+    "items": [
+      { "key": "marco-magico", "file": "frames/marco-magico.png" },
+      { "key": "marco-estrellas", "file": "frames/marco-estrellas.png" }
+    ]
   },
   "sounds": [
     { "key": "shutter", "file": "sounds/shutter.mp3", "type": "effect" },
