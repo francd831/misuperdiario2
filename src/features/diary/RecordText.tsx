@@ -10,7 +10,7 @@ import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import type { ExtendedEntry } from "./types";
 
 /** Check browser support for Web Speech API */
-function getSpeechRecognition(): typeof SpeechRecognition | null {
+function getSpeechRecognition(): (new () => SpeechRecognition) | null {
   const w = window as any;
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
 }
@@ -23,7 +23,7 @@ export function RecordText() {
   const [unlockDate, setUnlockDate] = useState("");
   const [listening, setListening] = useState(false);
   const [speechSupported] = useState(() => !!getSpeechRecognition());
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Cleanup on unmount
