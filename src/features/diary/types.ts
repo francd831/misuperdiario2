@@ -1,6 +1,6 @@
 import type { DiaryEntry } from "@/core/storage/repositories/entryRepository";
 
-export type EntryType = "video" | "audio";
+export type EntryType = "video" | "audio" | "text";
 
 /** Extended entry with fields stored alongside the base entry in IndexedDB */
 export interface ExtendedEntry extends DiaryEntry {

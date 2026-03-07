@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Video, Mic, ArrowLeft } from "lucide-react";
+import { Video, Mic, PenLine, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function RecordSelector() {
