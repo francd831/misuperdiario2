@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { dbListByIndex, dbSet } from "@/core/storage/indexeddb";
+import { dbListByIndex } from "@/core/storage/indexeddb";
+import { useProfile } from "@/core/auth/ProfileContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, Play } from "lucide-react";
@@ -18,13 +19,15 @@ interface DailyPhoto {
 export function PhotoList() {
   const [photos, setPhotos] = useState<DailyPhoto[]>([]);
   const navigate = useNavigate();
+  const { activeProfile } = useProfile();
   const today = new Date().toISOString().slice(0, 10);
+  const profileId = activeProfile?.id ?? "default";
 
   useEffect(() => {
-    dbListByIndex("daily_photos", "by-profile", "default").then((p) => {
+    dbListByIndex("daily_photos", "by-profile", profileId).then((p) => {
       setPhotos((p as DailyPhoto[]).sort((a, b) => b.date.localeCompare(a.date)));
     });
-  }, []);
+  }, [profileId]);
 
   const hasToday = photos.some((p) => p.date === today);
 

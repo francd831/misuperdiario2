@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Camera, RotateCcw } from "lucide-react";
 import { dbSet, dbListByIndex, dbDelete } from "@/core/storage/indexeddb";
+import { useProfile } from "@/core/auth/ProfileContext";
 import { OverlayLayer } from "@/features/overlays/OverlayLayer";
 import { OverlayTray } from "@/features/overlays/OverlayTray";
 import { useOverlayProject } from "@/features/overlays/useOverlayProject";
@@ -11,6 +12,8 @@ import type { OverlayProject } from "@/core/media/overlays/overlayEngine";
 
 export function PhotoCapture() {
   const navigate = useNavigate();
+  const { activeProfile } = useProfile();
+  const profileId = activeProfile?.id ?? "default";
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [photo, setPhoto] = useState<Blob | null>(null);
@@ -69,11 +72,11 @@ export function PhotoCapture() {
     const today = new Date().toISOString().slice(0, 10);
     const existing = await dbListByIndex("daily_photos", "by-date", today);
     for (const e of existing) {
-      if ((e as any).profileId === "default") await dbDelete("daily_photos", e.id);
+      if ((e as any).profileId === profileId) await dbDelete("daily_photos", e.id);
     }
     await dbSet("daily_photos", {
       id: crypto.randomUUID(),
-      profileId: "default",
+      profileId,
       date: today,
       blob: photo,
       caption,
