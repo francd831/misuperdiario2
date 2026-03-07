@@ -12,15 +12,6 @@ const allPackAssets = import.meta.glob<string>("/src/assets/packs/**/*", {
   import: "default",
 });
 
-function isUrl(v: unknown): v is string {
-  return typeof v === "string" && !!v;
-}
-
-function basename(path: string): string {
-  const parts = path.split("/").filter(Boolean);
-  return parts[parts.length - 1] ?? path;
-}
-
 export const packLoader = {
   getPackAssetUrl(packId: string, assetPath: string): string | undefined {
     const key = `/src/assets/packs/${packId}/${assetPath}`;
@@ -31,8 +22,7 @@ export const packLoader = {
     const prefix = `/src/assets/packs/${packId}/stickers/`;
     return Object.entries(allPackAssets)
       .filter(([key]) => key.startsWith(prefix))
-      .map(([, url]) => url)
-      .filter(isUrl);
+      .map(([, url]) => url);
   },
 
   getPackFrames(packId: string): { key: string; file: string }[] {
@@ -41,7 +31,7 @@ export const packLoader = {
     for (const [key, url] of Object.entries(allPackAssets)) {
       if (key.startsWith(prefix)) {
         const filename = key.replace(prefix, "");
-        const name = basename(filename).replace(/\.[^.]+$/, "");
+        const name = filename.replace(/\.[^.]+$/, "");
         items.push({ key: name, file: url });
       }
     }
@@ -54,7 +44,7 @@ export const packLoader = {
     for (const [key, url] of Object.entries(allPackAssets)) {
       if (key.startsWith(prefix)) {
         const filename = key.replace(prefix, "");
-        const name = basename(filename).replace(/\.[^.]+$/, "");
+        const name = filename.replace(/\.[^.]+$/, "");
         items.push({ key: name, file: url, type: defaultType });
       }
     }
@@ -63,63 +53,40 @@ export const packLoader = {
 
   async getActivePackAssets() {
     const pack: PackManifest = await packRegistry.getActivePack();
+    const p: any = pack; // safe shim for flexible manifest shapes
 
     // Stickers: prefer autoLoad, else use categories.items if present
     let stickers: string[] = [];
-    if (pack.stickers?.autoLoad) {
+    if (p.stickers?.autoLoad) {
       stickers = this.getPackStickers(pack.id);
-    } else if (Array.isArray(pack.stickers?.categories)) {
-      const raw: string[] = pack.stickers.categories.flatMap((c: any) => c.items ?? []);
-      stickers = raw
-        .map((p) => {
-          if (typeof p !== "string") return undefined;
-          // if already a resolved url, keep it; else resolve via manifest path
-          if (p.startsWith("/src/") || p.startsWith("http")) return p;
-          return this.getPackAssetUrl(pack.id, p);
-        })
-        .filter(isUrl);
+    } else if (p.stickers && Array.isArray(p.stickers.categories)) {
+      stickers = p.stickers.categories.flatMap((c: any) => c.items ?? []);
+    } else if (Array.isArray(p.stickers)) {
+      // manifest might be an array of sticker paths
+      stickers = p.stickers.map((s: string) => (typeof s === "string" ? (s.startsWith("/src/") || s.startsWith("http") ? s : this.getPackAssetUrl(pack.id, s)) : undefined)).filter(Boolean) as string[];
     } else {
+      // fallback to scanning
       stickers = this.getPackStickers(pack.id);
     }
 
     // Frames: support object with autoLoad, items, or simple array fallback
     let frames: { key: string; file: string }[] = [];
-    const framesAutoFlag = !!(pack.frames?.autoLoad || (pack as any).framesAuto?.autoLoad);
-    if (framesAutoFlag) {
+    if (p.frames?.autoLoad || p.framesAuto?.autoLoad) {
       frames = this.getPackFrames(pack.id);
-    } else if (Array.isArray((pack as any).frames?.items)) {
-      const raw = (pack as any).frames.items;
-      frames = raw
+    } else if (p.frames && Array.isArray(p.frames.items)) {
+      frames = p.frames.items;
+    } else if (Array.isArray(p.frames)) {
+      // allow old-style array of {key,file} or strings
+      frames = p.frames
         .map((it: any) => {
           if (typeof it === "string") {
-            const fileUrl = this.getPackAssetUrl(pack.id, it);
-            if (!fileUrl) return undefined;
-            const key = basename(it).replace(/\.[^.]+$/, "");
-            return { key, file: fileUrl };
+            const file = this.getPackAssetUrl(pack.id, it);
+            if (!file) return undefined;
+            return { key: it.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, ""), file };
           } else if (it && typeof it.file === "string") {
-            const fileUrl = it.file.startsWith("/src/") || it.file.startsWith("http") ? it.file : this.getPackAssetUrl(pack.id, it.file);
-            if (!fileUrl) return undefined;
-            const key = typeof it.key === "string" ? it.key : basename(it.file).replace(/\.[^.]+$/, "");
-            return { key, file: fileUrl };
-          }
-          return undefined;
-        })
-        .filter(Boolean) as { key: string; file: string }[];
-    } else if (Array.isArray((pack as any).frames)) {
-      // allow old-style array of {key,file} or array of strings
-      const raw = (pack as any).frames;
-      frames = raw
-        .map((it: any) => {
-          if (typeof it === "string") {
-            const fileUrl = this.getPackAssetUrl(pack.id, it);
-            if (!fileUrl) return undefined;
-            const key = basename(it).replace(/\.[^.]+$/, "");
-            return { key, file: fileUrl };
-          } else if (it && typeof it.file === "string") {
-            const fileUrl = it.file.startsWith("/src/") || it.file.startsWith("http") ? it.file : this.getPackAssetUrl(pack.id, it.file);
-            if (!fileUrl) return undefined;
-            const key = typeof it.key === "string" ? it.key : basename(it.file).replace(/\.[^.]+$/, "");
-            return { key, file: fileUrl };
+            const file = it.file.startsWith("/src/") || it.file.startsWith("http") ? it.file : this.getPackAssetUrl(pack.id, it.file);
+            if (!file) return undefined;
+            return { key: it.key ?? it.file.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, ""), file };
           }
           return undefined;
         })
@@ -129,50 +96,25 @@ export const packLoader = {
     }
 
     // Sounds: prefer manifest flags, support defaultType and fallbacks
-    const defaultSoundType =
-      pack.sounds?.defaultType || (pack as any).soundsAuto?.defaultType || "effect";
+    const defaultSoundType = p.sounds?.defaultType || p.soundsAuto?.defaultType || "effect";
     let sounds: { key: string; file: string; type: string }[] = [];
-    const soundsAutoFlag = !!(pack.sounds?.autoLoad || (pack as any).soundsAuto?.autoLoad);
-    if (soundsAutoFlag) {
+    if (p.sounds?.autoLoad || p.soundsAuto?.autoLoad) {
       sounds = this.getPackSounds(pack.id, defaultSoundType);
-    } else if (Array.isArray((pack as any).sounds)) {
-      const raw = (pack as any).sounds;
-      sounds = raw
-        .map((it: any) => {
-          if (typeof it === "string") {
-            const fileUrl = this.getPackAssetUrl(pack.id, it);
-            if (!fileUrl) return undefined;
-            const key = basename(it).replace(/\.[^.]+$/, "");
-            return { key, file: fileUrl, type: defaultSoundType };
-          } else if (it && typeof it.file === "string") {
-            const fileUrl = it.file.startsWith("/src/") || it.file.startsWith("http") ? it.file : this.getPackAssetUrl(pack.id, it.file);
-            if (!fileUrl) return undefined;
-            const key = typeof it.key === "string" ? it.key : basename(it.file).replace(/\.[^.]+$/, "");
-            const type = typeof it.type === "string" ? it.type : defaultSoundType;
-            return { key, file: fileUrl, type };
-          }
-          return undefined;
-        })
-        .filter(Boolean) as { key: string; file: string; type: string }[];
-    } else if (Array.isArray((pack as any).sounds?.items)) {
-      const raw = (pack as any).sounds.items;
-      sounds = raw
-        .map((it: any) => {
-          if (typeof it === "string") {
-            const fileUrl = this.getPackAssetUrl(pack.id, it);
-            if (!fileUrl) return undefined;
-            const key = basename(it).replace(/\.[^.]+$/, "");
-            return { key, file: fileUrl, type: defaultSoundType };
-          } else if (it && typeof it.file === "string") {
-            const fileUrl = it.file.startsWith("/src/") || it.file.startsWith("http") ? it.file : this.getPackAssetUrl(pack.id, it.file);
-            if (!fileUrl) return undefined;
-            const key = typeof it.key === "string" ? it.key : basename(it.file).replace(/\.[^.]+$/, "");
-            const type = typeof it.type === "string" ? it.type : defaultSoundType;
-            return { key, file: fileUrl, type };
-          }
-          return undefined;
-        })
-        .filter(Boolean) as { key: string; file: string; type: string }[];
+    } else if (Array.isArray(p.sounds)) {
+      sounds = p.sounds.map((it: any) => {
+        if (typeof it === "string") {
+          const file = this.getPackAssetUrl(pack.id, it);
+          if (!file) return undefined;
+          return { key: it.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, ""), file, type: defaultSoundType };
+        } else if (it && typeof it.file === "string") {
+          const file = it.file.startsWith("/src/") || it.file.startsWith("http") ? it.file : this.getPackAssetUrl(pack.id, it.file);
+          if (!file) return undefined;
+          return { key: it.key ?? it.file.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, ""), file, type: it.type ?? defaultSoundType };
+        }
+        return undefined;
+      }).filter(Boolean) as { key: string; file: string; type: string }[];
+    } else if (p.sounds && Array.isArray(p.sounds.items)) {
+      sounds = p.sounds.items;
     } else {
       sounds = this.getPackSounds(pack.id, defaultSoundType);
     }
