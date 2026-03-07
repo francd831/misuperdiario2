@@ -10,7 +10,7 @@ import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import type { ExtendedEntry } from "./types";
 
 /** Check browser support for Web Speech API */
-function getSpeechRecognition(): (new () => SpeechRecognition) | null {
+function getSpeechRecognition(): any {
   const w = window as any;
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
 }
