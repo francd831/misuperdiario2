@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Circle, Square } from "lucide-react";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { settingsRepository } from "@/core/storage/repositories/settingsRepository";
+import { useProfile } from "@/core/auth/ProfileContext";
 import { OverlayLayer } from "@/features/overlays/OverlayLayer";
 import { OverlayTray } from "@/features/overlays/OverlayTray";
 import { useOverlayProject } from "@/features/overlays/useOverlayProject";
@@ -16,6 +17,7 @@ const MAX_SECONDS_DEFAULT = 300;
 
 export function RecordVideo() {
   const navigate = useNavigate();
+  const { activeProfile } = useProfile();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -103,7 +105,7 @@ export function RecordVideo() {
     const id = crypto.randomUUID();
     const entry: ExtendedEntry = {
       id,
-      profileId: "default",
+      profileId: activeProfile?.id ?? "default",
       date: new Date().toISOString().slice(0, 10),
       type: "video",
       title: title || undefined,

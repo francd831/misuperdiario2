@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
+import { useProfile } from "@/core/auth/ProfileContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,12 @@ export function DiaryHome() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
+  const { activeProfile } = useProfile();
 
   useEffect(() => {
-    entryRepository.getAll().then((e) => setEntries(e as ExtendedEntry[]));
-  }, []);
+    if (!activeProfile) return;
+    entryRepository.getByProfile(activeProfile.id).then((e) => setEntries(e as ExtendedEntry[]));
+  }, [activeProfile]);
 
   const filtered = useMemo(() => {
     let list = entries;
@@ -119,7 +122,6 @@ export function DiaryHome() {
         </div>
       ))}
 
-      {/* Floating action button */}
       <Button
         className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg"
         onClick={() => navigate("/record")}
