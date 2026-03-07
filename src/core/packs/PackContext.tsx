@@ -10,8 +10,8 @@ interface PackContextValue {
   packs: PackManifest[];
   unlockedIds: Set<string>;
   stickers: string[];
-  frames: string[];
-  sounds: Record<string, string>;
+  frames: { key: string; file: string }[];
+  sounds: { key: string; file: string; type: string }[];
   activatePack: (id: string) => Promise<void>;
   unlockPack: (id: string) => Promise<void>;
   lockPack: (id: string) => Promise<void>;
@@ -25,8 +25,8 @@ export function PackProvider({ children }: { children: ReactNode }) {
   const [packs, setPacks] = useState<PackManifest[]>([]);
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
   const [stickers, setStickers] = useState<string[]>([]);
-  const [frames, setFrames] = useState<string[]>([]);
-  const [sounds, setSounds] = useState<Record<string, string>>({});
+  const [frames, setFrames] = useState<{ key: string; file: string }[]>([]);
+  const [sounds, setSounds] = useState<{ key: string; file: string; type: string }[]>([]);
 
   const loadAssets = useCallback((packId: string) => {
     setStickers(packLoader.getPackStickers(packId));
