@@ -35,7 +35,7 @@
     "autoLoad": true,
     "folder": "frames",
     "items": [
-      { "key": "marco-magico", "file": "frames/marco-magico.png" },
+      { "key": "castillo-magico", "file": "frames/castillo.png" },
       { "key": "marco-estrellas", "file": "frames/marco-estrellas.png" }
     ]
   },
