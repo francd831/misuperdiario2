@@ -3,26 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck } from "lucide-react";
-import { settingsRepository } from "@/core/storage/repositories/settingsRepository";
+import { profileService } from "@/core/auth/profileService";
+import { useProfile } from "@/core/auth/ProfileContext";
 
 export function AdminLock() {
   const navigate = useNavigate();
+  const { login } = useProfile();
   const [pin, setPin] = useState("");
-  const [confirmPin, setConfirmPin] = useState("");
-  const [hasPin, setHasPin] = useState<boolean | null>(null);
-  const [step, setStep] = useState<"check" | "enter" | "create" | "confirm">("check");
+  const [adminId, setAdminId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [shake, setShake] = useState(false);
 
   useEffect(() => {
-    settingsRepository.get().then((s) => {
-      const adminPin = (s as any).adminPin;
-      setHasPin(!!adminPin);
-      setStep(adminPin ? "enter" : "create");
+    profileService.getAdminProfile().then((a) => {
+      if (a) setAdminId(a.id);
+      else navigate("/settings");
     });
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (!lockedUntil) return;
@@ -33,9 +32,10 @@ export function AdminLock() {
   }, [lockedUntil]);
 
   const verify = useCallback(async (value: string) => {
-    if (value.length < 4 || lockedUntil) return;
-    const s = await settingsRepository.get();
-    if ((s as any).adminPin === value) {
+    if (value.length < 4 || lockedUntil || !adminId) return;
+    const ok = await profileService.verifyPin(adminId, value);
+    if (ok) {
+      login(adminId);
       navigate("/admin");
     } else {
       const n = attempts + 1;
@@ -50,24 +50,9 @@ export function AdminLock() {
       }
       setPin("");
     }
-  }, [attempts, lockedUntil, navigate]);
+  }, [attempts, lockedUntil, adminId, login, navigate]);
 
-  const create = async () => {
-    if (pin.length < 4) return;
-    if (step === "create") { setStep("confirm"); return; }
-    if (confirmPin !== pin) {
-      setError("No coinciden");
-      setConfirmPin("");
-      setShake(true);
-      setTimeout(() => setShake(false), 600);
-      return;
-    }
-    const s = await settingsRepository.get();
-    await settingsRepository.save({ ...s, adminPin: pin } as any);
-    navigate("/admin");
-  };
-
-  if (step === "check") return null;
+  if (!adminId) return null;
 
   const remaining = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
 
@@ -76,32 +61,12 @@ export function AdminLock() {
       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
         <ShieldCheck className="h-10 w-10 text-primary" />
       </div>
-      <h1 className="text-2xl font-bold">
-        {step === "enter" ? "PIN Admin" : step === "create" ? "Crear PIN Admin" : "Confirmar PIN"}
-      </h1>
+      <h1 className="text-2xl font-bold">PIN Admin</h1>
 
       <div className={shake ? "animate-shake" : ""}>
-        {step === "enter" && (
-          <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(v); setError(""); if (v.length === 4) verify(v); }} disabled={!!lockedUntil}>
-            <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
-          </InputOTP>
-        )}
-        {step === "create" && (
-          <>
-            <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(v); setError(""); }}>
-              <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
-            </InputOTP>
-            <Button className="mt-6 w-full" onClick={create} disabled={pin.length < 4}>Siguiente</Button>
-          </>
-        )}
-        {step === "confirm" && (
-          <>
-            <InputOTP maxLength={4} value={confirmPin} onChange={(v) => { setConfirmPin(v); setError(""); }}>
-              <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
-            </InputOTP>
-            <Button className="mt-6 w-full" onClick={create} disabled={confirmPin.length < 4}>Crear</Button>
-          </>
-        )}
+        <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(v); setError(""); if (v.length === 4) verify(v); }} disabled={!!lockedUntil}>
+          <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
+        </InputOTP>
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}

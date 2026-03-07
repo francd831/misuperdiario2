@@ -186,7 +186,8 @@ export function OverlayLayer({
 
     if (type === "frame") {
       const idx = parseInt(assetRef.key.replace("frames/", ""), 10);
-      const url = frames[idx];
+      const frame = frames[idx];
+      const url = typeof frame === "string" ? frame : frame?.file;
       if (url) return <img src={url} alt="" className="h-full w-full object-contain" draggable={false} />;
       return null;
     }

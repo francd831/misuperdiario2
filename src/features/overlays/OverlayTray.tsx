@@ -128,7 +128,9 @@ export function OverlayTray({ selectedId, onAdd, onDelete, collapsed: initialCol
               <div>
                 {frames.length > 0 ? (
                   <div className="grid grid-cols-4 gap-1.5">
-                    {frames.map((url, i) => (
+                    {frames.map((frame, i) => {
+                      const url = typeof frame === "string" ? frame : frame?.file;
+                      return (
                       <button
                         key={i}
                         onClick={() => handleAddFrame(i)}
@@ -136,7 +138,8 @@ export function OverlayTray({ selectedId, onAdd, onDelete, collapsed: initialCol
                       >
                         <img src={url} alt="" className="h-12 w-12 object-contain" />
                       </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground py-4 text-center">

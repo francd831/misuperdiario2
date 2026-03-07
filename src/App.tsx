@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/app/layout/AppLayout";
 import { AppRoutes } from "@/app/routes/AppRoutes";
 import { PackProvider } from "@/core/packs/PackContext";
+import { ProfileProvider } from "@/core/auth/ProfileContext";
 import "@/assets/styles/tokens.css";
 import "@/assets/styles/themes.css";
 
@@ -17,11 +18,13 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <PackProvider>
-          <AppLayout>
-            <AppRoutes />
-          </AppLayout>
-        </PackProvider>
+        <ProfileProvider>
+          <PackProvider>
+            <AppLayout>
+              <AppRoutes />
+            </AppLayout>
+          </PackProvider>
+        </ProfileProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

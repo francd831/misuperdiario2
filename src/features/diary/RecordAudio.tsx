@@ -7,12 +7,14 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Circle, Square, Mic } from "lucide-react";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { settingsRepository } from "@/core/storage/repositories/settingsRepository";
+import { useProfile } from "@/core/auth/ProfileContext";
 import type { ExtendedEntry } from "./types";
 
 const MAX_SECONDS_DEFAULT = 600;
 
 export function RecordAudio() {
   const navigate = useNavigate();
+  const { activeProfile } = useProfile();
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -69,7 +71,7 @@ export function RecordAudio() {
     const id = crypto.randomUUID();
     const entry: ExtendedEntry = {
       id,
-      profileId: "default",
+      profileId: activeProfile?.id ?? "default",
       date: new Date().toISOString().slice(0, 10),
       type: "audio",
       title: title || undefined,
