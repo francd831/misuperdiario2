@@ -50,10 +50,7 @@ export const AppRoutes = () => {
       <Route path="/store" element={<PackStore />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/admin-lock" element={<AdminLock />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/profiles" element={<AdminProfiles />} />
-      <Route path="/admin/content" element={<AdminContent />} />
-      <Route path="/admin/settings" element={<AdminSettings />} />
+      <Route path="/admin/*" element={<Navigate to="/" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
