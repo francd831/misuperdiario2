@@ -67,42 +67,55 @@ export function EntryDetail() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col pb-24">
-      <div className="flex items-center gap-3 px-4 pt-4">
+    <div className="fixed inset-0 flex flex-col bg-background">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
         <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="flex-1 truncate text-xl font-bold">
+        <h1 className="flex-1 truncate text-lg font-bold">
           {entry.title || entry.note || "Entrada"}
         </h1>
+        {unlocked && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive"
+            onClick={() => setShowDelete(true)}
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
+        )}
       </div>
 
       {!unlocked ? (
-        <Card className="mx-4 mt-4">
-          <CardContent className="flex flex-col items-center gap-4 py-12">
-            <Lock className="h-16 w-16 text-muted-foreground" />
-            <p className="text-lg font-semibold">Cápsula del tiempo bloqueada</p>
-            <p className="text-sm text-muted-foreground">
-              Se desbloqueará el{" "}
-              {entry.unlockAt
-                ? new Date(entry.unlockAt).toLocaleDateString("es")
-                : "—"}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex-1 flex items-center justify-center px-4">
+          <Card>
+            <CardContent className="flex flex-col items-center gap-4 py-12">
+              <Lock className="h-16 w-16 text-muted-foreground" />
+              <p className="text-lg font-semibold">Cápsula del tiempo bloqueada</p>
+              <p className="text-sm text-muted-foreground">
+                Se desbloqueará el{" "}
+                {entry.unlockAt
+                  ? new Date(entry.unlockAt).toLocaleDateString("es")
+                  : "—"}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       ) : (
         <>
-          {/* Media with overlays */}
-          <div className="px-4 pt-4">
+          {/* Media fits available space */}
+          <div className="flex-1 min-h-0 px-3 pb-1">
             {entry.type === "video" && mediaUrl ? (
               <OverlayLayer
                 overlays={overlays}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 onChange={setOverlays}
-                className="rounded-xl"
+                className="rounded-xl h-full"
               >
-                <video src={mediaUrl} controls className="w-full rounded-xl" />
+                <video src={mediaUrl} controls className="h-full w-full object-contain rounded-xl" />
               </OverlayLayer>
             ) : entry.type === "audio" && mediaUrl ? (
               <OverlayLayer
@@ -110,22 +123,44 @@ export function EntryDetail() {
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 onChange={setOverlays}
-                className="rounded-xl bg-card p-6"
+                className="rounded-xl bg-card p-6 h-full flex items-center"
               >
                 <audio src={mediaUrl} controls className="w-full" />
               </OverlayLayer>
             ) : entry.type === "text" ? (
-              <div className="rounded-xl bg-card p-6">
+              <div className="rounded-xl bg-card p-6 h-full overflow-y-auto">
                 <p className="whitespace-pre-wrap text-base leading-relaxed">
                   {entry.note || "Sin contenido"}
                 </p>
               </div>
             ) : (
-              <p className="text-muted-foreground">Sin contenido multimedia</p>
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-muted-foreground">Sin contenido multimedia</p>
+              </div>
             )}
           </div>
 
-          {/* Keyboard-style tray below media (not for text) */}
+          {/* Info bar */}
+          <div className="shrink-0 px-4 py-1">
+            <p className="text-xs text-muted-foreground">
+              {new Date(entry.createdAt).toLocaleDateString("es", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              {entry.duration
+                ? ` · ${Math.floor(entry.duration / 60)}:${String(
+                    Math.floor(entry.duration % 60),
+                  ).padStart(2, "0")}`
+                : ""}
+            </p>
+            {entry.note && entry.type !== "text" && (
+              <p className="text-sm mt-0.5">{entry.note}</p>
+            )}
+          </div>
+
+          {/* Editor tray (not for text) */}
           {entry.type !== "text" && (
             <OverlayTray
               selectedId={selectedId}
@@ -134,35 +169,6 @@ export function EntryDetail() {
             />
           )}
         </>
-      )}
-
-      <div className="flex flex-col gap-2 px-4 pt-4">
-        <p className="text-sm text-muted-foreground">
-          {new Date(entry.createdAt).toLocaleDateString("es", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-          {entry.duration
-            ? ` · ${Math.floor(entry.duration / 60)}:${String(
-                Math.floor(entry.duration % 60),
-              ).padStart(2, "0")}`
-            : ""}
-        </p>
-        {entry.note && <p className="text-sm">{entry.note}</p>}
-      </div>
-
-      {unlocked && (
-        <div className="flex gap-2 px-4 pt-2">
-          <Button
-            variant="destructive"
-            className="gap-2"
-            onClick={() => setShowDelete(true)}
-          >
-            <Trash2 className="h-4 w-4" /> Eliminar entrada
-          </Button>
-        </div>
       )}
 
       <ConfirmDialog

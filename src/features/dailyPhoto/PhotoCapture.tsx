@@ -100,46 +100,53 @@ export function PhotoCapture() {
   // After capture – preview with overlays
   if (photo) {
     return (
-      <div className="flex min-h-[100dvh] flex-col pb-24">
-        <h2 className="px-4 pt-4 text-xl font-bold">Tu foto de hoy</h2>
-        <div className="px-4 pt-4">
+      <div className="fixed inset-0 flex flex-col bg-background">
+        <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
+          <Button variant="ghost" size="icon" onClick={() => { setPhoto(null); startCamera(); }}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="text-lg font-bold">Tu foto de hoy</h2>
+        </div>
+
+        {/* Photo fits available space */}
+        <div className="flex-1 min-h-0 px-3 pb-1">
           <OverlayLayer
             overlays={overlays}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onChange={setOverlays}
-            className="rounded-xl"
+            className="rounded-xl h-full"
           >
-            <img src={preview} alt="Preview" className="w-full rounded-xl" />
+            <img src={preview} alt="Preview" className="h-full w-full object-contain rounded-xl" />
           </OverlayLayer>
         </div>
-        <OverlayTray
-          selectedId={selectedId}
-          onAdd={addOverlay}
-          onDelete={deleteSelected}
-        />
-        <div className="px-4 pt-4">
+
+        {/* Bottom controls */}
+        <div className="shrink-0 space-y-2 px-4 pb-3 pt-1">
           <Input
             placeholder="Caption (opcional)"
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
           />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="flex-1 gap-1"
+              onClick={() => { setPhoto(null); startCamera(); }}
+            >
+              <RotateCcw className="h-4 w-4" /> Repetir
+            </Button>
+            <Button className="flex-1" onClick={save}>
+              Guardar
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2 px-4 pt-2">
-          <Button
-            variant="outline"
-            className="flex-1 gap-1"
-            onClick={() => {
-              setPhoto(null);
-              startCamera();
-            }}
-          >
-            <RotateCcw className="h-4 w-4" /> Repetir
-          </Button>
-          <Button className="flex-1" onClick={save}>
-            Guardar
-          </Button>
-        </div>
+
+        <OverlayTray
+          selectedId={selectedId}
+          onAdd={addOverlay}
+          onDelete={deleteSelected}
+        />
       </div>
     );
   }
