@@ -221,21 +221,22 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Hidden admin access */}
-
-      {isAdmin ? (
-        <Button variant="outline" className="gap-2" onClick={() => navigate("/admin")}>
-          <Shield className="h-4 w-4" /> Panel de administración
-        </Button>
-      ) : (
-        <LongPress onLongPress={() => navigate("/admin-lock")} duration={2500}>
-          <div className="flex items-center justify-center py-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-              <Shield className="h-5 w-5 text-muted-foreground" />
-            </div>
-          </div>
-        </LongPress>
-      )}
+      {/* Admin access */}
+      <div className="mt-8 mb-4">
+        {isAdmin ? (
+          <Button variant="outline" className="w-full gap-2" onClick={() => navigate("/admin")}>
+            <Shield className="h-4 w-4" /> Panel de administración
+          </Button>
+        ) : (
+          <button
+            onClick={() => navigate("/admin-lock")}
+            className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+          >
+            <Shield className="h-4 w-4" />
+            <span>Acceso administrador</span>
+          </button>
+        )}
+      </div>
 
       {activeProfile && (
         <AvatarPicker
