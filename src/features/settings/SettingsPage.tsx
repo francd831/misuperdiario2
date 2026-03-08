@@ -59,6 +59,14 @@ export function SettingsPage() {
     if (!activeProfile) return;
     await profileRepository.save({ ...activeProfile, name: profileName });
     toast({ title: "Nombre guardado" });
+    refresh();
+  };
+
+  const handleAvatarSelect = async (avatar: string) => {
+    if (!activeProfile) return;
+    await profileRepository.save({ ...activeProfile, avatar: avatar || undefined });
+    toast({ title: "Avatar actualizado" });
+    refresh();
   };
 
   const handleLogout = () => {
