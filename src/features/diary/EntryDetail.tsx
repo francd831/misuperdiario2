@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Trash2, Lock } from "lucide-react";
+import { ArrowLeft, Trash2, Lock, Play, Pause, RotateCcw } from "lucide-react";
 import { ConfirmDialog } from "@/app/components/ConfirmDialog";
 import { usePack } from "@/core/packs/PackContext";
 import { OverlayLayer } from "@/features/overlays/OverlayLayer";
@@ -18,6 +18,8 @@ export function EntryDetail() {
   const navigate = useNavigate();
   const [entry, setEntry] = useState<ExtendedEntry | null>(null);
   const [showDelete, setShowDelete] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
   const { activePack } = usePack();
 
   useEffect(() => {
@@ -114,7 +116,15 @@ export function EntryDetail() {
                 onChange={setOverlays}
                 className="rounded-xl max-h-full max-w-full"
               >
-                <video src={mediaUrl} controls className="max-h-full max-w-full object-contain rounded-xl" />
+                <video
+                  ref={videoRef}
+                  src={mediaUrl}
+                  className="max-h-full max-w-full object-contain rounded-xl"
+                  onPlay={() => setPlaying(true)}
+                  onPause={() => setPlaying(false)}
+                  onEnded={() => setPlaying(false)}
+                  playsInline
+                />
               </OverlayLayer>
             ) : entry.type === "audio" && mediaUrl ? (
               <OverlayLayer
@@ -138,6 +148,37 @@ export function EntryDetail() {
               </div>
             )}
           </div>
+
+          {/* Video controls */}
+          {entry.type === "video" && mediaUrl && (
+            <div className="shrink-0 flex items-center justify-center gap-3 px-4 py-1.5">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 rounded-full"
+                onClick={() => {
+                  if (videoRef.current) {
+                    videoRef.current.currentTime = 0;
+                    videoRef.current.pause();
+                    setPlaying(false);
+                  }
+                }}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                className="h-11 w-11 rounded-full"
+                onClick={() => {
+                  if (videoRef.current) {
+                    playing ? videoRef.current.pause() : videoRef.current.play();
+                  }
+                }}
+              >
+                {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+              </Button>
+            </div>
+          )}
 
           {/* Info bar */}
           <div className="shrink-0 px-4 py-1">
