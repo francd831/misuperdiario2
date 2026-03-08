@@ -158,10 +158,10 @@ export function DiaryHome() {
             className="flex items-center justify-between py-1"
           >
             <h3 className="text-base font-bold text-foreground">
-              📓 Mis entradas ({entries.length})
+              📓 Ver todo ({entries.length})
             </h3>
             <span className="text-xs font-medium text-primary">
-              {showEntries ? "Ocultar" : "Ver todas"}
+              {showEntries ? "Ocultar" : "Mostrar"}
             </span>
           </button>
 
