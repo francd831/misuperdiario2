@@ -187,16 +187,16 @@ export function PhotoCapture() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </div>
+      </div>
 
-        {/* Capture button – integrated inside the camera view */}
-        <div className="absolute bottom-6 left-0 right-0 z-40 flex justify-center">
-          <button
-            onClick={capture}
-            className="flex h-18 w-18 items-center justify-center rounded-full border-4 border-white bg-white/20 shadow-lg backdrop-blur-sm active:scale-90 transition-transform"
-          >
-            <Camera className="h-8 w-8 text-white" />
-          </button>
-        </div>
+      {/* Capture button – outside the overlay area */}
+      <div className="shrink-0 flex justify-center py-4 bg-black">
+        <button
+          onClick={capture}
+          className="flex h-18 w-18 items-center justify-center rounded-full border-4 border-white bg-white/20 shadow-lg backdrop-blur-sm active:scale-90 transition-transform"
+        >
+          <Camera className="h-8 w-8 text-white" />
+        </button>
       </div>
 
       {/* Overlay tray sits below the camera */}

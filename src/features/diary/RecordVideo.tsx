@@ -273,30 +273,30 @@ export function RecordVideo() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </div>
+      </div>
 
-        {/* Timer + record/stop button – integrated inside the camera */}
-        <div className="absolute bottom-6 left-0 right-0 z-40 flex flex-col items-center gap-3">
-          {recording && (
-            <p className="rounded-full bg-black/50 px-4 py-1 text-lg font-mono text-white">
-              {fmt(elapsed)} / {fmt(maxSeconds)}
-            </p>
-          )}
-          {!recording ? (
-            <button
-              onClick={startRecording}
-              className="flex h-18 w-18 items-center justify-center rounded-full bg-destructive shadow-lg active:scale-90 transition-transform"
-            >
-              <Circle className="h-8 w-8 text-white" fill="white" />
-            </button>
-          ) : (
-            <button
-              onClick={stopRecording}
-              className="flex h-18 w-18 items-center justify-center rounded-full bg-destructive shadow-lg animate-pulse active:scale-90 transition-transform"
-            >
-              <Square className="h-6 w-6 text-white" fill="white" />
-            </button>
-          )}
-        </div>
+      {/* Timer + record/stop button – outside the overlay area */}
+      <div className="shrink-0 flex flex-col items-center gap-3 py-4 bg-black">
+        {recording && (
+          <p className="rounded-full bg-black/50 px-4 py-1 text-lg font-mono text-white">
+            {fmt(elapsed)} / {fmt(maxSeconds)}
+          </p>
+        )}
+        {!recording ? (
+          <button
+            onClick={startRecording}
+            className="flex h-18 w-18 items-center justify-center rounded-full bg-destructive shadow-lg active:scale-90 transition-transform"
+          >
+            <Circle className="h-8 w-8 text-white" fill="white" />
+          </button>
+        ) : (
+          <button
+            onClick={stopRecording}
+            className="flex h-18 w-18 items-center justify-center rounded-full bg-destructive shadow-lg animate-pulse active:scale-90 transition-transform"
+          >
+            <Square className="h-6 w-6 text-white" fill="white" />
+          </button>
+        )}
       </div>
 
       {/* Overlay tray sits below the camera */}
