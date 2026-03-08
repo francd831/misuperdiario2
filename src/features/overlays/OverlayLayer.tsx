@@ -232,16 +232,26 @@ export function OverlayLayer({
       )}
       {children}
 
-      {/* Frame overlay */}
+      {/* Frame overlay – positioned like stickers so they can be moved/scaled/rotated */}
       {overlays
         .filter((o) => o.type === "frame")
         .map((item) => (
           <div
             key={item.id}
-            className={`absolute inset-0 pointer-events-none z-[5] ${
-              interactive && selectedId === item.id ? "ring-2 ring-primary/50 rounded" : ""
+            className={`absolute cursor-grab active:cursor-grabbing transition-shadow ${
+              interactive && selectedId === item.id
+                ? "drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+                : ""
             }`}
-            style={{ pointerEvents: interactive ? "auto" : "none" }}
+            style={{
+              left: `${item.transform.x}%`,
+              top: `${item.transform.y}%`,
+              width: "100%",
+              height: "100%",
+              transform: `translate(-50%, -50%) scale(${item.transform.scale}) rotate(${item.transform.rotation}deg)`,
+              zIndex: 5 + (selectedId === item.id ? 100 : 0),
+              pointerEvents: interactive ? "auto" : "none",
+            }}
             onPointerDown={(e) => handleItemPointerDown(e, item)}
             onClick={(e) => e.stopPropagation()}
           >

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { usePack } from "@/core/packs/PackContext";
-import { createOverlay, updateTransform, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X, ZoomIn, RotateCw, Minus, Plus } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
+import { Sticker, Frame, Type, Trash2, X } from "lucide-react";
 
 type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
@@ -21,7 +20,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
   const { stickers, frames, activePack } = usePack();
   const packId = activePack?.id ?? "base";
 
-  const selectedItem = selectedId ? overlays.find((o) => o.id === selectedId) : null;
+  
 
   const tools = [
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
@@ -43,49 +42,8 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
     onAdd(createOverlay("text", { packId, key: "text" }, { text: "Texto", fontSize: 28 }));
   };
 
-  const patchSelected = (patch: Partial<OverlayItem["transform"]>) => {
-    if (!selectedId) return;
-    onChange(overlays.map((o) => (o.id === selectedId ? updateTransform(o, patch) : o)));
-  };
-
   return (
     <div className="relative z-30 flex flex-col">
-      {/* Transform controls – shown when an item is selected */}
-      {selectedItem && selectedItem.type !== "background" && !activeTab && (
-        <div className="bg-card/95 backdrop-blur-xl border-t border-border px-4 py-3 animate-in fade-in duration-150 space-y-3">
-          {/* Scale */}
-          <div className="flex items-center gap-3">
-            <ZoomIn className="h-4 w-4 text-muted-foreground shrink-0" />
-            <Slider
-              min={20}
-              max={500}
-              step={5}
-              value={[Math.round(selectedItem.transform.scale * 100)]}
-              onValueChange={([v]) => patchSelected({ scale: v / 100 })}
-              className="flex-1"
-            />
-            <span className="text-xs text-muted-foreground w-10 text-right tabular-nums">
-              {Math.round(selectedItem.transform.scale * 100)}%
-            </span>
-          </div>
-          {/* Rotation */}
-          <div className="flex items-center gap-3">
-            <RotateCw className="h-4 w-4 text-muted-foreground shrink-0" />
-            <Slider
-              min={-180}
-              max={180}
-              step={1}
-              value={[Math.round(selectedItem.transform.rotation)]}
-              onValueChange={([v]) => patchSelected({ rotation: v })}
-              className="flex-1"
-            />
-            <span className="text-xs text-muted-foreground w-10 text-right tabular-nums">
-              {Math.round(selectedItem.transform.rotation)}°
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* Expanded panel - slides up from toolbar */}
       {activeTab && (
         <div className="bg-card/95 backdrop-blur-xl border-t border-border animate-in slide-in-from-bottom-4 duration-200">
