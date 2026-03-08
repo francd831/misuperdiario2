@@ -131,21 +131,7 @@
     40%, 80% { transform: translateX(8px); }
   }
 
-  .app-bg-fun {
-    position: relative;
-  }
-  .app-bg-fun::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(ellipse 80% 60% at 5% 95%, hsl(var(--pack-bgBlob1) / 0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 70% 55% at 95% 10%, hsl(var(--pack-bgBlob2) / 0.30) 0%, transparent 55%),
-      radial-gradient(ellipse 65% 55% at 50% 50%, hsl(var(--pack-bgBlob3) / 0.20) 0%, transparent 50%),
-      radial-gradient(ellipse 90% 45% at 85% 85%, hsl(var(--pack-bgBlob4) / 0.25) 0%, transparent 50%),
-      radial-gradient(ellipse 55% 65% at 15% 25%, hsl(var(--pack-bgBlob5) / 0.22) 0%, transparent 50%),
-      hsl(var(--background));
+  .animate-float {
+    animation: float var(--float-duration, 15s) ease-in-out infinite;
   }
 }
