@@ -222,7 +222,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                         <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           ✨ Animados
                         </p>
-                        <div className="grid grid-cols-10 gap-0">
+                        <div className="grid grid-cols-12 gap-0">
                           {packAnimated.map((def) => {
                             const key = animatedKey(def);
                             return (
@@ -232,7 +232,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                                 className="flex aspect-square items-center justify-center rounded bg-secondary/60 hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                               >
                                 <span
-                                  className="text-lg leading-none"
+                                  className="text-[1.1rem] leading-none"
                                   style={{ animation: `stk-${def.animation} 1.5s ease-in-out infinite` }}
                                 >
                                   {def.emoji}
