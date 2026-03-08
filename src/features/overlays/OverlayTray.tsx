@@ -192,7 +192,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               </button>
             </div>
 
-            <div className="max-h-[22vh] overflow-y-auto px-2 py-2">
+            <div className="max-h-[20vh] overflow-y-auto px-1 py-1.5">
               {activeTab === "stickers" && (
                 <div className="space-y-2">
                   {stickers.length > 0 && (
