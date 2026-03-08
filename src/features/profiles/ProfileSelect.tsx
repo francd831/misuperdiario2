@@ -106,13 +106,13 @@ export function ProfileSelect() {
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-6">
         <div className="absolute inset-0 -z-10"><ShaderAnimation /></div>
-        <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={resetCreate}>
+        <Button variant="ghost" size="icon" className="absolute left-4 top-4 text-white" onClick={resetCreate}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-          <UserPlus className="h-10 w-10 text-primary" />
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+          <UserPlus className="h-10 w-10 text-white" />
         </div>
-        <h1 className="text-2xl font-bold">Nuevo perfil</h1>
+        <h1 className="text-2xl font-bold text-white drop-shadow-lg">Nuevo perfil</h1>
 
         {createStep === "name" && (
           <>
