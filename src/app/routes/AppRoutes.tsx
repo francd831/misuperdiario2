@@ -31,6 +31,7 @@ export const AppRoutes = () => {
         <Route path="/admin/profiles" element={<AdminProfiles />} />
         <Route path="/admin/content" element={<AdminContent />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/storage" element={<AdminStorage />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     );

@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { Users, FileText, Settings, LogOut } from "lucide-react";
+import { Users, FileText, Settings, LogOut, HardDrive } from "lucide-react";
 import { useProfile } from "@/core/auth/ProfileContext";
 
 const navItems = [
   { to: "/admin", icon: Users, label: "Panel" },
-  { to: "/admin/profiles", icon: Users, label: "Perfiles" },
   { to: "/admin/content", icon: FileText, label: "Contenido" },
+  { to: "/admin/storage", icon: HardDrive, label: "Espacio" },
   { to: "/admin/settings", icon: Settings, label: "Ajustes" },
 ];
 
