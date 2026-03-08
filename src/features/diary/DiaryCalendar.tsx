@@ -81,7 +81,7 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
     return dailyPhotos.filter((p) => p.date === key);
   }, [selectedDay, dailyPhotos]);
 
-  const selectedDayKey = selectedDay?.toISOString().slice(0, 10);
+  const selectedDayKey = selectedDay ? toLocalDateKey(selectedDay) : undefined;
 
   // Custom day content with colored dots
   function DayWithDots(props: DayContentProps) {
