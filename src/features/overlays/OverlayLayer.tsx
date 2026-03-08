@@ -192,11 +192,6 @@ export function OverlayLayer({
     }
 
     if (type === "frame") {
-      // Animated frame
-      const animFrame = parseAnimatedFrameKey(assetRef.key);
-      if (animFrame) {
-        return <AnimatedFrame def={animFrame} />;
-      }
       const idx = parseInt(assetRef.key.replace("frames/", ""), 10);
       const frame = frames[idx];
       const url = typeof frame === "string" ? frame : frame?.file;
