@@ -17,11 +17,19 @@ const TYPE_COLORS: Record<string, string> = {
   capsule: "bg-[hsl(45,93%,58%)]",
 };
 
-interface Props {
-  entries: ExtendedEntry[];
+export interface DailyPhotoItem {
+  id: string;
+  date: string;
+  caption?: string;
+  createdAt: string;
 }
 
-export function DiaryCalendar({ entries }: Props) {
+interface Props {
+  entries: ExtendedEntry[];
+  dailyPhotos?: DailyPhotoItem[];
+}
+
+export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
   const navigate = useNavigate();
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
 
@@ -33,20 +41,24 @@ export function DiaryCalendar({ entries }: Props) {
       if (!map.has(day)) map.set(day, new Set());
       const types = map.get(day)!;
       if (e.type) types.add(e.type);
-      if (e.photoUrl) types.add("photo");
       if (e.isLocked && e.unlockAt && new Date(e.unlockAt) > new Date()) {
         types.add("capsule");
       }
     }
+    for (const p of dailyPhotos) {
+      const day = p.date;
+      if (!map.has(day)) map.set(day, new Set());
+      map.get(day)!.add("photo");
+    }
     return map;
-  }, [entries]);
+  }, [entries, dailyPhotos]);
 
   // Days that have content
   const daysWithContent = useMemo(() => {
     return Array.from(dayTypesMap.keys()).map((d) => new Date(d + "T00:00:00"));
   }, [dayTypesMap]);
 
-  // Entries for selected day
+  // Entries + photos for selected day
   const selectedDayEntries = useMemo(() => {
     if (!selectedDay) return [];
     const key = selectedDay.toISOString().slice(0, 10);
@@ -54,6 +66,12 @@ export function DiaryCalendar({ entries }: Props) {
       .filter((e) => (e.date || e.createdAt.slice(0, 10)) === key)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [selectedDay, entries]);
+
+  const selectedDayPhotos = useMemo(() => {
+    if (!selectedDay) return [];
+    const key = selectedDay.toISOString().slice(0, 10);
+    return dailyPhotos.filter((p) => p.date === key);
+  }, [selectedDay, dailyPhotos]);
 
   const selectedDayKey = selectedDay?.toISOString().slice(0, 10);
 
