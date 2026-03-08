@@ -71,7 +71,7 @@ export function LockScreen({ hasPin, onUnlock, onCreatePin }: Props) {
   const remainingSeconds = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <div className="flex flex-col items-center gap-3">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
           {step === "enter" ? (

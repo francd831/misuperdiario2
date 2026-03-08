@@ -41,7 +41,7 @@ export function AdminSetup() {
   }, [name, pin, confirmPin, createProfile, login]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
         <ShieldCheck className="h-10 w-10 text-primary" />
       </div>
