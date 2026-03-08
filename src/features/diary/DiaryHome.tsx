@@ -11,6 +11,10 @@ import { Video, Mic, Lock, Search, PenLine, LogOut, Camera, Sparkles } from "luc
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
 import { DiaryCalendar, type DailyPhotoItem } from "./DiaryCalendar";
+import { useAchievements } from "@/features/achievements/useAchievements";
+import { StreakIndicator } from "@/features/achievements/StreakIndicator";
+import { AchievementBadges } from "@/features/achievements/AchievementBadges";
+import { AchievementCelebration } from "@/features/achievements/AchievementCelebration";
 
 const ACTION_CARDS = [
   {
