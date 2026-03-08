@@ -39,7 +39,7 @@ const ACTION_CARDS = [
   },
   {
     id: "photo",
-    label: "Foto diaria",
+    label: "Mi foto diaria",
     emoji: "📸",
     description: "Tu foto de hoy",
     route: "/daily-photo/capture",
@@ -137,7 +137,7 @@ export function DiaryHome() {
             <div className="relative z-10 flex flex-col gap-2">
               <span className="text-3xl">{action.emoji}</span>
               <div>
-                <p className="text-sm font-bold text-white">{action.label}</p>
+                <p className="text-base font-bold text-white leading-tight">{action.label}</p>
                 <p className="text-[11px] text-white/70 leading-tight">{action.description}</p>
               </div>
             </div>
