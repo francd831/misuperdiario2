@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, Camera } from "lucide-react";
+import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, Camera, RefreshCw } from "lucide-react";
 import { LongPress } from "@/app/components/LongPress";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
 import { profileService } from "@/core/auth/profileService";
