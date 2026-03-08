@@ -231,7 +231,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                                 className="flex flex-col aspect-square items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                               >
                                 <span
-                                  className="text-2xl"
+                                  className="text-xl leading-none"
                                   style={{ animation: `stk-${def.animation} 1.5s ease-in-out infinite` }}
                                 >
                                   {def.emoji}
