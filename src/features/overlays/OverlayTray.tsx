@@ -206,14 +206,14 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               {activeTab === "frames" && (
                 <div>
                   {frames.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-1.5">
                       {frames.map((frame, i) => {
                         const url = typeof frame === "string" ? frame : frame?.file;
                         return (
                           <button
                             key={i}
                             onPointerDown={(e) => startDrag(e, "frame", `frames/${i}`, url)}
-                            className="flex aspect-[4/3] items-center justify-center rounded-xl bg-secondary/60 hover:bg-secondary active:scale-95 overflow-hidden transition-all duration-150 p-2 touch-none select-none"
+                            className="flex aspect-[4/3] items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-95 overflow-hidden transition-all duration-150 p-1.5 touch-none select-none"
                           >
                             <img src={url} alt="" className="h-full w-full object-contain pointer-events-none" draggable={false} />
                           </button>
