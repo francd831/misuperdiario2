@@ -3,6 +3,7 @@ import type { OverlayItem, OverlayProject } from "@/core/media/overlays/overlayE
 import { updateTransform } from "@/core/media/overlays/overlayEngine";
 import { usePack } from "@/core/packs/PackContext";
 import { packLoader } from "@/core/packs/packLoader";
+import { parseAnimatedKey, AnimatedSticker } from "@/features/stickers/AnimatedSticker";
 
 interface Props {
   overlays: OverlayProject;
