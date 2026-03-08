@@ -88,15 +88,15 @@ export const profileService = {
   /* ─── Session ─── */
 
   login(profileId: string): void {
-    localStorage.setItem(ACTIVE_KEY, profileId);
+    sessionStorage.setItem(ACTIVE_KEY, profileId);
   },
 
   logout(): void {
-    localStorage.removeItem(ACTIVE_KEY);
+    sessionStorage.removeItem(ACTIVE_KEY);
   },
 
   getActiveProfileId(): string | null {
-    return localStorage.getItem(ACTIVE_KEY);
+    return sessionStorage.getItem(ACTIVE_KEY);
   },
 
   async getActiveProfile(): Promise<Profile | null> {
