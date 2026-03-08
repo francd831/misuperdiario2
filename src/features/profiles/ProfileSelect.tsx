@@ -128,7 +128,7 @@ export function ProfileSelect() {
         {createStep === "pin" && (
           <>
             <p className="text-sm text-white/70">Crea un PIN de 4 dígitos</p>
-            <InputOTP maxLength={4} value={newPin} onChange={(v) => { setNewPin(v); setCreateError(""); if (v.length === 4) { setCreateStep("confirm"); } }}>
+            <InputOTP maxLength={4} value={newPin} onChange={(v) => { const normalized = normalizePin(v); setNewPin(normalized); setCreateError(""); if (normalized.length === 4) { setCreateStep("confirm"); } }}>
               <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
             </InputOTP>
           </>

@@ -69,7 +69,7 @@ export function AdminSetup() {
         <>
           <h1 className="text-2xl font-bold">Crea un PIN</h1>
           <p className="text-sm text-muted-foreground">4 dígitos para el administrador</p>
-          <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(v); setError(""); }}>
+          <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(normalizePin(v)); setError(""); }}>
             <InputOTPGroup>
               {[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}
             </InputOTPGroup>
