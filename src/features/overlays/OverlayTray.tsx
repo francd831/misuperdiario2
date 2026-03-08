@@ -205,9 +205,9 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                           <button
                             key={i}
                             onPointerDown={(e) => startDrag(e, "sticker", `stickers/${i}`, url)}
-                            className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 hover:bg-secondary active:scale-90 overflow-hidden transition-all duration-150 p-0 touch-none select-none"
+                            className="flex aspect-square items-center justify-center rounded bg-secondary/60 hover:bg-secondary active:scale-90 overflow-hidden transition-all duration-150 p-0 touch-none select-none"
                           >
-                            <img src={url} alt="" className="h-full w-full object-contain pointer-events-none" draggable={false} />
+                            <img src={url} alt="" className="h-[85%] w-[85%] object-contain pointer-events-none" draggable={false} />
                           </button>
                         ))}
                       </div>
