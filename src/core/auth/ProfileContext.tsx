@@ -5,6 +5,7 @@ import type { Profile } from "../storage/repositories/profileRepository";
 type ProfileState =
   | { status: "loading" }
   | { status: "no-profiles" }
+  | { status: "needs-admin" }
   | { status: "select" }
   | { status: "active"; profile: Profile };
 
@@ -27,6 +28,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const hasProfiles = await profileService.hasProfiles();
     if (!hasProfiles) {
       setState({ status: "no-profiles" });
+      setActiveProfile(null);
+      return;
+    }
+
+    // Ensure admin exists even if user profiles are present
+    const admin = await profileService.getAdminProfile();
+    if (!admin) {
+      setState({ status: "needs-admin" });
       setActiveProfile(null);
       return;
     }

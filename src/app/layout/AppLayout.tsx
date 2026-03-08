@@ -31,7 +31,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     );
   }
 
-  if (state.status === "no-profiles") {
+  if (state.status === "no-profiles" || state.status === "needs-admin") {
     return (
       <div className="relative min-h-screen text-foreground">
         <PackBackground />

@@ -221,24 +221,7 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* TEMPORAL: Reset admin PIN */}
-      <Button
-        variant="destructive"
-        size="sm"
-        className="gap-2"
-        onClick={async () => {
-          const profiles = await profileRepository.getAll();
-          const admin = profiles.find((p) => p.role === "admin");
-          if (admin) {
-            await profileRepository.save({ ...admin, pin: undefined });
-            toast({ title: "PIN de admin eliminado. Podrás crear uno nuevo al acceder." });
-          } else {
-            toast({ title: "No se encontró perfil de admin", variant: "destructive" });
-          }
-        }}
-      >
-        <KeyRound className="h-4 w-4" /> Resetear PIN de administrador
-      </Button>
+      {/* Hidden admin access */}
 
       {isAdmin ? (
         <Button variant="outline" className="gap-2" onClick={() => navigate("/admin")}>
