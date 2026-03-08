@@ -6,7 +6,7 @@ import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles, Image } from "luc
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
 import { PACK_EFFECTS, effectKey, type EffectDef } from "@/features/effects";
 
-type Tab = "emoji" | "stickers" | "frames" | "text" | "effects" | "backgrounds" | null;
+type Tab = "emoji" | "stickers" | "frames" | "text" | "effects" | null;
 
 const DEFAULT_EMOJIS = [
   "⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰",
