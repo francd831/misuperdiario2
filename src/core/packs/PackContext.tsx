@@ -93,7 +93,6 @@ const FALLBACK: PackContextValue = {
   stickers: [],
   frames: [],
   backgrounds: [],
-  sounds: [],
   activatePack: async () => {},
   unlockPack: async () => {},
   lockPack: async () => {},

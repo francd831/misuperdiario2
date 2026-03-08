@@ -102,35 +102,10 @@ export const packLoader = {
       frames = this.getPackFrames(pack.id);
     }
 
-    // Sounds: prefer manifest flags, support defaultType and fallbacks
-    const defaultSoundType = p.sounds?.defaultType || p.soundsAuto?.defaultType || "effect";
-    let sounds: { key: string; file: string; type: string }[] = [];
-    if (p.sounds?.autoLoad || p.soundsAuto?.autoLoad) {
-      sounds = this.getPackSounds(pack.id, defaultSoundType);
-    } else if (Array.isArray(p.sounds)) {
-      sounds = p.sounds.map((it: any) => {
-        if (typeof it === "string") {
-          const file = this.getPackAssetUrl(pack.id, it);
-          if (!file) return undefined;
-          return { key: it.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, ""), file, type: defaultSoundType };
-        } else if (it && typeof it.file === "string") {
-          const file = it.file.startsWith("/src/") || it.file.startsWith("http") ? it.file : this.getPackAssetUrl(pack.id, it.file);
-          if (!file) return undefined;
-          return { key: it.key ?? it.file.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, ""), file, type: it.type ?? defaultSoundType };
-        }
-        return undefined;
-      }).filter(Boolean) as { key: string; file: string; type: string }[];
-    } else if (p.sounds && Array.isArray(p.sounds.items)) {
-      sounds = p.sounds.items;
-    } else {
-      sounds = this.getPackSounds(pack.id, defaultSoundType);
-    }
-
     return {
       pack,
       stickers,
       frames,
-      sounds,
     };
   },
 };

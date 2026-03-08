@@ -19,7 +19,6 @@ const DETAIL_ROUTE_RE = /^\/(daily-photo|entry)\/[^/]+$/;
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { state, activeProfile } = useProfile();
   const location = useLocation();
-  useAmbientSound();
 
   if (state.status === "loading") {
     return (

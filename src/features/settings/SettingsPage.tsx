@@ -127,52 +127,6 @@ export function SettingsPage() {
       </Card>
 
       <Card>
-        <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><Volume2 className="h-4 w-4" />Audio</CardTitle></CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <Switch
-              checked={ambientSound}
-              onCheckedChange={(checked) => {
-                setAmbientSound(checked);
-                localStorage.setItem(AMBIENT_KEY, checked ? "1" : "0");
-                if (checked && activePackObj) {
-                  ambientEngine.start(activePackObj.id);
-                  ambientEngine.setVolume(ambientVolume / 100);
-                } else {
-                  ambientEngine.stop();
-                }
-              }}
-              id="ambient"
-            />
-            <Label htmlFor="ambient">Sonido ambiente</Label>
-          </div>
-          {ambientSound && (
-            <div className="flex items-center gap-3">
-              <Volume2 className="h-4 w-4 text-muted-foreground shrink-0" />
-              <Slider
-                min={10}
-                max={100}
-                step={5}
-                value={[ambientVolume]}
-                onValueChange={([v]) => {
-                  setAmbientVolume(v);
-                  localStorage.setItem(AMBIENT_VOL_KEY, String(v));
-                  ambientEngine.setVolume(v / 100);
-                }}
-                className="flex-1"
-              />
-              <span className="text-xs text-muted-foreground w-8 text-right tabular-nums">{ambientVolume}%</span>
-            </div>
-          )}
-          {ambientSound && activePackObj && (
-            <p className="text-xs text-muted-foreground">
-              🎵 Sonido: <span className="font-medium text-foreground">{activePackObj.name}</span>
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
         <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><HardDrive className="h-4 w-4" />Almacenamiento</CardTitle></CardHeader>
         <CardContent className="flex flex-col gap-3">
           <p className="text-sm text-muted-foreground">{storageInfo}</p>
