@@ -2,7 +2,7 @@
  * Overlay Engine – unified model & helpers for stickers, frames, backgrounds, text.
  */
 
-export type OverlayType = "sticker" | "frame" | "background" | "text";
+export type OverlayType = "sticker" | "frame" | "background" | "text" | "effect";
 
 export interface OverlayAssetRef {
   packId: string;
