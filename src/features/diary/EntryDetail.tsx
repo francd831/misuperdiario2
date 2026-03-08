@@ -149,6 +149,37 @@ export function EntryDetail() {
             )}
           </div>
 
+          {/* Video controls */}
+          {entry.type === "video" && mediaUrl && (
+            <div className="shrink-0 flex items-center justify-center gap-3 px-4 py-1.5">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 rounded-full"
+                onClick={() => {
+                  if (videoRef.current) {
+                    videoRef.current.currentTime = 0;
+                    videoRef.current.pause();
+                    setPlaying(false);
+                  }
+                }}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                className="h-11 w-11 rounded-full"
+                onClick={() => {
+                  if (videoRef.current) {
+                    playing ? videoRef.current.pause() : videoRef.current.play();
+                  }
+                }}
+              >
+                {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+              </Button>
+            </div>
+          )}
+
           {/* Info bar */}
           <div className="shrink-0 px-4 py-1">
             <p className="text-xs text-muted-foreground">
