@@ -118,7 +118,7 @@ export function DiaryHome() {
       <div className="text-center py-2">
         <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 mb-3">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
-          <span className="text-xs font-semibold text-primary">Diario personal</span>
+          <span className="text-xs font-semibold text-primary">Mi diario</span>
         </div>
         <h2 className="text-xl font-bold text-foreground">
           ¿Qué quieres hacer hoy?
