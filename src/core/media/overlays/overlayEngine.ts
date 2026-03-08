@@ -61,6 +61,7 @@ export function createOverlay(
     text: partial?.text,
     textColor: partial?.textColor ?? "#ffffff",
     fontSize: partial?.fontSize ?? 24,
+    fontFamily: partial?.fontFamily ?? "sans-serif",
   };
 }
 

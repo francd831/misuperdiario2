@@ -196,7 +196,11 @@ export function OverlayLayer({
       return (
         <span
           className="select-none font-bold whitespace-nowrap drop-shadow-md"
-          style={{ color: item.textColor, fontSize: `${item.fontSize ?? 24}px` }}
+          style={{
+            color: item.textColor,
+            fontSize: `${item.fontSize ?? 24}px`,
+            fontFamily: item.fontFamily ?? "sans-serif",
+          }}
         >
           {item.text || "Texto"}
         </span>
