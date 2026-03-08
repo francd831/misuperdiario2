@@ -14,25 +14,29 @@ export function AdminSetup() {
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
 
+  const normalizePin = (value: string) => value.replace(/\D/g, "").slice(0, 4);
+
   const handleNext = () => {
     if (step === "name") {
       if (!name.trim()) return;
       setStep("pin");
     } else if (step === "pin") {
-      if (pin.length < 4) return;
+      if (normalizePin(pin).length < 4) return;
       setStep("confirm");
     }
   };
 
   const handleCreate = useCallback(async () => {
-    if (confirmPin !== pin) {
+    const normalizedPin = normalizePin(pin);
+    const normalizedConfirm = normalizePin(confirmPin);
+    if (normalizedConfirm !== normalizedPin) {
       setError("Los PINs no coinciden");
       setConfirmPin("");
       setShake(true);
       setTimeout(() => setShake(false), 600);
       return;
     }
-    const profile = await createProfile(name.trim(), pin, "admin");
+    const profile = await createProfile(name.trim(), normalizedPin, "admin");
     login(profile.id);
   }, [name, pin, confirmPin, createProfile, login]);
 

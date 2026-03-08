@@ -82,20 +82,17 @@ export function ProfileSelect() {
     setCreateError("");
   };
 
+  const normalizePin = (value: string) => value.replace(/\D/g, "").slice(0, 4);
+
   const handleCreateNext = async () => {
     if (createStep === "name") {
       if (newName.trim().length < 2) { setCreateError("Mínimo 2 caracteres"); return; }
       setCreateError("");
       setCreateStep("pin");
     } else if (createStep === "pin") {
-      if (newPin.length < 4) return;
+      if (normalizePin(newPin).length < 4) return;
       setCreateError("");
       setCreateStep("confirm");
-    } else if (createStep === "confirm") {
-      if (confirmPin !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); return; }
-      await createProfile(newName.trim(), newPin, "user");
-      resetCreate();
-      loadProfiles();
     }
   };
 
