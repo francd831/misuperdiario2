@@ -216,6 +216,7 @@ export function OverlayLayer({
     <div
       ref={containerRef}
       className={`relative overflow-hidden touch-none ${className}`}
+      data-overlay-drop="true"
       onPointerDown={handleContainerPointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
