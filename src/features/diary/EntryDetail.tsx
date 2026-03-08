@@ -192,32 +192,105 @@ export function EntryDetail() {
 
           {/* Video controls */}
           {entry.type === "video" && mediaUrl && (
-            <div className="shrink-0 flex items-center justify-center gap-3 px-4 py-1.5">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full"
-                onClick={() => {
-                  if (videoRef.current) {
-                    videoRef.current.currentTime = 0;
-                    videoRef.current.pause();
+            <div className="shrink-0 flex flex-col gap-1.5 px-4 py-1.5">
+              {/* Main transport */}
+              <div className="flex items-center justify-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-full"
+                  onClick={() => {
+                    stopReverse();
+                    if (videoRef.current) {
+                      videoRef.current.currentTime = 0;
+                      videoRef.current.pause();
+                      setPlaying(false);
+                    }
+                  }}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  className="h-11 w-11 rounded-full"
+                  onClick={() => {
+                    if (!videoRef.current) return;
+                    if (playing) {
+                      videoRef.current.pause();
+                      stopReverse();
+                      setPlaying(false);
+                    } else {
+                      setPlaying(true);
+                      if (reversed) {
+                        startReverse();
+                      } else {
+                        videoRef.current.playbackRate = speed;
+                        videoRef.current.play();
+                      }
+                    }
+                  }}
+                >
+                  {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+                </Button>
+                {/* Reverse toggle */}
+                <Button
+                  variant={reversed ? "default" : "outline"}
+                  size="icon"
+                  className="h-9 w-9 rounded-full"
+                  onClick={() => {
+                    const wasPlaying = playing;
+                    stopReverse();
+                    if (videoRef.current) videoRef.current.pause();
                     setPlaying(false);
-                  }
-                }}
-              >
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                className="h-11 w-11 rounded-full"
-                onClick={() => {
-                  if (videoRef.current) {
-                    playing ? videoRef.current.pause() : videoRef.current.play();
-                  }
-                }}
-              >
-                {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
-              </Button>
+                    setReversed((r) => {
+                      const next = !r;
+                      if (wasPlaying && videoRef.current) {
+                        setTimeout(() => {
+                          if (next) {
+                            setPlaying(true);
+                            startReverse();
+                          } else {
+                            videoRef.current!.playbackRate = speed;
+                            videoRef.current!.play();
+                            setPlaying(true);
+                          }
+                        }, 50);
+                      }
+                      return next;
+                    });
+                  }}
+                >
+                  <ArrowLeftRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Speed selector */}
+              <div className="flex items-center justify-center gap-1">
+                <Gauge className="h-3.5 w-3.5 text-muted-foreground mr-1" />
+                {SPEED_OPTIONS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      setSpeed(s);
+                      if (videoRef.current && !reversed) {
+                        videoRef.current.playbackRate = s;
+                      }
+                    }}
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-semibold transition-all ${
+                      speed === s
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    {s}x
+                  </button>
+                ))}
+                {reversed && (
+                  <span className="ml-1.5 text-[10px] font-medium text-primary bg-primary/10 rounded-full px-2 py-0.5">
+                    ⏪ Reversa
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
