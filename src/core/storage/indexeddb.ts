@@ -94,7 +94,7 @@ let dbPromise: Promise<IDBPDatabase<VideoDiarioDB>> | null = null;
 
 function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<VideoDiarioDB>(DB_NAME, 2, {
+    dbPromise = openDB<VideoDiarioDB>(DB_NAME, 3, {
       upgrade(db) {
         if (!db.objectStoreNames.contains("profiles")) {
           db.createObjectStore("profiles", { keyPath: "id" });
