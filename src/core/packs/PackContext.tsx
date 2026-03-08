@@ -11,6 +11,7 @@ interface PackContextValue {
   unlockedIds: Set<string>;
   stickers: string[];
   frames: { key: string; file: string }[];
+  backgrounds: string[];
   sounds: { key: string; file: string; type: string }[];
   activatePack: (id: string) => Promise<void>;
   unlockPack: (id: string) => Promise<void>;
