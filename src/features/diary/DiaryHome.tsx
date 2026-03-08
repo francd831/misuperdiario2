@@ -134,12 +134,12 @@ export function DiaryHome() {
             className="group relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-200 active:scale-[0.97] hover:shadow-lg"
           >
             <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-90`} />
-            <div className="relative z-10 flex flex-col gap-2">
-              <span className="text-3xl">{action.emoji}</span>
-              <div>
-                <p className="text-base font-bold text-white leading-tight">{action.label}</p>
-                <p className="text-[11px] text-white/70 leading-tight">{action.description}</p>
+            <div className="relative z-10 flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{action.emoji}</span>
+                <p className="text-lg font-bold text-white leading-tight">{action.label}</p>
               </div>
+              <p className="text-[11px] text-white/70 leading-tight">{action.description}</p>
             </div>
             {/* Decorative circle */}
             <div className="absolute -bottom-4 -right-4 h-20 w-20 rounded-full bg-white/10 transition-transform duration-300 group-hover:scale-125" />
