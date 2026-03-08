@@ -245,7 +245,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                   })()}
 
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                    <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                       Emojis
                     </p>
                     <div className="grid grid-cols-10 gap-0">
