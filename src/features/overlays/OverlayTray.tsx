@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
@@ -7,6 +7,22 @@ import { Sticker, Frame, Type, Trash2, X } from "lucide-react";
 type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
 const DEFAULT_EMOJIS = ["⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰"];
+
+const TEXT_FONTS = [
+  { label: "Sans", value: "sans-serif" },
+  { label: "Serif", value: "Georgia, serif" },
+  { label: "Mono", value: "'Courier New', monospace" },
+  { label: "Comic", value: "'Comic Sans MS', cursive" },
+  { label: "Impact", value: "Impact, sans-serif" },
+  { label: "Cursiva", value: "'Brush Script MT', cursive" },
+];
+
+const TEXT_SIZES = [16, 20, 24, 32, 40, 56];
+
+const TEXT_COLORS = [
+  "#ffffff", "#000000", "#ef4444", "#f97316", "#eab308",
+  "#22c55e", "#3b82f6", "#8b5cf6", "#ec4899", "#06b6d4",
+];
 
 interface Props {
   selectedId: string | null;
@@ -47,6 +63,12 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
 
+  // Text editor state
+  const [textInput, setTextInput] = useState("Texto");
+  const [textFont, setTextFont] = useState(TEXT_FONTS[0].value);
+  const [textSize, setTextSize] = useState(28);
+  const [textColor, setTextColor] = useState("#ffffff");
+
   const tools = [
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
     { id: "frames" as const, icon: Frame, label: "Marcos" },
@@ -64,7 +86,13 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
   };
 
   const handleAddText = () => {
-    onAdd(createOverlay("text", { packId, key: "text" }, { text: "Texto", fontSize: 28 }));
+    if (!textInput.trim()) return;
+    onAdd(createOverlay("text", { packId, key: "text" }, {
+      text: textInput,
+      fontSize: textSize,
+      textColor,
+      fontFamily: textFont,
+    }));
   };
 
   // ─── Drag handling ─────────────────────────────
@@ -229,15 +257,85 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               )}
 
               {activeTab === "text" && (
-                <div className="flex flex-col items-center gap-3 py-4">
-                  <button
-                    onClick={handleAddText}
-                    className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all duration-150"
-                  >
-                    <Type className="h-4 w-4" />
-                    Añadir texto
-                  </button>
-                  <p className="text-xs text-muted-foreground text-center">
+                <div className="space-y-2 py-2">
+                  {/* Text input + add button */}
+                  <div className="flex gap-1.5 px-1">
+                    <input
+                      type="text"
+                      value={textInput}
+                      onChange={(e) => setTextInput(e.target.value)}
+                      placeholder="Escribe tu texto…"
+                      className="flex-1 rounded-lg bg-secondary/80 border border-border/50 px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                      style={{ fontFamily: textFont }}
+                    />
+                    <button
+                      onClick={handleAddText}
+                      disabled={!textInput.trim()}
+                      className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-40"
+                    >
+                      <Type className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Font picker */}
+                  <div className="px-1">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Fuente</p>
+                    <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
+                      {TEXT_FONTS.map((f) => (
+                        <button
+                          key={f.value}
+                          onClick={() => setTextFont(f.value)}
+                          className={`shrink-0 rounded-md px-2.5 py-1 text-xs transition-all ${
+                            textFont === f.value
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-secondary/60 text-foreground hover:bg-secondary"
+                          }`}
+                          style={{ fontFamily: f.value }}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Size picker */}
+                  <div className="px-1">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Tamaño</p>
+                    <div className="flex gap-1">
+                      {TEXT_SIZES.map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setTextSize(s)}
+                          className={`flex-1 rounded-md py-1 text-xs font-medium transition-all ${
+                            textSize === s
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-secondary/60 text-foreground hover:bg-secondary"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Color picker */}
+                  <div className="px-1">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Color</p>
+                    <div className="flex gap-1.5">
+                      {TEXT_COLORS.map((c) => (
+                        <button
+                          key={c}
+                          onClick={() => setTextColor(c)}
+                          className={`h-6 w-6 rounded-full border-2 transition-all ${
+                            textColor === c ? "border-primary scale-110" : "border-transparent"
+                          }`}
+                          style={{ backgroundColor: c }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-muted-foreground text-center">
                     Arrastra y pellizca para mover, escalar y rotar
                   </p>
                 </div>

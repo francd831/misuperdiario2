@@ -26,6 +26,7 @@ export interface OverlayItem {
   text?: string;
   textColor?: string;
   fontSize?: number;
+  fontFamily?: string;
   /** Video-only: time range (seconds). Undefined = full clip */
   startTime?: number;
   endTime?: number;
@@ -44,7 +45,7 @@ function uid(): string {
 export function createOverlay(
   type: OverlayType,
   assetRef: OverlayAssetRef,
-  partial?: Partial<OverlayTransform & { zIndex: number; text: string; textColor: string; fontSize: number }>,
+  partial?: Partial<OverlayTransform & { zIndex: number; text: string; textColor: string; fontSize: number; fontFamily: string }>,
 ): OverlayItem {
   return {
     id: uid(),
@@ -60,6 +61,7 @@ export function createOverlay(
     text: partial?.text,
     textColor: partial?.textColor ?? "#ffffff",
     fontSize: partial?.fontSize ?? 24,
+    fontFamily: partial?.fontFamily ?? "sans-serif",
   };
 }
 
