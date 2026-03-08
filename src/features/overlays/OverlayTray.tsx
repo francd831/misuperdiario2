@@ -197,7 +197,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                 <div className="space-y-1.5">
                   {stickers.length > 0 && (
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                         {activePack?.name ?? "Pack"}
                       </p>
                       <div className="grid grid-cols-10 gap-0">
