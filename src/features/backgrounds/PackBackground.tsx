@@ -1,5 +1,6 @@
-import { usePack } from "@/core/packs/PackContext";
+import { useContext } from "react";
 import { useMemo } from "react";
+import { PackCtx } from "@/core/packs/PackContext";
 
 interface FloatingItem {
   emoji: string;
