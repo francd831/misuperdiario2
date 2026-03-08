@@ -154,18 +154,18 @@ export function RecordVideo() {
         </div>
 
         {/* Video fits available space */}
-        <div className="flex-1 min-h-0 px-3 pb-1">
+        <div className="flex-1 min-h-0 px-3 pb-1 flex items-center justify-center">
           <OverlayLayer
             overlays={overlays}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onChange={setOverlays}
-            className="rounded-xl h-full"
+            className="rounded-xl max-h-full max-w-full"
           >
             <video
               src={recordedVideoUrl}
               controls
-              className="h-full w-full object-contain rounded-xl"
+              className="max-h-full max-w-full object-contain rounded-xl"
             />
           </OverlayLayer>
         </div>
