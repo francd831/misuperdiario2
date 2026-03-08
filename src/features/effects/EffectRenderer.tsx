@@ -262,6 +262,341 @@ export function EffectRenderer({ def }: { def: EffectDef }) {
           </div>
         ));
 
+      // ── Candy rain (spiraling down with wobble) ──
+      case "candy-rain":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-candy-rain pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              top: `-8%`,
+              fontSize: `${p.size * 1.2}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Sweet pop (items popping up from random spots) ──
+      case "sweet-pop":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-sweet-pop pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              top: `${p.top}%`,
+              fontSize: `${p.size * 1.3}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Frosting wave (horizontal wave of particles) ──
+      case "frosting-wave":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-frosting-wave pointer-events-none select-none"
+            style={{
+              left: `-10%`,
+              top: `${30 + (p.id % 4) * 12}%`,
+              fontSize: `${p.size}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Paw walk (paws appearing one by one in a path) ──
+      case "paw-walk":
+        return particles.map((p, i) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-paw-walk pointer-events-none select-none"
+            style={{
+              left: `${10 + i * 11}%`,
+              bottom: `${15 + (i % 2) * 20}%`,
+              fontSize: "2.2rem",
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${i * 0.5}s`,
+              transform: `rotate(${i % 2 === 0 ? -15 : 15}deg)`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Hearts rising from bottom ──
+      case "hearts-rise":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-hearts-rise pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              bottom: `-5%`,
+              fontSize: `${p.size}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+              ['--fx-sway' as string]: `${p.offsetX}px`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Bubbles floating up ──
+      case "bubbles-float":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-bubbles-float pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              bottom: `-8%`,
+              fontSize: `${0.8 + (p.id % 4) * 0.5}rem`,
+              animationDuration: `${def.duration + p.delay * 0.5}s`,
+              animationDelay: `${p.delay}s`,
+              ['--fx-sway' as string]: `${p.offsetX * 1.5}px`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Spell cast (radial burst from center) ──
+      case "spell-cast":
+        return (
+          <>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="text-5xl animate-fx-pulse select-none">🪄</span>
+            </div>
+            {particles.map((p) => (
+              <span
+                key={p.id}
+                className="absolute animate-fx-spell-cast pointer-events-none select-none"
+                style={{
+                  left: `50%`,
+                  top: `50%`,
+                  fontSize: `${p.size}rem`,
+                  animationDuration: `${def.duration}s`,
+                  animationDelay: `${p.delay}s`,
+                  ['--fx-angle' as string]: `${(p.id / def.count) * 360}deg`,
+                  ['--fx-dist' as string]: `${80 + (p.id % 3) * 40}px`,
+                }}
+              >
+                {p.emoji}
+              </span>
+            ))}
+          </>
+        );
+
+      // ── Rune glow (symbols fading in and out at random positions) ──
+      case "rune-glow":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-rune-glow pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              top: `${p.top}%`,
+              fontSize: `${p.size * 1.5}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Potion bubbles (rising from bottom with wobble) ──
+      case "potion-bubble":
+        return (
+          <>
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-5xl animate-fx-pulse pointer-events-none select-none">🧪</span>
+            {particles.map((p) => (
+              <span
+                key={p.id}
+                className="absolute animate-fx-potion-bubble pointer-events-none select-none"
+                style={{
+                  left: `${35 + (p.id % 6) * 5}%`,
+                  bottom: `3%`,
+                  fontSize: `${0.8 + (p.id % 3) * 0.4}rem`,
+                  animationDuration: `${def.duration}s`,
+                  animationDelay: `${p.delay}s`,
+                  ['--fx-sway' as string]: `${p.offsetX}px`,
+                }}
+              >
+                {p.emoji}
+              </span>
+            ))}
+          </>
+        );
+
+      // ── Wave rock (items swaying at bottom) ──
+      case "wave-rock":
+        return particles.map((p, i) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-wave-rock pointer-events-none select-none"
+            style={{
+              left: `${i * 10}%`,
+              bottom: `${2 + (i % 3) * 4}%`,
+              fontSize: `${p.size * 1.3}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${i * 0.4}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Cannon blast (items shooting from left side) ──
+      case "cannon-blast":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-cannon-blast pointer-events-none select-none"
+            style={{
+              left: `0%`,
+              top: `${40 + (p.id % 3) * 8}%`,
+              fontSize: `${p.size * 1.2}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+              ['--fx-target-x' as string]: `${50 + p.offsetX * 2}vw`,
+              ['--fx-target-y' as string]: `${-20 - (p.id % 4) * 15}vh`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Treasure sparkle (random sparkles appearing) ──
+      case "treasure-sparkle":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-treasure-sparkle pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              top: `${p.top}%`,
+              fontSize: `${p.size * 1.2}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Speed lines (horizontal streaks) ──
+      case "speed-lines":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-speed-lines pointer-events-none select-none"
+            style={{
+              left: `110%`,
+              top: `${p.top}%`,
+              fontSize: `${p.size}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+              opacity: 0.7,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Drift smoke (smoke rising from bottom corners) ──
+      case "drift-smoke":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-drift-smoke pointer-events-none select-none"
+            style={{
+              left: `${p.id % 2 === 0 ? 5 + (p.id % 5) * 3 : 75 + (p.id % 5) * 3}%`,
+              bottom: `0%`,
+              fontSize: `${p.size * 1.5}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+              ['--fx-sway' as string]: `${p.offsetX}px`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Finish flag (waving checkered flag) ──
+      case "finish-flag":
+        return (
+          <div className="absolute top-[10%] left-1/2 -translate-x-1/2 pointer-events-none">
+            <div className="flex flex-col items-center gap-2 animate-fx-finish-flag">
+              <span className="text-7xl select-none">🏁</span>
+              <div className="flex gap-3">
+                <span className="text-4xl animate-fx-pulse select-none">🏎️</span>
+                <span className="text-4xl animate-fx-pulse select-none" style={{ animationDelay: "0.5s" }}>🏆</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      // ── Paint drip (drips falling from top) ──
+      case "paint-drip-down":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-paint-drip pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              top: `-5%`,
+              fontSize: `${p.size * 1.1}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
+      // ── Brush sweep (brush sweeping across) ──
+      case "brush-sweep":
+        return (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="animate-fx-brush-sweep absolute top-[40%] flex items-center gap-2">
+              <span className="text-6xl select-none">🖌️</span>
+              <div className="h-4 w-40 rounded-full bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 to-blue-400 opacity-50" />
+            </div>
+          </div>
+        );
+
+      // ── Color splat (random color explosions) ──
+      case "color-splat":
+        return particles.map((p) => (
+          <span
+            key={p.id}
+            className="absolute animate-fx-color-splat pointer-events-none select-none"
+            style={{
+              left: `${p.left}%`,
+              top: `${p.top}%`,
+              fontSize: `${p.size * 1.5}rem`,
+              animationDuration: `${def.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ));
+
       default:
         return null;
     }
