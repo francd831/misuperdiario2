@@ -14,6 +14,8 @@ interface AppLayoutProps {
 
 const FULL_SCREEN_ROUTES = ["/record/video", "/record/audio", "/daily-photo/capture", "/lock"];
 const NO_NAV_ROUTES = ["/record/video", "/record/audio", "/daily-photo/capture", "/admin-lock"];
+/** Routes where a detail view with its own overlay tray needs full screen (no bottom nav) */
+const DETAIL_ROUTE_RE = /^\/(daily-photo|entry)\/[^/]+$/;
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { state, activeProfile } = useProfile();
@@ -45,8 +47,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   }
 
   const isAdmin = activeProfile?.role === "admin";
-  const isFullScreen = FULL_SCREEN_ROUTES.some((r) => location.pathname.startsWith(r));
-  const showNav = !NO_NAV_ROUTES.some((r) => location.pathname.startsWith(r));
+  const isDetailRoute = DETAIL_ROUTE_RE.test(location.pathname) && !location.pathname.endsWith("/capture");
+  const isFullScreen = isDetailRoute || FULL_SCREEN_ROUTES.some((r) => location.pathname.startsWith(r));
+  const showNav = !isDetailRoute && !NO_NAV_ROUTES.some((r) => location.pathname.startsWith(r));
 
   if (isFullScreen && !isAdmin) {
     return (
