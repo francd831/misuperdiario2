@@ -39,7 +39,7 @@ const ACTION_CARDS = [
   },
   {
     id: "photo",
-    label: "Foto diaria",
+    label: "Mi foto diaria",
     emoji: "📸",
     description: "Tu foto de hoy",
     route: "/daily-photo/capture",
