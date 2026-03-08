@@ -182,8 +182,42 @@ export function SettingsPage() {
 
       <Card>
         <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><HardDrive className="h-4 w-4" />Almacenamiento</CardTitle></CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-3">
           <p className="text-sm text-muted-foreground">{storageInfo}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><RefreshCw className="h-4 w-4" />Actualización</CardTitle></CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <p className="text-sm text-muted-foreground">
+            Si hay una nueva versión disponible, pulsa para forzar la actualización.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={async () => {
+              try {
+                if ("serviceWorker" in navigator) {
+                  const registrations = await navigator.serviceWorker.getRegistrations();
+                  for (const reg of registrations) {
+                    await reg.unregister();
+                  }
+                }
+                const keys = await caches.keys();
+                for (const key of keys) {
+                  await caches.delete(key);
+                }
+                toast({ title: "Actualización aplicada. Recargando…" });
+                setTimeout(() => window.location.reload(), 800);
+              } catch {
+                window.location.reload();
+              }
+            }}
+          >
+            <RefreshCw className="h-4 w-4" /> Buscar actualización
+          </Button>
         </CardContent>
       </Card>
 
