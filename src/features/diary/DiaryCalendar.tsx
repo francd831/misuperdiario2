@@ -8,6 +8,14 @@ import { isUnlocked } from "./types";
 import { cn } from "@/lib/utils";
 import type { DayContentProps } from "react-day-picker";
 
+/** Format a Date as "YYYY-MM-DD" in local time (avoids UTC shift) */
+function toLocalDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 /** Color dot config per entry type */
 const TYPE_COLORS: Record<string, string> = {
   video: "bg-[hsl(265,70%,58%)]",
@@ -61,7 +69,7 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
   // Entries + photos for selected day
   const selectedDayEntries = useMemo(() => {
     if (!selectedDay) return [];
-    const key = selectedDay.toISOString().slice(0, 10);
+    const key = toLocalDateKey(selectedDay);
     return entries
       .filter((e) => (e.date || e.createdAt.slice(0, 10)) === key)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -69,15 +77,15 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
 
   const selectedDayPhotos = useMemo(() => {
     if (!selectedDay) return [];
-    const key = selectedDay.toISOString().slice(0, 10);
+    const key = toLocalDateKey(selectedDay);
     return dailyPhotos.filter((p) => p.date === key);
   }, [selectedDay, dailyPhotos]);
 
-  const selectedDayKey = selectedDay?.toISOString().slice(0, 10);
+  const selectedDayKey = selectedDay ? toLocalDateKey(selectedDay) : undefined;
 
   // Custom day content with colored dots
   function DayWithDots(props: DayContentProps) {
-    const dayKey = props.date.toISOString().slice(0, 10);
+    const dayKey = toLocalDateKey(props.date);
     const types = dayTypesMap.get(dayKey);
 
     return (
@@ -137,7 +145,7 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
 
       {/* Selected day entries */}
       {selectedDay && (
-        <div key={selectedDay.toISOString().slice(0, 10)} className="flex flex-col gap-2 animate-fade-in">
+        <div key={toLocalDateKey(selectedDay)} className="flex flex-col gap-2 animate-fade-in">
           <p className="text-xs font-semibold uppercase text-muted-foreground animate-fade-in">
             {selectedDay.toLocaleDateString("es", {
               weekday: "long",
