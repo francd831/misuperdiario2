@@ -128,7 +128,7 @@ function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
   return dbPromise;
 }
 
-type StoreNames = "profiles" | "entries" | "daily_photos" | "settings" | "entitlements" | "avatar_blobs";
+type StoreNames = "profiles" | "entries" | "daily_photos" | "settings" | "entitlements" | "avatar_blobs" | "achievements";
 
 export async function dbGet<T extends StoreNames>(
   store: T,
