@@ -160,7 +160,6 @@ export function AvatarPicker({ open, currentAvatar, profileName, onSelect, onClo
                 ref={fileRef}
                 type="file"
                 accept="image/*"
-                capture="user"
                 className="hidden"
                 onChange={handlePhoto}
               />
