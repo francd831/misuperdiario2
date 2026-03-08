@@ -109,132 +109,135 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
     <div className="flex flex-col gap-3">
       <h3 className="text-base font-bold text-foreground">📅 Calendario</h3>
 
-      <Card>
-        <CardContent className="p-2">
-          <Calendar
-            mode="single"
-            selected={selectedDay}
-            onSelect={setSelectedDay}
-            className="pointer-events-auto w-full"
-            modifiers={{ hasContent: daysWithContent }}
-            modifiersClassNames={{
-              hasContent: "font-bold",
-            }}
-            components={{
-              DayContent: DayWithDots,
-            }}
-          />
+      <div className="flex flex-col md:flex-row gap-3 md:items-start">
+        {/* Calendar card — only as wide as needed */}
+        <Card className="shrink-0 md:w-auto">
+          <CardContent className="p-2">
+            <Calendar
+              mode="single"
+              selected={selectedDay}
+              onSelect={setSelectedDay}
+              className="pointer-events-auto"
+              modifiers={{ hasContent: daysWithContent }}
+              modifiersClassNames={{
+                hasContent: "font-bold",
+              }}
+              components={{
+                DayContent: DayWithDots,
+              }}
+            />
 
-          {/* Legend */}
-          <div className="flex flex-wrap gap-3 px-3 pb-2 pt-1">
-            {[
-              { key: "video", label: "Vídeo" },
-              { key: "audio", label: "Voz" },
-              { key: "text", label: "Texto" },
-              { key: "photo", label: "Foto" },
-              { key: "capsule", label: "Cápsula" },
-            ].map((item) => (
-              <div key={item.key} className="flex items-center gap-1">
-                <span className={cn("h-2 w-2 rounded-full", TYPE_COLORS[item.key])} />
-                <span className="text-[10px] text-muted-foreground">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            {/* Legend */}
+            <div className="flex flex-wrap gap-3 px-3 pb-2 pt-1">
+              {[
+                { key: "video", label: "Vídeo" },
+                { key: "audio", label: "Voz" },
+                { key: "text", label: "Texto" },
+                { key: "photo", label: "Foto" },
+                { key: "capsule", label: "Cápsula" },
+              ].map((item) => (
+                <div key={item.key} className="flex items-center gap-1">
+                  <span className={cn("h-2 w-2 rounded-full", TYPE_COLORS[item.key])} />
+                  <span className="text-[10px] text-muted-foreground">{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Selected day entries */}
-      {selectedDay && (
-        <div key={toLocalDateKey(selectedDay)} className="flex flex-col gap-2 animate-fade-in">
-          <p className="text-xs font-semibold uppercase text-muted-foreground animate-fade-in">
-            {selectedDay.toLocaleDateString("es", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
-
-          {selectedDayEntries.length === 0 && selectedDayPhotos.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4 animate-fade-in">
-              Sin entradas este día
+        {/* Selected day entries — right side on desktop, below on mobile */}
+        {selectedDay && (
+          <div key={toLocalDateKey(selectedDay)} className="flex flex-1 flex-col gap-2 animate-fade-in min-w-0">
+            <p className="text-xs font-semibold uppercase text-muted-foreground animate-fade-in">
+              {selectedDay.toLocaleDateString("es", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
             </p>
-          ) : (
-            <>
-              {/* Daily photos */}
-              {selectedDayPhotos.map((photo, i) => (
-                <Card
-                  key={photo.id}
-                  className="cursor-pointer transition-shadow hover:shadow-md animate-scale-in"
-                  style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
-                  onClick={() => navigate(`/daily-photo/${photo.id}`)}
-                >
-                  <CardContent className="flex items-center gap-3 p-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[hsl(340,70%,55%)]/10">
-                      <Camera className="h-5 w-5 text-[hsl(340,70%,55%)]" />
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className="truncate font-medium">
-                        {photo.caption || "Foto diaria"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">Foto diaria</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
 
-              {/* Diary entries */}
-              {selectedDayEntries.map((entry, i) => (
-                <Card
-                  key={entry.id}
-                  className="cursor-pointer transition-shadow hover:shadow-md animate-scale-in"
-                  style={{ animationDelay: `${(selectedDayPhotos.length + i) * 60}ms`, animationFillMode: "backwards" }}
-                  onClick={() => navigate(`/entry/${entry.id}`)}
-                >
-                  <CardContent className="flex items-center gap-3 p-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      {entry.isLocked && !isUnlocked(entry) ? (
-                        <Lock className="h-5 w-5 text-primary" />
-                      ) : entry.type === "text" ? (
-                        <PenLine className="h-5 w-5 text-primary" />
-                      ) : entry.type === "audio" ? (
-                        <Mic className="h-5 w-5 text-primary" />
-                      ) : (
-                        <Video className="h-5 w-5 text-primary" />
+            {selectedDayEntries.length === 0 && selectedDayPhotos.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4 animate-fade-in">
+                Sin entradas este día
+              </p>
+            ) : (
+              <>
+                {/* Daily photos */}
+                {selectedDayPhotos.map((photo, i) => (
+                  <Card
+                    key={photo.id}
+                    className="cursor-pointer transition-shadow hover:shadow-md animate-scale-in"
+                    style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
+                    onClick={() => navigate(`/daily-photo/${photo.id}`)}
+                  >
+                    <CardContent className="flex items-center gap-3 p-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[hsl(340,70%,55%)]/10">
+                        <Camera className="h-5 w-5 text-[hsl(340,70%,55%)]" />
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="truncate font-medium">
+                          {photo.caption || "Foto diaria"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">Foto diaria</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                {/* Diary entries */}
+                {selectedDayEntries.map((entry, i) => (
+                  <Card
+                    key={entry.id}
+                    className="cursor-pointer transition-shadow hover:shadow-md animate-scale-in"
+                    style={{ animationDelay: `${(selectedDayPhotos.length + i) * 60}ms`, animationFillMode: "backwards" }}
+                    onClick={() => navigate(`/entry/${entry.id}`)}
+                  >
+                    <CardContent className="flex items-center gap-3 p-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                        {entry.isLocked && !isUnlocked(entry) ? (
+                          <Lock className="h-5 w-5 text-primary" />
+                        ) : entry.type === "text" ? (
+                          <PenLine className="h-5 w-5 text-primary" />
+                        ) : entry.type === "audio" ? (
+                          <Mic className="h-5 w-5 text-primary" />
+                        ) : (
+                          <Video className="h-5 w-5 text-primary" />
+                        )}
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="truncate font-medium">
+                          {entry.title || entry.note || "Sin título"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {entry.duration
+                            ? `${Math.floor(entry.duration / 60)}:${String(
+                                Math.floor(entry.duration % 60)
+                              ).padStart(2, "0")} · `
+                            : ""}
+                          {entry.type === "video"
+                            ? "Vídeo"
+                            : entry.type === "audio"
+                            ? "Audio"
+                            : "Texto"}
+                        </p>
+                      </div>
+                      {entry.isLocked && !isUnlocked(entry) && (
+                        <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                          🔒{" "}
+                          {entry.unlockAt
+                            ? new Date(entry.unlockAt).toLocaleDateString("es")
+                            : ""}
+                        </span>
                       )}
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className="truncate font-medium">
-                        {entry.title || entry.note || "Sin título"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {entry.duration
-                          ? `${Math.floor(entry.duration / 60)}:${String(
-                              Math.floor(entry.duration % 60)
-                            ).padStart(2, "0")} · `
-                          : ""}
-                        {entry.type === "video"
-                          ? "Vídeo"
-                          : entry.type === "audio"
-                          ? "Audio"
-                          : "Texto"}
-                      </p>
-                    </div>
-                    {entry.isLocked && !isUnlocked(entry) && (
-                      <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
-                        🔒{" "}
-                        {entry.unlockAt
-                          ? new Date(entry.unlockAt).toLocaleDateString("es")
-                          : ""}
-                      </span>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </>
-          )}
-        </div>
-      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
