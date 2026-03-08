@@ -8,11 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LongPress } from "@/app/components/LongPress";
 import { Shield, ArrowLeft, UserPlus } from "lucide-react";
 import ShaderAnimation from "@/components/ui/shader-animation";
-
-const COLORS = [
-  "bg-rose-400", "bg-amber-400", "bg-emerald-400", "bg-sky-400",
-  "bg-violet-400", "bg-pink-400", "bg-teal-400", "bg-orange-400",
-];
+import { ProfileAvatar } from "./ProfileAvatar";
 
 type CreateStep = "name" | "pin" | "confirm";
 
