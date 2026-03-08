@@ -176,7 +176,7 @@ export function RecordText() {
       )}
 
       {/* Save */}
-      <Button className="gap-2" onClick={save} disabled={!body.trim() && !title.trim()}>
+      <Button className="gap-2" onClick={save} disabled={(!body.trim() && !title.trim()) || (isCapsule && !unlockDate)}>
         <Save className="h-4 w-4" /> Guardar
       </Button>
     </div>

@@ -221,7 +221,7 @@ export function RecordVideo() {
             >
               Repetir
             </Button>
-            <Button className="flex-1" onClick={save}>
+            <Button className="flex-1" onClick={save} disabled={isCapsule && !unlockDate}>
               Guardar
             </Button>
           </div>

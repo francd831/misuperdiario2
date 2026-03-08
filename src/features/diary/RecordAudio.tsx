@@ -126,7 +126,7 @@ export function RecordAudio() {
         )}
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1" onClick={() => setBlob(null)}>Repetir</Button>
-          <Button className="flex-1" onClick={save}>Guardar</Button>
+          <Button className="flex-1" onClick={save} disabled={isCapsule && !unlockDate}>Guardar</Button>
         </div>
       </div>
     );

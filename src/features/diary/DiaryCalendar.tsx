@@ -45,12 +45,16 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
   const dayTypesMap = useMemo(() => {
     const map = new Map<string, Set<string>>();
     for (const e of entries) {
-      const day = e.date || e.createdAt.slice(0, 10);
-      if (!map.has(day)) map.set(day, new Set());
-      const types = map.get(day)!;
-      if (e.type) types.add(e.type);
-      if (e.isLocked && e.unlockAt && new Date(e.unlockAt) > new Date()) {
-        types.add("capsule");
+      // For locked capsules, mark on the unlock date instead of creation date
+      if (e.isLocked && e.unlockAt) {
+        const unlockDay = e.unlockAt.slice(0, 10);
+        if (!map.has(unlockDay)) map.set(unlockDay, new Set());
+        map.get(unlockDay)!.add("capsule");
+      } else {
+        const day = e.date || e.createdAt.slice(0, 10);
+        if (!map.has(day)) map.set(day, new Set());
+        const types = map.get(day)!;
+        if (e.type) types.add(e.type);
       }
     }
     for (const p of dailyPhotos) {
