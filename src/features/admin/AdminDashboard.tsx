@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Settings, BarChart3 } from "lucide-react";
+import { Users, FileText, Settings, BarChart3, LogOut } from "lucide-react";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { dbList } from "@/core/storage/indexeddb";
+import { useProfile } from "@/core/auth/ProfileContext";
 
 export function AdminDashboard() {
   const navigate = useNavigate();
+  const { logout } = useProfile();
   const [stats, setStats] = useState({ profiles: 0, entries: 0, photos: 0 });
 
   useEffect(() => {
