@@ -60,6 +60,13 @@ interface VideoDiarioDB extends DBSchema {
       unlockedAt?: string;
     };
   };
+  avatar_blobs: {
+    key: string;
+    value: {
+      id: string;
+      blob: Blob;
+    };
+  };
 }
 
 export interface StickerOverlay {
