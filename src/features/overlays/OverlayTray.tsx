@@ -357,7 +357,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                             return (
                               <button
                                 key={def.id}
-                                onClick={() => handleAddEffect(def)}
+                                onClick={() => handleToggleEffect(def)}
                                 className={`flex flex-col items-center gap-1 rounded-xl py-2.5 px-1 transition-all duration-150 ${
                                   isActive
                                     ? "bg-primary/20 ring-1 ring-primary/40"
