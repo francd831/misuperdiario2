@@ -140,6 +140,9 @@ export function DiaryHome() {
         ))}
       </div>
 
+      {/* Calendar */}
+      <DiaryCalendar entries={entries} />
+
       {/* Entries section */}
       {entries.length > 0 && (
         <div className="flex flex-col gap-3">
