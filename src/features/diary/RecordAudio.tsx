@@ -33,14 +33,26 @@ export function RecordAudio() {
     });
   }, []);
 
+  // Timer effect — only increments elapsed, does NOT stop recording
   useEffect(() => {
     if (!recording) return;
-    const id = setInterval(() => setElapsed((e) => {
-      if (e + 1 >= maxSeconds) stopRecording();
-      return e + 1;
-    }), 1000);
+    const id = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(id);
-  }, [recording, maxSeconds]);
+  }, [recording]);
+
+  // Separate effect to auto-stop when limit reached
+  useEffect(() => {
+    if (recording && elapsed >= maxSeconds) {
+      stopRecording();
+    }
+  }, [elapsed, maxSeconds, recording]);
+
+  const stopRecording = useCallback(() => {
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop();
+    }
+    setRecording(false);
+  }, []);
 
   const startRecording = useCallback(async () => {
     try {
@@ -53,7 +65,7 @@ export function RecordAudio() {
         setBlob(new Blob(chunksRef.current, { type: "audio/webm" }));
       };
       recorderRef.current = recorder;
-      recorder.start(1000);
+      recorder.start(); // continuous mode — single chunk, no duplicates
       setRecording(true);
       setElapsed(0);
     } catch {
