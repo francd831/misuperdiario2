@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, Camera, RefreshCw, KeyRound } from "lucide-react";
-import { LongPress } from "@/app/components/LongPress";
+import { Settings, Palette, Volume2, HardDrive, LogOut, Camera, RefreshCw, KeyRound } from "lucide-react";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
 import { profileService } from "@/core/auth/profileService";
 import { usePack } from "@/core/packs/PackContext";
@@ -221,22 +220,6 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Admin access */}
-      <div className="mt-8 mb-4">
-        {isAdmin ? (
-          <Button variant="outline" className="w-full gap-2" onClick={() => navigate("/admin")}>
-            <Shield className="h-4 w-4" /> Panel de administración
-          </Button>
-        ) : (
-          <button
-            onClick={() => navigate("/admin-lock")}
-            className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
-          >
-            <Shield className="h-4 w-4" />
-            <span>Acceso administrador</span>
-          </button>
-        )}
-      </div>
 
       {activeProfile && (
         <AvatarPicker
