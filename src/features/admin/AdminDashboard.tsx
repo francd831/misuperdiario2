@@ -33,7 +33,7 @@ export function AdminDashboard() {
     <div className="flex flex-col gap-4 px-4 pb-24 pt-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">🛡️ Admin</h1>
-        <Button variant="ghost" size="sm" onClick={() => navigate("/settings")}>Salir</Button>
+        <Button variant="ghost" size="sm" className="gap-1" onClick={logout}><LogOut className="h-4 w-4" /> Salir</Button>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
