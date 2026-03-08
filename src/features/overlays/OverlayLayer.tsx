@@ -4,6 +4,8 @@ import { updateTransform } from "@/core/media/overlays/overlayEngine";
 import { usePack } from "@/core/packs/PackContext";
 import { packLoader } from "@/core/packs/packLoader";
 import { parseAnimatedKey, AnimatedSticker } from "@/features/stickers/AnimatedSticker";
+import { parseEffectKey } from "@/features/effects";
+import { EffectRenderer } from "@/features/effects/EffectRenderer";
 
 
 interface Props {
