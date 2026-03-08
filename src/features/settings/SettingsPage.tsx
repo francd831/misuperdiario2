@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, UserPlus } from "lucide-react";
+import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, Camera } from "lucide-react";
 import { LongPress } from "@/app/components/LongPress";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
 import { profileService } from "@/core/auth/profileService";
@@ -13,17 +13,20 @@ import { usePack } from "@/core/packs/PackContext";
 import { useProfile } from "@/core/auth/ProfileContext";
 import { dbList } from "@/core/storage/indexeddb";
 import { useToast } from "@/hooks/use-toast";
+import { ProfileAvatar } from "@/features/profiles/ProfileAvatar";
+import { AvatarPicker } from "@/features/profiles/AvatarPicker";
 
 export function SettingsPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { activeProfile, logout } = useProfile();
+  const { activeProfile, logout, refresh } = useProfile();
   const [profileName, setProfileName] = useState("");
   const { activePack: activePackObj } = usePack();
   const [activePack, setActivePack] = useState("");
   const [storageInfo, setStorageInfo] = useState("");
   const [newPin, setNewPin] = useState("");
   const [ambientSound, setAmbientSound] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const isAdmin = activeProfile?.role === "admin";
 
