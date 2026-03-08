@@ -3,6 +3,7 @@ import type { OverlayItem, OverlayProject } from "@/core/media/overlays/overlayE
 import { updateTransform } from "@/core/media/overlays/overlayEngine";
 import { usePack } from "@/core/packs/PackContext";
 import { packLoader } from "@/core/packs/packLoader";
+import { parseAnimatedKey, AnimatedSticker } from "@/features/stickers/AnimatedSticker";
 
 interface Props {
   overlays: OverlayProject;
@@ -175,6 +176,11 @@ export function OverlayLayer({
     const { type, assetRef } = item;
 
     if (type === "sticker") {
+      // Check for animated sticker
+      const animated = parseAnimatedKey(assetRef.key);
+      if (animated) {
+        return <AnimatedSticker emoji={animated.emoji} animation={animated.animation} size="lg" />;
+      }
       if (!assetRef.key.startsWith("stickers/")) {
         return <span className="text-3xl leading-none select-none">{assetRef.key}</span>;
       }
