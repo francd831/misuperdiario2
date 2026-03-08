@@ -20,14 +20,22 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   if (state.status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-lg text-muted-foreground">Cargando…</p>
+      <div className="relative flex min-h-screen items-center justify-center text-foreground">
+        <PackBackground />
+        <p className="relative z-10 text-lg text-muted-foreground">Cargando…</p>
       </div>
     );
   }
 
   if (state.status === "no-profiles") {
-    return <AdminSetup />;
+    return (
+      <div className="relative min-h-screen text-foreground">
+        <PackBackground />
+        <div className="relative z-10">
+          <AdminSetup />
+        </div>
+      </div>
+    );
   }
 
   if (state.status === "select") {
