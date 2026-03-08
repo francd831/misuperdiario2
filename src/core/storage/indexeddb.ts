@@ -67,6 +67,16 @@ interface VideoDiarioDB extends DBSchema {
       blob: Blob;
     };
   };
+  achievements: {
+    key: string;
+    value: {
+      id: string;
+      profileId: string;
+      achievementId: string;
+      unlockedAt: string;
+    };
+    indexes: { "by-profile": string };
+  };
 }
 
 export interface StickerOverlay {
