@@ -14,25 +14,29 @@ export function AdminSetup() {
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
 
+  const normalizePin = (value: string) => value.replace(/\D/g, "").slice(0, 4);
+
   const handleNext = () => {
     if (step === "name") {
       if (!name.trim()) return;
       setStep("pin");
     } else if (step === "pin") {
-      if (pin.length < 4) return;
+      if (normalizePin(pin).length < 4) return;
       setStep("confirm");
     }
   };
 
   const handleCreate = useCallback(async () => {
-    if (confirmPin !== pin) {
+    const normalizedPin = normalizePin(pin);
+    const normalizedConfirm = normalizePin(confirmPin);
+    if (normalizedConfirm !== normalizedPin) {
       setError("Los PINs no coinciden");
       setConfirmPin("");
       setShake(true);
       setTimeout(() => setShake(false), 600);
       return;
     }
-    const profile = await createProfile(name.trim(), pin, "admin");
+    const profile = await createProfile(name.trim(), normalizedPin, "admin");
     login(profile.id);
   }, [name, pin, confirmPin, createProfile, login]);
 
@@ -65,7 +69,7 @@ export function AdminSetup() {
         <>
           <h1 className="text-2xl font-bold">Crea un PIN</h1>
           <p className="text-sm text-muted-foreground">4 dígitos para el administrador</p>
-          <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(v); setError(""); }}>
+          <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(normalizePin(v)); setError(""); }}>
             <InputOTPGroup>
               {[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}
             </InputOTPGroup>
@@ -80,7 +84,7 @@ export function AdminSetup() {
         <>
           <h1 className="text-2xl font-bold">Confirma tu PIN</h1>
           <div className={shake ? "animate-shake" : ""}>
-            <InputOTP maxLength={4} value={confirmPin} onChange={(v) => { setConfirmPin(v); setError(""); }}>
+            <InputOTP maxLength={4} value={confirmPin} onChange={(v) => { setConfirmPin(normalizePin(v)); setError(""); }}>
               <InputOTPGroup>
                 {[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}
               </InputOTPGroup>

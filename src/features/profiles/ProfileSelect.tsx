@@ -82,20 +82,17 @@ export function ProfileSelect() {
     setCreateError("");
   };
 
+  const normalizePin = (value: string) => value.replace(/\D/g, "").slice(0, 4);
+
   const handleCreateNext = async () => {
     if (createStep === "name") {
       if (newName.trim().length < 2) { setCreateError("Mínimo 2 caracteres"); return; }
       setCreateError("");
       setCreateStep("pin");
     } else if (createStep === "pin") {
-      if (newPin.length < 4) return;
+      if (normalizePin(newPin).length < 4) return;
       setCreateError("");
       setCreateStep("confirm");
-    } else if (createStep === "confirm") {
-      if (confirmPin !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); return; }
-      await createProfile(newName.trim(), newPin, "user");
-      resetCreate();
-      loadProfiles();
     }
   };
 
@@ -131,7 +128,7 @@ export function ProfileSelect() {
         {createStep === "pin" && (
           <>
             <p className="text-sm text-white/70">Crea un PIN de 4 dígitos</p>
-            <InputOTP maxLength={4} value={newPin} onChange={(v) => { setNewPin(v); setCreateError(""); if (v.length === 4) { setCreateStep("confirm"); } }}>
+            <InputOTP maxLength={4} value={newPin} onChange={(v) => { const normalized = normalizePin(v); setNewPin(normalized); setCreateError(""); if (normalized.length === 4) { setCreateStep("confirm"); } }}>
               <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
             </InputOTP>
           </>
@@ -140,7 +137,7 @@ export function ProfileSelect() {
         {createStep === "confirm" && (
           <>
             <p className="text-sm text-white/70">Confirma tu PIN</p>
-            <InputOTP maxLength={4} value={confirmPin} onChange={(v) => { setConfirmPin(v); setCreateError(""); if (v.length === 4) { setTimeout(async () => { if (v !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); } else { await createProfile(newName.trim(), newPin, "user"); resetCreate(); loadProfiles(); } }, 200); } }}>
+            <InputOTP maxLength={4} value={confirmPin} onChange={async (v) => { const normalized = normalizePin(v); setConfirmPin(normalized); setCreateError(""); if (normalized.length === 4) { if (normalized !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); return; } await createProfile(newName.trim(), newPin, "user"); resetCreate(); loadProfiles(); } }}>
               <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
             </InputOTP>
           </>
