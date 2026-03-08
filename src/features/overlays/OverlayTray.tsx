@@ -102,6 +102,14 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
     }));
   };
 
+  const handleAddEffect = (def: EffectDef) => {
+    // Only allow one effect of each type
+    const key = effectKey(def);
+    const exists = overlays.some((o) => o.type === "effect" && o.assetRef.key === key);
+    if (exists) return;
+    onAdd(createOverlay("effect", { packId, key }));
+  };
+
   // ─── Drag handling ─────────────────────────────
 
   const startDrag = useCallback((
