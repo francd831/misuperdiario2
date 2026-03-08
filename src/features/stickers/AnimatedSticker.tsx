@@ -1,6 +1,5 @@
 /**
  * Animated Sticker component – renders emoji-based stickers with CSS animations.
- * Each sticker has a unique animation style (bounce, spin, pulse, wobble, float).
  */
 
 export type AnimationType = "bounce" | "spin" | "pulse" | "wobble" | "float" | "shake" | "swing" | "jelly" | "heartbeat" | "flash";
@@ -11,7 +10,7 @@ export interface AnimatedStickerDef {
   animation: AnimationType;
 }
 
-/** Animated stickers per pack */
+/** Animated stickers per pack – 24 per pack */
 export const ANIMATED_STICKERS: Record<string, AnimatedStickerDef[]> = {
   base: [
     { emoji: "⭐", label: "Estrella", animation: "spin" },
@@ -26,6 +25,18 @@ export const ANIMATED_STICKERS: Record<string, AnimatedStickerDef[]> = {
     { emoji: "🍭", label: "Piruleta", animation: "wobble" },
     { emoji: "🎯", label: "Diana", animation: "jelly" },
     { emoji: "🌙", label: "Luna", animation: "pulse" },
+    { emoji: "🎪", label: "Circo", animation: "bounce" },
+    { emoji: "🧩", label: "Puzzle", animation: "shake" },
+    { emoji: "🎸", label: "Guitarra", animation: "swing" },
+    { emoji: "🌺", label: "Hibisco", animation: "heartbeat" },
+    { emoji: "🪁", label: "Cometa", animation: "float" },
+    { emoji: "🎭", label: "Máscaras", animation: "wobble" },
+    { emoji: "🫧", label: "Burbujas", animation: "pulse" },
+    { emoji: "🪩", label: "Disco", animation: "spin" },
+    { emoji: "🧸", label: "Peluche", animation: "jelly" },
+    { emoji: "🎠", label: "Carrusel", animation: "swing" },
+    { emoji: "🌊", label: "Ola", animation: "float" },
+    { emoji: "🔔", label: "Campana", animation: "shake" },
   ],
   reinoMagico: [
     { emoji: "🦄", label: "Unicornio", animation: "bounce" },
@@ -40,6 +51,18 @@ export const ANIMATED_STICKERS: Record<string, AnimatedStickerDef[]> = {
     { emoji: "🧜", label: "Sirena", animation: "float" },
     { emoji: "🪷", label: "Loto", animation: "pulse" },
     { emoji: "🫧", label: "Burbujas", animation: "bounce" },
+    { emoji: "🦚", label: "Pavo real", animation: "wobble" },
+    { emoji: "🧞", label: "Genio", animation: "jelly" },
+    { emoji: "🪻", label: "Lavanda", animation: "float" },
+    { emoji: "🦢", label: "Cisne", animation: "swing" },
+    { emoji: "🌸", label: "Cerezo", animation: "heartbeat" },
+    { emoji: "🦩", label: "Flamenco", animation: "bounce" },
+    { emoji: "🎀", label: "Lazo", animation: "wobble" },
+    { emoji: "🍄", label: "Seta mágica", animation: "pulse" },
+    { emoji: "🐇", label: "Conejo", animation: "jelly" },
+    { emoji: "🕊️", label: "Paloma", animation: "float" },
+    { emoji: "🌙", label: "Luna", animation: "spin" },
+    { emoji: "💫", label: "Magia", animation: "flash" },
   ],
   futbol: [
     { emoji: "⚽", label: "Balón", animation: "spin" },
@@ -54,6 +77,18 @@ export const ANIMATED_STICKERS: Record<string, AnimatedStickerDef[]> = {
     { emoji: "🔥", label: "Fuego", animation: "heartbeat" },
     { emoji: "💪", label: "Fuerza", animation: "jelly" },
     { emoji: "🥇", label: "Oro", animation: "spin" },
+    { emoji: "🎯", label: "Puntería", animation: "bounce" },
+    { emoji: "🦅", label: "Águila", animation: "float" },
+    { emoji: "💨", label: "Velocidad", animation: "shake" },
+    { emoji: "🫡", label: "Saludo", animation: "swing" },
+    { emoji: "🎺", label: "Trompeta", animation: "wobble" },
+    { emoji: "🧤", label: "Guante", animation: "jelly" },
+    { emoji: "⏱️", label: "Crono", animation: "pulse" },
+    { emoji: "🎪", label: "Arena", animation: "bounce" },
+    { emoji: "🌟", label: "Estrella", animation: "spin" },
+    { emoji: "👊", label: "Puño", animation: "shake" },
+    { emoji: "🦁", label: "León", animation: "heartbeat" },
+    { emoji: "🎵", label: "Hinchada", animation: "swing" },
   ],
   baloncesto: [
     { emoji: "🏀", label: "Balón", animation: "bounce" },
@@ -68,6 +103,70 @@ export const ANIMATED_STICKERS: Record<string, AnimatedStickerDef[]> = {
     { emoji: "🥇", label: "Campeón", animation: "float" },
     { emoji: "🏅", label: "Medalla", animation: "heartbeat" },
     { emoji: "💥", label: "Explosión", animation: "jelly" },
+    { emoji: "🎺", label: "Bocina", animation: "swing" },
+    { emoji: "🦾", label: "Robot", animation: "shake" },
+    { emoji: "🌟", label: "MVP", animation: "spin" },
+    { emoji: "👑", label: "Rey", animation: "wobble" },
+    { emoji: "💨", label: "Veloz", animation: "float" },
+    { emoji: "🧊", label: "Hielo", animation: "pulse" },
+    { emoji: "🎵", label: "Ritmo", animation: "swing" },
+    { emoji: "🦅", label: "Águila", animation: "float" },
+    { emoji: "🫶", label: "Corazón", animation: "heartbeat" },
+    { emoji: "✊", label: "Puño", animation: "shake" },
+    { emoji: "🎪", label: "Arena", animation: "bounce" },
+    { emoji: "🥁", label: "Tambor", animation: "jelly" },
+  ],
+  espacio: [
+    { emoji: "🚀", label: "Cohete", animation: "bounce" },
+    { emoji: "🌍", label: "Tierra", animation: "spin" },
+    { emoji: "🌙", label: "Luna", animation: "float" },
+    { emoji: "⭐", label: "Estrella", animation: "pulse" },
+    { emoji: "🛸", label: "OVNI", animation: "wobble" },
+    { emoji: "👽", label: "Alien", animation: "jelly" },
+    { emoji: "🪐", label: "Saturno", animation: "swing" },
+    { emoji: "☄️", label: "Cometa", animation: "shake" },
+    { emoji: "🌌", label: "Galaxia", animation: "heartbeat" },
+    { emoji: "🔭", label: "Telescopio", animation: "wobble" },
+    { emoji: "👨‍🚀", label: "Astronauta", animation: "float" },
+    { emoji: "🛰️", label: "Satélite", animation: "spin" },
+    { emoji: "💫", label: "Destello", animation: "flash" },
+    { emoji: "🌠", label: "Estrella fugaz", animation: "bounce" },
+    { emoji: "🌕", label: "Luna llena", animation: "pulse" },
+    { emoji: "🌑", label: "Eclipse", animation: "heartbeat" },
+    { emoji: "✨", label: "Brillo", animation: "flash" },
+    { emoji: "🌟", label: "Supernova", animation: "jelly" },
+    { emoji: "🔥", label: "Reentrada", animation: "shake" },
+    { emoji: "🌀", label: "Agujero negro", animation: "spin" },
+    { emoji: "⚡", label: "Energía", animation: "flash" },
+    { emoji: "🎆", label: "Nebulosa", animation: "pulse" },
+    { emoji: "🏳️", label: "Bandera lunar", animation: "swing" },
+    { emoji: "🤖", label: "Robot", animation: "wobble" },
+  ],
+  dinosaurios: [
+    { emoji: "🦕", label: "Braquiosaurio", animation: "float" },
+    { emoji: "🦖", label: "T-Rex", animation: "shake" },
+    { emoji: "🥚", label: "Huevo", animation: "wobble" },
+    { emoji: "🌋", label: "Volcán", animation: "jelly" },
+    { emoji: "🦴", label: "Hueso", animation: "bounce" },
+    { emoji: "🌿", label: "Helecho", animation: "swing" },
+    { emoji: "🪨", label: "Roca", animation: "pulse" },
+    { emoji: "🐾", label: "Huella", animation: "heartbeat" },
+    { emoji: "🔥", label: "Fuego", animation: "flash" },
+    { emoji: "🌲", label: "Bosque", animation: "float" },
+    { emoji: "💎", label: "Fósil", animation: "spin" },
+    { emoji: "🌍", label: "Pangea", animation: "pulse" },
+    { emoji: "☄️", label: "Meteorito", animation: "shake" },
+    { emoji: "🦎", label: "Lagarto", animation: "wobble" },
+    { emoji: "🐊", label: "Cocodrilo", animation: "jelly" },
+    { emoji: "🪶", label: "Pluma", animation: "float" },
+    { emoji: "🏔️", label: "Montaña", animation: "bounce" },
+    { emoji: "🌊", label: "Mar antiguo", animation: "swing" },
+    { emoji: "🦷", label: "Diente", animation: "shake" },
+    { emoji: "🐢", label: "Tortuga", animation: "heartbeat" },
+    { emoji: "🌺", label: "Flora", animation: "pulse" },
+    { emoji: "⚡", label: "Trueno", animation: "flash" },
+    { emoji: "🪺", label: "Nido", animation: "wobble" },
+    { emoji: "🐉", label: "Dragón", animation: "bounce" },
   ],
 };
 
@@ -104,7 +203,6 @@ export function AnimatedSticker({ emoji, animation, size = "md" }: Props) {
   );
 }
 
-/** Get animation type from an animated sticker key like "animated:spin:⭐" */
 export function parseAnimatedKey(key: string): { emoji: string; animation: AnimationType } | null {
   if (!key.startsWith("animated:")) return null;
   const parts = key.split(":");
@@ -112,7 +210,6 @@ export function parseAnimatedKey(key: string): { emoji: string; animation: Anima
   return { animation: parts[1] as AnimationType, emoji: parts[2] };
 }
 
-/** Create a key for an animated sticker */
 export function animatedKey(def: AnimatedStickerDef): string {
   return `animated:${def.animation}:${def.emoji}`;
 }

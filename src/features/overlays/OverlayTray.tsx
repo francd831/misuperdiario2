@@ -1,12 +1,11 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X } from "lucide-react";
+import { Sticker, Frame, Type, Trash2, X, SmilePlus } from "lucide-react";
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
 
-
-type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
+type Tab = "emoji" | "stickers" | "frames" | "text" | null;
 
 const DEFAULT_EMOJIS = [
   "⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰",
@@ -40,8 +39,8 @@ interface Props {
 interface DragState {
   type: "sticker" | "frame";
   key: string;
-  imgSrc?: string; // URL for visual ghost
-  emoji?: string;  // emoji text for ghost
+  imgSrc?: string;
+  emoji?: string;
   x: number;
   y: number;
 }
@@ -75,6 +74,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
   const [textColor, setTextColor] = useState("#ffffff");
 
   const tools = [
+    { id: "emoji" as const, icon: SmilePlus, label: "Emoji" },
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
     { id: "frames" as const, icon: Frame, label: "Marcos" },
     { id: "text" as const, icon: Type, label: "Texto" },
@@ -112,7 +112,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
     e.preventDefault();
     dragStartPos.current = { x: e.clientX, y: e.clientY };
     isDragging.current = false;
-    
+
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - dragStartPos.current!.x;
       const dy = ev.clientY - dragStartPos.current!.y;
@@ -139,7 +139,6 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
         }
         setDrag(null);
       } else {
-        // Was a tap, not a drag → add at center
         if (type === "sticker") handleAddSticker(key);
         else if (type === "frame") {
           const idx = parseInt(key.replace("frames/", ""), 10);
@@ -170,18 +169,14 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
           {drag.emoji ? (
             <span className="text-4xl drop-shadow-lg">{drag.emoji}</span>
           ) : drag.imgSrc ? (
-            <img
-              src={drag.imgSrc}
-              alt=""
-              className="h-14 w-14 object-contain drop-shadow-lg"
-            />
+            <img src={drag.imgSrc} alt="" className="h-14 w-14 object-contain drop-shadow-lg" />
           ) : null}
         </div>,
         document.body,
       )}
 
       <div className="relative z-30 flex flex-col">
-        {/* Expanded panel - slides up from toolbar */}
+        {/* Expanded panel */}
         {activeTab && (
           <div className="bg-card/95 backdrop-blur-xl border-t border-border animate-in slide-in-from-bottom-4 duration-200">
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/50">
@@ -197,6 +192,22 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
             </div>
 
             <div className="max-h-[20vh] overflow-y-auto px-1 py-1.5">
+              {/* ─── EMOJI TAB ─── */}
+              {activeTab === "emoji" && (
+                <div className="grid grid-cols-12 gap-0">
+                  {DEFAULT_EMOJIS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onPointerDown={(e) => startDrag(e, "sticker", emoji, undefined, emoji)}
+                      className="flex aspect-square items-center justify-center rounded bg-secondary/60 text-[1.1rem] hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* ─── STICKERS TAB ─── */}
               {activeTab === "stickers" && (
                 <div className="space-y-1.5">
                   {stickers.length > 0 && (
@@ -247,26 +258,10 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                       </div>
                     ) : null;
                   })()}
-
-                  <div>
-                    <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                      Emojis
-                    </p>
-                    <div className="grid grid-cols-12 gap-0">
-                      {DEFAULT_EMOJIS.map((emoji) => (
-                        <button
-                          key={emoji}
-                          onPointerDown={(e) => startDrag(e, "sticker", emoji, undefined, emoji)}
-                          className="flex aspect-square items-center justify-center rounded bg-secondary/60 text-[1.1rem] hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               )}
 
+              {/* ─── FRAMES TAB ─── */}
               {activeTab === "frames" && (
                 <div className="space-y-1.5">
                   {frames.length > 0 && (
@@ -299,9 +294,9 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                 </div>
               )}
 
+              {/* ─── TEXT TAB ─── */}
               {activeTab === "text" && (
                 <div className="space-y-2 py-2">
-                  {/* Text input + add button */}
                   <div className="flex gap-1.5 px-1">
                     <input
                       type="text"
@@ -320,7 +315,6 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     </button>
                   </div>
 
-                  {/* Font picker */}
                   <div className="px-1">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Fuente</p>
                     <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
@@ -341,7 +335,6 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     </div>
                   </div>
 
-                  {/* Size picker */}
                   <div className="px-1">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Tamaño</p>
                     <div className="flex gap-1">
@@ -361,7 +354,6 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     </div>
                   </div>
 
-                  {/* Color picker */}
                   <div className="px-1">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Color</p>
                     <div className="flex gap-1.5">
@@ -395,7 +387,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               <button
                 key={tool.id}
                 onClick={() => toggleTab(tool.id)}
-                className={`flex flex-col items-center gap-0.5 rounded-xl px-4 py-1.5 transition-all duration-150 ${
+                className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-all duration-150 ${
                   isActive
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground"
@@ -410,7 +402,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
           {selectedId && (
             <button
               onClick={onDelete}
-              className="flex flex-col items-center gap-0.5 rounded-xl px-4 py-1.5 text-destructive hover:bg-destructive/10 transition-all duration-150 animate-in fade-in zoom-in-90 duration-150"
+              className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 text-destructive hover:bg-destructive/10 transition-all duration-150 animate-in fade-in zoom-in-90 duration-150"
             >
               <Trash2 className="h-5 w-5" />
               <span className="text-[10px] font-medium">Borrar</span>

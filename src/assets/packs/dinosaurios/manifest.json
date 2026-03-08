@@ -1,0 +1,29 @@
+{
+  "id": "dinosaurios",
+  "name": "Dinosaurios",
+  "description": "¡Viaja a la era prehistórica con dinosaurios y volcanes!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "85 60% 40%",
+    "secondary": "35 70% 88%",
+    "accent": "15 75% 50%",
+    "background": "80 20% 97%",
+    "foreground": "85 40% 12%",
+    "bgBlob1": "85 60% 45%",
+    "bgBlob2": "35 70% 55%",
+    "bgBlob3": "15 75% 50%",
+    "bgBlob4": "120 40% 45%",
+    "bgBlob5": "50 60% 50%"
+  },
+  "stickers": {
+    "autoLoad": true,
+    "folder": "stickers"
+  },
+  "frames": {
+    "autoLoad": true,
+    "folder": "frames"
+  },
+  "sounds": {}
+}
