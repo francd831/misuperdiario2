@@ -105,6 +105,9 @@ function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
         if (!db.objectStoreNames.contains("entitlements")) {
           db.createObjectStore("entitlements", { keyPath: "packId" });
         }
+        if (!db.objectStoreNames.contains("avatar_blobs")) {
+          db.createObjectStore("avatar_blobs", { keyPath: "id" });
+        }
       },
     });
   }
