@@ -26,6 +26,7 @@ export function RecordText() {
   const [speechSupported] = useState(() => !!getSpeechRecognition());
   const recognitionRef = useRef<any>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const baseTextRef = useRef("");
 
   // Cleanup on unmount
   useEffect(() => {
@@ -47,27 +48,27 @@ export function RecordText() {
     const recognition = new SR();
     recognition.lang = "es-ES";
     recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.interimResults = false; // Only final results to avoid duplicates
 
-    let finalTranscript = "";
+    // Capture the current text as the base before dictation starts
+    setBody((current) => {
+      baseTextRef.current = current;
+      return current;
+    });
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
+      // Rebuild all final transcripts from scratch each time
+      let allFinal = "";
+      for (let i = 0; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-        } else {
-          interim += transcript;
+          allFinal += event.results[i][0].transcript;
         }
       }
 
-      if (finalTranscript) {
-        setBody((prev) => {
-          const spacer = prev && !prev.endsWith(" ") && !prev.endsWith("\n") ? " " : "";
-          return prev + spacer + finalTranscript;
-        });
-        finalTranscript = "";
+      if (allFinal) {
+        const base = baseTextRef.current;
+        const spacer = base && !base.endsWith(" ") && !base.endsWith("\n") ? " " : "";
+        setBody(base + spacer + allFinal);
       }
     };
 
