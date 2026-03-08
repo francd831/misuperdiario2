@@ -129,8 +129,8 @@ export function RecordAudio() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
-      <div className={`flex h-32 w-32 items-center justify-center rounded-full ${recording ? "animate-pulse bg-destructive/20" : "bg-primary/10"}`}>
-        <Mic className={`h-16 w-16 ${recording ? "text-destructive" : "text-primary"}`} />
+      <div className={`flex h-44 w-44 items-center justify-center rounded-full ${recording ? "animate-pulse bg-destructive/20" : "bg-primary/10"}`}>
+        <Mic className={`h-24 w-24 ${recording ? "text-destructive" : "text-primary"}`} />
       </div>
       <p className="font-mono text-3xl">{fmt(elapsed)} / {fmt(maxSeconds)}</p>
       <div className="flex gap-4">
