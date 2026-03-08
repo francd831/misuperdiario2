@@ -125,6 +125,47 @@ export default {
           "0%, 50%, 100%": { opacity: "1" },
           "25%, 75%": { opacity: "0.3" },
         },
+        // ─── Animated frame keyframes ───
+        "frm-glow-pulse": {
+          "0%, 100%": { opacity: "1", filter: "brightness(1)" },
+          "50%": { opacity: "0.85", filter: "brightness(1.4)" },
+        },
+        "frm-rainbow": {
+          "0%": { "--frm-angle": "0deg" } as any,
+          "100%": { "--frm-angle": "360deg" } as any,
+        },
+        "frm-dash-march": {
+          "0%": { strokeDashoffset: "0" },
+          "100%": { strokeDashoffset: "24" },
+        },
+        "frm-corner-sparkle": {
+          "0%, 100%": { opacity: "0.4", transform: "translate(-30%, -30%) scale(0.8)" },
+          "50%": { opacity: "1", transform: "translate(-30%, -30%) scale(1.3)" },
+        },
+        "frm-neon-flicker": {
+          "0%, 100%": { opacity: "1" },
+          "5%": { opacity: "0.6" },
+          "10%": { opacity: "1" },
+          "40%": { opacity: "0.9" },
+          "44%": { opacity: "0.4" },
+          "46%": { opacity: "1" },
+        },
+        "frm-shimmer": {
+          "0%, 100%": { filter: "brightness(1) saturate(1)" },
+          "50%": { filter: "brightness(1.3) saturate(1.2)" },
+        },
+        "frm-frost": {
+          "0%, 100%": { opacity: "0.7", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.005)" },
+        },
+        "frm-fire": {
+          "0%": { filter: "brightness(1)", transform: "scale(1)" },
+          "100%": { filter: "brightness(1.2)", transform: "scale(1.003)" },
+        },
+        "frm-double-pulse": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.7", transform: "scale(0.995)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
