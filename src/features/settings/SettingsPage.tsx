@@ -66,9 +66,11 @@ export function SettingsPage() {
     <div className="flex flex-col gap-4 px-4 pb-24 pt-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">⚙️ Ajustes</h1>
-        <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground" onClick={handleLogout}>
-          <LogOut className="h-4 w-4" /> Salir
-        </Button>
+        <div className="flex gap-1">
+          <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground" onClick={handleLogout}>
+            <LogOut className="h-4 w-4" /> Cambiar perfil
+          </Button>
+        </div>
       </div>
 
       <Card>
