@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Video, Mic, Lock, Search, PenLine, LogOut, Camera, Sparkles } from "lucide-react";
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
+import { DiaryCalendar } from "./DiaryCalendar";
 
 const ACTION_CARDS = [
   {
@@ -138,6 +139,9 @@ export function DiaryHome() {
           </button>
         ))}
       </div>
+
+      {/* Calendar */}
+      <DiaryCalendar entries={entries} />
 
       {/* Entries section */}
       {entries.length > 0 && (
