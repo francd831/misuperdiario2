@@ -26,6 +26,7 @@ export interface OverlayItem {
   text?: string;
   textColor?: string;
   fontSize?: number;
+  fontFamily?: string;
   /** Video-only: time range (seconds). Undefined = full clip */
   startTime?: number;
   endTime?: number;
