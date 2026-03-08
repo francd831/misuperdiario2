@@ -88,7 +88,7 @@ export interface StickerOverlay {
 }
 
 const DB_NAME = "video-diario";
-const DB_VERSION = 1;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<VideoDiarioDB>> | null = null;
 
