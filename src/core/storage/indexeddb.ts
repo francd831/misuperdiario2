@@ -67,6 +67,16 @@ interface VideoDiarioDB extends DBSchema {
       blob: Blob;
     };
   };
+  achievements: {
+    key: string;
+    value: {
+      id: string;
+      profileId: string;
+      achievementId: string;
+      unlockedAt: string;
+    };
+    indexes: { "by-profile": string };
+  };
 }
 
 export interface StickerOverlay {
@@ -78,13 +88,13 @@ export interface StickerOverlay {
 }
 
 const DB_NAME = "video-diario";
-const DB_VERSION = 1;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<VideoDiarioDB>> | null = null;
 
 function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<VideoDiarioDB>(DB_NAME, 2, {
+    dbPromise = openDB<VideoDiarioDB>(DB_NAME, 3, {
       upgrade(db) {
         if (!db.objectStoreNames.contains("profiles")) {
           db.createObjectStore("profiles", { keyPath: "id" });
@@ -108,13 +118,17 @@ function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
         if (!db.objectStoreNames.contains("avatar_blobs")) {
           db.createObjectStore("avatar_blobs", { keyPath: "id" });
         }
+        if (!db.objectStoreNames.contains("achievements")) {
+          const achStore = db.createObjectStore("achievements", { keyPath: "id" });
+          achStore.createIndex("by-profile", "profileId");
+        }
       },
     });
   }
   return dbPromise;
 }
 
-type StoreNames = "profiles" | "entries" | "daily_photos" | "settings" | "entitlements" | "avatar_blobs";
+type StoreNames = "profiles" | "entries" | "daily_photos" | "settings" | "entitlements" | "avatar_blobs" | "achievements";
 
 export async function dbGet<T extends StoreNames>(
   store: T,
@@ -145,7 +159,7 @@ export async function dbList<T extends StoreNames>(
 }
 
 export async function dbListByIndex(
-  store: "entries" | "daily_photos",
+  store: "entries" | "daily_photos" | "achievements",
   indexName: string,
   value: string
 ): Promise<any[]> {

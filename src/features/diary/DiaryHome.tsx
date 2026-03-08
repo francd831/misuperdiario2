@@ -11,6 +11,10 @@ import { Video, Mic, Lock, Search, PenLine, LogOut, Camera, Sparkles } from "luc
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
 import { DiaryCalendar, type DailyPhotoItem } from "./DiaryCalendar";
+import { useAchievements } from "@/features/achievements/useAchievements";
+import { StreakIndicator } from "@/features/achievements/StreakIndicator";
+import { AchievementBadges } from "@/features/achievements/AchievementBadges";
+import { AchievementCelebration } from "@/features/achievements/AchievementCelebration";
 
 const ACTION_CARDS = [
   {
@@ -63,6 +67,7 @@ export function DiaryHome() {
   const [showEntries, setShowEntries] = useState(false);
   const navigate = useNavigate();
   const { activeProfile, logout } = useProfile();
+  const { streak, unlocked, celebration, dismissCelebration } = useAchievements();
 
   useEffect(() => {
     if (!activeProfile) return;
@@ -101,13 +106,21 @@ export function DiaryHome() {
 
   return (
     <div className="flex flex-col gap-5 px-4 pb-24 pt-4">
+      {/* Celebration modal */}
+      {celebration && (
+        <AchievementCelebration achievement={celebration} onDismiss={dismissCelebration} />
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{getGreeting()}</p>
-          <h1 className="text-2xl font-bold text-foreground">
-            {activeProfile?.name ?? "Mi Diario"} ✨
-          </h1>
+        <div className="flex items-center gap-2">
+          <div>
+            <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+            <h1 className="text-2xl font-bold text-foreground">
+              {activeProfile?.name ?? "Mi Diario"} ✨
+            </h1>
+          </div>
+          <StreakIndicator streak={streak} />
         </div>
         <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={logout}>
           <LogOut className="h-4 w-4" />
@@ -149,6 +162,9 @@ export function DiaryHome() {
 
       {/* Calendar */}
       <DiaryCalendar entries={entries} dailyPhotos={dailyPhotos} />
+
+      {/* Achievements */}
+      <AchievementBadges unlocked={unlocked} />
 
       {/* Entries section */}
       {entries.length > 0 && (
