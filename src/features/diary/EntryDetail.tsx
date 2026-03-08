@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Trash2, Lock, Play, Pause, RotateCcw } from "lucide-react";
+import { ArrowLeft, Trash2, Lock, Play, Pause, RotateCcw, Gauge, ArrowLeftRight } from "lucide-react";
 import { ConfirmDialog } from "@/app/components/ConfirmDialog";
 import { usePack } from "@/core/packs/PackContext";
 import { OverlayLayer } from "@/features/overlays/OverlayLayer";
@@ -12,6 +12,8 @@ import { useOverlayProject } from "@/features/overlays/useOverlayProject";
 import { migrateLegacyOverlays, type OverlayProject } from "@/core/media/overlays/overlayEngine";
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
+
+const SPEED_OPTIONS = [0.5, 1, 2, 4] as const;
 
 export function EntryDetail() {
   const { id } = useParams<{ id: string }>();
