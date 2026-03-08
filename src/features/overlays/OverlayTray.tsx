@@ -253,7 +253,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                         <button
                           key={emoji}
                           onPointerDown={(e) => startDrag(e, "sticker", emoji, undefined, emoji)}
-                          className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 text-xl hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
+                          className="flex aspect-square items-center justify-center rounded bg-secondary/60 text-lg hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                         >
                           {emoji}
                         </button>
