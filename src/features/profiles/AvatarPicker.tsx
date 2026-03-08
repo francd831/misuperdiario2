@@ -18,7 +18,7 @@ interface Props {
   open: boolean;
   currentAvatar?: string;
   profileName: string;
-  onSelect: (avatar: string) => void;
+  onSelect: (avatar: string) => void | Promise<void>;
   onClose: () => void;
 }
 
@@ -38,7 +38,7 @@ export function AvatarPicker({ open, currentAvatar, profileName, onSelect, onClo
     // Resize to 256x256
     const img = new Image();
     const url = URL.createObjectURL(file);
-    img.onload = async () => {
+    img.onload = () => {
       const canvas = document.createElement("canvas");
       canvas.width = 256;
       canvas.height = 256;
@@ -51,12 +51,15 @@ export function AvatarPicker({ open, currentAvatar, profileName, onSelect, onClo
         if (!blob) return;
         const key = `avatar-${Date.now()}`;
         await dbSet("avatar_blobs", { id: key, blob });
-        onSelect(`custom:${key}`);
+        await onSelect(`custom:${key}`);
         onClose();
       }, "image/webp", 0.85);
       URL.revokeObjectURL(url);
     };
+    img.onerror = () => URL.revokeObjectURL(url);
     img.src = url;
+    // Reset input so the same file can be re-selected
+    e.target.value = "";
   };
 
   const tabs: { id: Tab; label: string }[] = [
@@ -157,7 +160,6 @@ export function AvatarPicker({ open, currentAvatar, profileName, onSelect, onClo
                 ref={fileRef}
                 type="file"
                 accept="image/*"
-                capture="user"
                 className="hidden"
                 onChange={handlePhoto}
               />
