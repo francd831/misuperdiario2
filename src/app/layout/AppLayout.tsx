@@ -38,7 +38,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const showNav = !NO_NAV_ROUTES.some((r) => location.pathname.startsWith(r));
 
   if (isFullScreen && !isAdmin) {
-    return <>{children}</>;
+    return <div className="min-h-screen app-bg-fun">{children}</div>;
   }
 
   return (
