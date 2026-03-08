@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { usePack } from "@/core/packs/PackContext";
-import { createOverlay, updateTransform, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X, ZoomIn, RotateCw, Minus, Plus } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
+import { Sticker, Frame, Type, Trash2, X } from "lucide-react";
 
 type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
