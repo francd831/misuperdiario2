@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Trash2, Lock, Play, Pause, RotateCcw } from "lucide-react";
+import { ArrowLeft, Trash2, Lock, Play, Pause, RotateCcw, Gauge, ArrowLeftRight } from "lucide-react";
 import { ConfirmDialog } from "@/app/components/ConfirmDialog";
 import { usePack } from "@/core/packs/PackContext";
 import { OverlayLayer } from "@/features/overlays/OverlayLayer";
@@ -13,6 +13,8 @@ import { migrateLegacyOverlays, type OverlayProject } from "@/core/media/overlay
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
 
+const SPEED_OPTIONS = [0.5, 1, 2, 4] as const;
+
 export function EntryDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -20,7 +22,46 @@ export function EntryDetail() {
   const [showDelete, setShowDelete] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState<number>(1);
+  const [reversed, setReversed] = useState(false);
+  const reverseRaf = useRef<number | null>(null);
   const { activePack } = usePack();
+
+  // Reverse playback via requestAnimationFrame stepping
+  const stopReverse = useCallback(() => {
+    if (reverseRaf.current) {
+      cancelAnimationFrame(reverseRaf.current);
+      reverseRaf.current = null;
+    }
+  }, []);
+
+  const startReverse = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    const step = () => {
+      if (!videoRef.current) return;
+      const dt = (1 / 30) * speed; // ~30fps scaled by speed
+      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - dt);
+      if (videoRef.current.currentTime <= 0) {
+        setPlaying(false);
+        stopReverse();
+        return;
+      }
+      reverseRaf.current = requestAnimationFrame(step);
+    };
+    reverseRaf.current = requestAnimationFrame(step);
+  }, [speed, stopReverse]);
+
+  // Sync playbackRate when speed changes
+  useEffect(() => {
+    if (videoRef.current && !reversed) {
+      videoRef.current.playbackRate = speed;
+    }
+  }, [speed, reversed]);
+
+  // Cleanup reverse on unmount
+  useEffect(() => () => stopReverse(), [stopReverse]);
 
   useEffect(() => {
     if (id) entryRepository.getById(id).then((e) => setEntry((e as ExtendedEntry) ?? null));
@@ -151,32 +192,105 @@ export function EntryDetail() {
 
           {/* Video controls */}
           {entry.type === "video" && mediaUrl && (
-            <div className="shrink-0 flex items-center justify-center gap-3 px-4 py-1.5">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full"
-                onClick={() => {
-                  if (videoRef.current) {
-                    videoRef.current.currentTime = 0;
-                    videoRef.current.pause();
+            <div className="shrink-0 flex flex-col gap-1.5 px-4 py-1.5">
+              {/* Main transport */}
+              <div className="flex items-center justify-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-full"
+                  onClick={() => {
+                    stopReverse();
+                    if (videoRef.current) {
+                      videoRef.current.currentTime = 0;
+                      videoRef.current.pause();
+                      setPlaying(false);
+                    }
+                  }}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  className="h-11 w-11 rounded-full"
+                  onClick={() => {
+                    if (!videoRef.current) return;
+                    if (playing) {
+                      videoRef.current.pause();
+                      stopReverse();
+                      setPlaying(false);
+                    } else {
+                      setPlaying(true);
+                      if (reversed) {
+                        startReverse();
+                      } else {
+                        videoRef.current.playbackRate = speed;
+                        videoRef.current.play();
+                      }
+                    }
+                  }}
+                >
+                  {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+                </Button>
+                {/* Reverse toggle */}
+                <Button
+                  variant={reversed ? "default" : "outline"}
+                  size="icon"
+                  className="h-9 w-9 rounded-full"
+                  onClick={() => {
+                    const wasPlaying = playing;
+                    stopReverse();
+                    if (videoRef.current) videoRef.current.pause();
                     setPlaying(false);
-                  }
-                }}
-              >
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                className="h-11 w-11 rounded-full"
-                onClick={() => {
-                  if (videoRef.current) {
-                    playing ? videoRef.current.pause() : videoRef.current.play();
-                  }
-                }}
-              >
-                {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
-              </Button>
+                    setReversed((r) => {
+                      const next = !r;
+                      if (wasPlaying && videoRef.current) {
+                        setTimeout(() => {
+                          if (next) {
+                            setPlaying(true);
+                            startReverse();
+                          } else {
+                            videoRef.current!.playbackRate = speed;
+                            videoRef.current!.play();
+                            setPlaying(true);
+                          }
+                        }, 50);
+                      }
+                      return next;
+                    });
+                  }}
+                >
+                  <ArrowLeftRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Speed selector */}
+              <div className="flex items-center justify-center gap-1">
+                <Gauge className="h-3.5 w-3.5 text-muted-foreground mr-1" />
+                {SPEED_OPTIONS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      setSpeed(s);
+                      if (videoRef.current && !reversed) {
+                        videoRef.current.playbackRate = s;
+                      }
+                    }}
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-semibold transition-all ${
+                      speed === s
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    {s}x
+                  </button>
+                ))}
+                {reversed && (
+                  <span className="ml-1.5 text-[10px] font-medium text-primary bg-primary/10 rounded-full px-2 py-0.5">
+                    ⏪ Reversa
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
