@@ -1,5 +1,6 @@
-import { usePack } from "@/core/packs/PackContext";
+import { useContext } from "react";
 import { useMemo } from "react";
+import { PackCtx } from "@/core/packs/PackContext";
 
 interface FloatingItem {
   emoji: string;
@@ -43,8 +44,8 @@ function generateItems(emojis: string[], count: number): FloatingItem[] {
 }
 
 export function PackBackground() {
-  const { activePack } = usePack();
-  const packId = activePack?.id ?? "base";
+  const ctx = useContext(PackCtx);
+  const packId = ctx?.activePack?.id ?? "base";
 
   const items = useMemo(() => {
     const emojis = PACK_DECORATIONS[packId] ?? DEFAULT_DECORATIONS;

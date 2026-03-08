@@ -18,7 +18,7 @@ interface PackContextValue {
   refreshEntitlements: () => Promise<void>;
 }
 
-const PackCtx = createContext<PackContextValue | null>(null);
+export const PackCtx = createContext<PackContextValue | null>(null);
 
 export function PackProvider({ children }: { children: ReactNode }) {
   const [activePack, setActivePack] = useState<PackManifest | null>(null);
