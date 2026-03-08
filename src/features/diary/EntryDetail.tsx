@@ -105,17 +105,16 @@ export function EntryDetail() {
         </div>
       ) : (
         <>
-          {/* Media fits available space */}
-          <div className="flex-1 min-h-0 px-3 pb-1">
+          <div className="flex-1 min-h-0 px-3 pb-1 flex items-center justify-center">
             {entry.type === "video" && mediaUrl ? (
               <OverlayLayer
                 overlays={overlays}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 onChange={setOverlays}
-                className="rounded-xl h-full"
+                className="rounded-xl max-h-full max-w-full"
               >
-                <video src={mediaUrl} controls className="h-full w-full object-contain rounded-xl" />
+                <video src={mediaUrl} controls className="max-h-full max-w-full object-contain rounded-xl" />
               </OverlayLayer>
             ) : entry.type === "audio" && mediaUrl ? (
               <OverlayLayer
@@ -123,18 +122,18 @@ export function EntryDetail() {
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 onChange={setOverlays}
-                className="rounded-xl bg-card p-6 h-full flex items-center"
+                className="rounded-xl bg-card p-6 max-h-full max-w-full flex items-center"
               >
                 <audio src={mediaUrl} controls className="w-full" />
               </OverlayLayer>
             ) : entry.type === "text" ? (
-              <div className="rounded-xl bg-card p-6 h-full overflow-y-auto">
+              <div className="rounded-xl bg-card p-6 max-h-full w-full overflow-y-auto">
                 <p className="whitespace-pre-wrap text-base leading-relaxed">
                   {entry.note || "Sin contenido"}
                 </p>
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex items-center justify-center">
                 <p className="text-muted-foreground">Sin contenido multimedia</p>
               </div>
             )}

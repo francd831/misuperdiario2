@@ -155,7 +155,7 @@ export function PhotoCapture() {
 
   // Live camera – fullscreen with integrated capture button
   return (
-    <div className="fixed inset-0 flex flex-col bg-black">
+    <div className="fixed inset-0 flex flex-col bg-black h-[100dvh]">
       {/* Camera fills all available space */}
       <div className="relative flex-1 min-h-0">
         <OverlayLayer
