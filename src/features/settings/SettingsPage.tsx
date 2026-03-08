@@ -159,6 +159,16 @@ export function SettingsPage() {
           </div>
         </LongPress>
       )}
+
+      {activeProfile && (
+        <AvatarPicker
+          open={showAvatarPicker}
+          currentAvatar={activeProfile.avatar}
+          profileName={activeProfile.name}
+          onSelect={handleAvatarSelect}
+          onClose={() => setShowAvatarPicker(false)}
+        />
+      )}
     </div>
   );
 }
