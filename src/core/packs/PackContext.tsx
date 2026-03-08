@@ -28,13 +28,11 @@ export function PackProvider({ children }: { children: ReactNode }) {
   const [stickers, setStickers] = useState<string[]>([]);
   const [frames, setFrames] = useState<{ key: string; file: string }[]>([]);
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
-  const [sounds, setSounds] = useState<{ key: string; file: string; type: string }[]>([]);
 
   const loadAssets = useCallback((packId: string) => {
     setStickers(packLoader.getPackStickers(packId));
     setFrames(packLoader.getPackFrames(packId));
     setBackgrounds(packLoader.getPackBackgrounds(packId));
-    setSounds(packLoader.getPackSounds(packId));
   }, []);
 
   const refreshEntitlements = useCallback(async () => {
