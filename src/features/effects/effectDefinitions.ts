@@ -86,9 +86,9 @@ export const PACK_EFFECTS: Record<string, EffectDef[]> = {
     {
       id: "dino-steps",
       label: "Pisadas de dinosaurio",
-      emoji: "🦶",
+      emoji: "🐾",
       animation: "dino-steps",
-      particles: ["🦶"],
+      particles: ["🐾"],
       count: 6,
       duration: 4,
     },
