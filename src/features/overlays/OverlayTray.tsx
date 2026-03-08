@@ -2,10 +2,11 @@ import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X, SmilePlus } from "lucide-react";
+import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles } from "lucide-react";
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
+import { PACK_EFFECTS, effectKey, type EffectDef } from "@/features/effects";
 
-type Tab = "emoji" | "stickers" | "frames" | "text" | null;
+type Tab = "emoji" | "stickers" | "frames" | "text" | "effects" | null;
 
 const DEFAULT_EMOJIS = [
   "⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰",
