@@ -221,7 +221,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                         <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           ✨ Animados
                         </p>
-                        <div className="grid grid-cols-5 gap-1">
+                        <div className="grid grid-cols-8 gap-0.5">
                           {packAnimated.map((def) => {
                             const key = animatedKey(def);
                             return (
