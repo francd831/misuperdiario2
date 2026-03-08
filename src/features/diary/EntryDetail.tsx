@@ -116,7 +116,15 @@ export function EntryDetail() {
                 onChange={setOverlays}
                 className="rounded-xl max-h-full max-w-full"
               >
-                <video src={mediaUrl} controls className="max-h-full max-w-full object-contain rounded-xl" />
+                <video
+                  ref={videoRef}
+                  src={mediaUrl}
+                  className="max-h-full max-w-full object-contain rounded-xl"
+                  onPlay={() => setPlaying(true)}
+                  onPause={() => setPlaying(false)}
+                  onEnded={() => setPlaying(false)}
+                  playsInline
+                />
               </OverlayLayer>
             ) : entry.type === "audio" && mediaUrl ? (
               <OverlayLayer
