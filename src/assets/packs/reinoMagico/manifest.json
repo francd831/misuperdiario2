@@ -2,7 +2,7 @@
   "id": "reinoMagico",
   "name": "Reino Mágico",
   "description": "Un mundo encantado lleno de magia y fantasía",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Video Diario",
   "free": false,
   "theme": {
@@ -11,7 +11,6 @@
     "accent": "330 70% 60%",
     "background": "270 20% 98%",
     "foreground": "270 50% 10%",
-    "glow": "270 80% 70%",
     "bgBlob1": "270 60% 55%",
     "bgBlob2": "330 70% 60%",
     "bgBlob3": "45 85% 65%",
@@ -20,40 +19,11 @@
   },
   "stickers": {
     "autoLoad": true,
-    "folder": "stickers",
-    "categories": [
-      {
-        "id": "default",
-        "name": "Principales",
-        "items": [
-          "stickers/estrella.png",
-          "stickers/corona.png",
-          "stickers/varita.png",
-          "stickers/unicornio.png"
-        ]
-      }
-    ]
+    "folder": "stickers"
   },
   "frames": {
     "autoLoad": true,
-    "folder": "frames",
-    "items": [
-      { "key": "castillo-magico", "file": "frames/castillo.png" },
-      { "key": "marco-estrellas", "file": "frames/marco-estrellas.png" }
-    ]
+    "folder": "frames"
   },
-  "sounds": [
-    { "key": "shutter", "file": "sounds/shutter.mp3", "type": "effect" },
-    { "key": "magic", "file": "sounds/magic.mp3", "type": "ambience" }
-  ],
-  "soundsAuto": {
-    "autoLoad": true,
-    "folder": "sounds",
-    "defaultType": "effect"
-  },
-  "intro": "intro/intro.mp4",
-  "preview": {
-    "cover": "preview/preview.png",
-    "accent": "var(--color-accent)"
-  }
+  "sounds": {}
 }

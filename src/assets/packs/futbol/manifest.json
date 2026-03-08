@@ -1,0 +1,29 @@
+{
+  "id": "futbol",
+  "name": "Fútbol",
+  "description": "¡Vive la pasión del fútbol con balones, trofeos y estadios!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "145 70% 40%",
+    "secondary": "45 90% 88%",
+    "accent": "210 75% 50%",
+    "background": "140 20% 97%",
+    "foreground": "145 40% 12%",
+    "bgBlob1": "145 70% 45%",
+    "bgBlob2": "45 90% 60%",
+    "bgBlob3": "210 75% 55%",
+    "bgBlob4": "0 70% 55%",
+    "bgBlob5": "120 50% 50%"
+  },
+  "stickers": {
+    "autoLoad": true,
+    "folder": "stickers"
+  },
+  "frames": {
+    "autoLoad": true,
+    "folder": "frames"
+  },
+  "sounds": {}
+}
