@@ -44,42 +44,6 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
 
   return (
     <div className="relative z-30 flex flex-col">
-      {/* Transform controls – shown when an item is selected */}
-      {selectedItem && selectedItem.type !== "background" && !activeTab && (
-        <div className="bg-card/95 backdrop-blur-xl border-t border-border px-4 py-3 animate-in fade-in duration-150 space-y-3">
-          {/* Scale */}
-          <div className="flex items-center gap-3">
-            <ZoomIn className="h-4 w-4 text-muted-foreground shrink-0" />
-            <Slider
-              min={20}
-              max={500}
-              step={5}
-              value={[Math.round(selectedItem.transform.scale * 100)]}
-              onValueChange={([v]) => patchSelected({ scale: v / 100 })}
-              className="flex-1"
-            />
-            <span className="text-xs text-muted-foreground w-10 text-right tabular-nums">
-              {Math.round(selectedItem.transform.scale * 100)}%
-            </span>
-          </div>
-          {/* Rotation */}
-          <div className="flex items-center gap-3">
-            <RotateCw className="h-4 w-4 text-muted-foreground shrink-0" />
-            <Slider
-              min={-180}
-              max={180}
-              step={1}
-              value={[Math.round(selectedItem.transform.rotation)]}
-              onValueChange={([v]) => patchSelected({ rotation: v })}
-              className="flex-1"
-            />
-            <span className="text-xs text-muted-foreground w-10 text-right tabular-nums">
-              {Math.round(selectedItem.transform.rotation)}°
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* Expanded panel - slides up from toolbar */}
       {activeTab && (
         <div className="bg-card/95 backdrop-blur-xl border-t border-border animate-in slide-in-from-bottom-4 duration-200">
