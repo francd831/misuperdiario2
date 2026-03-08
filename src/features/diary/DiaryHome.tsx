@@ -148,7 +148,7 @@ export function DiaryHome() {
       </div>
 
       {/* Calendar */}
-      <DiaryCalendar entries={entries} />
+      <DiaryCalendar entries={entries} dailyPhotos={dailyPhotos} />
 
       {/* Entries section */}
       {entries.length > 0 && (
