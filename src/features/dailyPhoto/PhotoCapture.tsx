@@ -202,7 +202,9 @@ export function PhotoCapture() {
       {/* Overlay tray sits below the camera */}
       <OverlayTray
         selectedId={selectedId}
+        overlays={overlays}
         onAdd={addOverlay}
+        onChange={setOverlays}
         onDelete={deleteSelected}
       />
     </div>
