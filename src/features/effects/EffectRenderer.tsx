@@ -91,7 +91,7 @@ export function EffectRenderer({ def }: { def: EffectDef }) {
               transform: `rotate(${i % 2 === 0 ? -20 : 20}deg)`,
             }}
           >
-            🦶
+            🐾
           </span>
         ));
 
