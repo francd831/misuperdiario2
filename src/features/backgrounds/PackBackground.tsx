@@ -48,7 +48,7 @@ export function PackBackground() {
 
   const items = useMemo(() => {
     const emojis = PACK_DECORATIONS[packId] ?? DEFAULT_DECORATIONS;
-    return generateItems(emojis, 22);
+    return generateItems(emojis, 28);
   }, [packId]);
 
   return (
