@@ -24,19 +24,18 @@ const DEFAULT_DECORATIONS = ["✨", "⭐", "🌟", "💫", "🎈", "🎉"];
 
 function generateItems(emojis: string[], count: number): FloatingItem[] {
   const items: FloatingItem[] = [];
-  // Use deterministic pseudo-random based on index for consistent layout
   for (let i = 0; i < count; i++) {
     const seed = (i * 7 + 13) % 100;
     const seed2 = (i * 11 + 7) % 100;
     const seed3 = (i * 3 + 17) % 100;
     items.push({
       emoji: emojis[i % emojis.length],
-      size: 18 + (seed % 20),
+      size: 22 + (seed % 28),
       x: (seed * 1.01) % 100,
       y: (seed2 * 1.01) % 100,
-      delay: (seed3 * 0.15),
-      duration: 12 + (seed % 18),
-      opacity: 0.08 + (seed % 12) * 0.01,
+      delay: (seed3 * 0.12),
+      duration: 10 + (seed % 14),
+      opacity: 0.13 + (seed % 15) * 0.015,
       rotation: (seed3 * 3.6) % 360,
     });
   }
