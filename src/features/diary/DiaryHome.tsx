@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Video, Mic, Lock, Plus, Search, PenLine } from "lucide-react";
+import { Video, Mic, Lock, Plus, Search, PenLine, LogOut } from "lucide-react";
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
 
@@ -15,7 +15,7 @@ export function DiaryHome() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
-  const { activeProfile } = useProfile();
+  const { activeProfile, logout } = useProfile();
 
   useEffect(() => {
     if (!activeProfile) return;
@@ -47,7 +47,12 @@ export function DiaryHome() {
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-24 pt-4">
-      <h1 className="text-2xl font-bold">📓 Mi Diario</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">📓 Mi Diario</h1>
+        <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground" onClick={logout}>
+          <LogOut className="h-4 w-4" /> {activeProfile?.name}
+        </Button>
+      </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
