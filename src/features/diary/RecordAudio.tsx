@@ -33,14 +33,26 @@ export function RecordAudio() {
     });
   }, []);
 
+  // Timer effect — only increments elapsed, does NOT stop recording
   useEffect(() => {
     if (!recording) return;
-    const id = setInterval(() => setElapsed((e) => {
-      if (e + 1 >= maxSeconds) stopRecording();
-      return e + 1;
-    }), 1000);
+    const id = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(id);
-  }, [recording, maxSeconds]);
+  }, [recording]);
+
+  // Separate effect to auto-stop when limit reached
+  useEffect(() => {
+    if (recording && elapsed >= maxSeconds) {
+      stopRecording();
+    }
+  }, [elapsed, maxSeconds, recording]);
+
+  const stopRecording = useCallback(() => {
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop();
+    }
+    setRecording(false);
+  }, []);
 
   const startRecording = useCallback(async () => {
     try {
@@ -53,7 +65,7 @@ export function RecordAudio() {
         setBlob(new Blob(chunksRef.current, { type: "audio/webm" }));
       };
       recorderRef.current = recorder;
-      recorder.start(1000);
+      recorder.start(); // continuous mode — single chunk, no duplicates
       setRecording(true);
       setElapsed(0);
     } catch {
@@ -61,10 +73,7 @@ export function RecordAudio() {
     }
   }, []);
 
-  const stopRecording = () => {
-    recorderRef.current?.stop();
-    setRecording(false);
-  };
+  // stopRecording moved above startRecording as useCallback
 
   const save = async () => {
     if (!blob) return;
@@ -120,8 +129,8 @@ export function RecordAudio() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
-      <div className={`flex h-32 w-32 items-center justify-center rounded-full ${recording ? "animate-pulse bg-destructive/20" : "bg-primary/10"}`}>
-        <Mic className={`h-16 w-16 ${recording ? "text-destructive" : "text-primary"}`} />
+      <div className={`flex h-44 w-44 items-center justify-center rounded-full ${recording ? "animate-pulse bg-destructive/20" : "bg-primary/10"}`}>
+        <Mic className={`h-24 w-24 ${recording ? "text-destructive" : "text-primary"}`} />
       </div>
       <p className="font-mono text-3xl">{fmt(elapsed)} / {fmt(maxSeconds)}</p>
       <div className="flex gap-4">
