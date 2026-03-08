@@ -94,6 +94,7 @@ const FALLBACK: PackContextValue = {
   unlockedIds: new Set(),
   stickers: [],
   frames: [],
+  backgrounds: [],
   sounds: [],
   activatePack: async () => {},
   unlockPack: async () => {},

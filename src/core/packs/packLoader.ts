@@ -38,6 +38,13 @@ export const packLoader = {
     return items;
   },
 
+  getPackBackgrounds(packId: string): string[] {
+    const prefix = `/src/assets/packs/${packId}/backgrounds/`;
+    return Object.entries(allPackAssets)
+      .filter(([key]) => key.startsWith(prefix))
+      .map(([, url]) => url);
+  },
+
   getPackSounds(packId: string, defaultType = "effect"): { key: string; file: string; type: string }[] {
     const prefix = `/src/assets/packs/${packId}/sounds/`;
     const items: { key: string; file: string; type: string }[] = [];
