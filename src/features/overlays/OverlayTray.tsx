@@ -294,6 +294,14 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                         })}
                       </div>
                     </div>
+                  )}
+
+                  {frames.length === 0 && (
+                    <p className="text-sm text-muted-foreground py-8 text-center">
+                      Este pack no incluye marcos
+                    </p>
+                  )}
+                </div>
               )}
 
               {/* ─── EFFECTS TAB ─── */}
@@ -343,12 +351,6 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                       </div>
                     );
                   })()}
-
-                  {frames.length === 0 && (
-                    <p className="text-sm text-muted-foreground py-8 text-center">
-                      Este pack no incluye marcos
-                    </p>
-                  )}
                 </div>
               )}
 
