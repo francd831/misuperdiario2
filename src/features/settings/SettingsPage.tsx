@@ -24,8 +24,6 @@ export function SettingsPage() {
   const [activePack, setActivePack] = useState("");
   const [storageInfo, setStorageInfo] = useState("");
   const [newPin, setNewPin] = useState("");
-  const [ambientSound, setAmbientSound] = useState(() => localStorage.getItem(AMBIENT_KEY) === "1");
-  const [ambientVolume, setAmbientVolume] = useState(() => parseInt(localStorage.getItem(AMBIENT_VOL_KEY) || "60", 10));
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const isAdmin = activeProfile?.role === "admin";
