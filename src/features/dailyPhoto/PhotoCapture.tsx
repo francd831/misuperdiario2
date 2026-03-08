@@ -195,7 +195,6 @@ export function PhotoCapture() {
         selectedId={selectedId}
         onAdd={addOverlay}
         onDelete={deleteSelected}
-        collapsed
       />
     </div>
   );

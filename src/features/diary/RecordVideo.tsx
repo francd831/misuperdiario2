@@ -272,7 +272,6 @@ export function RecordVideo() {
         selectedId={selectedId}
         onAdd={addOverlay}
         onDelete={deleteSelected}
-        collapsed
       />
     </div>
   );
