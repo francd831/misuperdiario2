@@ -147,61 +147,81 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
             })}
           </p>
 
-          {selectedDayEntries.length === 0 ? (
+          {selectedDayEntries.length === 0 && selectedDayPhotos.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               Sin entradas este día
             </p>
           ) : (
-            selectedDayEntries.map((entry) => (
-              <Card
-                key={entry.id}
-                className="cursor-pointer transition-shadow hover:shadow-md"
-                onClick={() => navigate(`/entry/${entry.id}`)}
-              >
-                <CardContent className="flex items-center gap-3 p-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    {entry.isLocked && !isUnlocked(entry) ? (
-                      <Lock className="h-5 w-5 text-primary" />
-                    ) : entry.type === "text" ? (
-                      <PenLine className="h-5 w-5 text-primary" />
-                    ) : entry.type === "audio" ? (
-                      <Mic className="h-5 w-5 text-primary" />
-                    ) : entry.photoUrl && !entry.videoUrl ? (
-                      <Camera className="h-5 w-5 text-primary" />
-                    ) : (
-                      <Video className="h-5 w-5 text-primary" />
+            <>
+              {/* Daily photos */}
+              {selectedDayPhotos.map((photo) => (
+                <Card
+                  key={photo.id}
+                  className="cursor-pointer transition-shadow hover:shadow-md"
+                  onClick={() => navigate(`/daily-photo/${photo.id}`)}
+                >
+                  <CardContent className="flex items-center gap-3 p-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[hsl(340,70%,55%)]/10">
+                      <Camera className="h-5 w-5 text-[hsl(340,70%,55%)]" />
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="truncate font-medium">
+                        {photo.caption || "Foto diaria"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Foto diaria</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              {/* Diary entries */}
+              {selectedDayEntries.map((entry) => (
+                <Card
+                  key={entry.id}
+                  className="cursor-pointer transition-shadow hover:shadow-md"
+                  onClick={() => navigate(`/entry/${entry.id}`)}
+                >
+                  <CardContent className="flex items-center gap-3 p-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      {entry.isLocked && !isUnlocked(entry) ? (
+                        <Lock className="h-5 w-5 text-primary" />
+                      ) : entry.type === "text" ? (
+                        <PenLine className="h-5 w-5 text-primary" />
+                      ) : entry.type === "audio" ? (
+                        <Mic className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Video className="h-5 w-5 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="truncate font-medium">
+                        {entry.title || entry.note || "Sin título"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {entry.duration
+                          ? `${Math.floor(entry.duration / 60)}:${String(
+                              Math.floor(entry.duration % 60)
+                            ).padStart(2, "0")} · `
+                          : ""}
+                        {entry.type === "video"
+                          ? "Vídeo"
+                          : entry.type === "audio"
+                          ? "Audio"
+                          : "Texto"}
+                      </p>
+                    </div>
+                    {entry.isLocked && !isUnlocked(entry) && (
+                      <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                        🔒{" "}
+                        {entry.unlockAt
+                          ? new Date(entry.unlockAt).toLocaleDateString("es")
+                          : ""}
+                      </span>
                     )}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="truncate font-medium">
-                      {entry.title || entry.note || "Sin título"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {entry.duration
-                        ? `${Math.floor(entry.duration / 60)}:${String(
-                            Math.floor(entry.duration % 60)
-                          ).padStart(2, "0")} · `
-                        : ""}
-                      {entry.type === "video"
-                        ? "Vídeo"
-                        : entry.type === "audio"
-                        ? "Audio"
-                        : entry.type === "text"
-                        ? "Texto"
-                        : "Foto"}
-                    </p>
-                  </div>
-                  {entry.isLocked && !isUnlocked(entry) && (
-                    <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
-                      🔒{" "}
-                      {entry.unlockAt
-                        ? new Date(entry.unlockAt).toLocaleDateString("es")
-                        : ""}
-                    </span>
-                  )}
-                </CardContent>
-              </Card>
-            ))
+                  </CardContent>
+                </Card>
+              ))}
+            </>
           )}
         </div>
       )}

@@ -57,6 +57,7 @@ function getGreeting(): string {
 
 export function DiaryHome() {
   const [entries, setEntries] = useState<ExtendedEntry[]>([]);
+  const [dailyPhotos, setDailyPhotos] = useState<DailyPhotoItem[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [showEntries, setShowEntries] = useState(false);
@@ -67,6 +68,11 @@ export function DiaryHome() {
     if (!activeProfile) return;
     entryRepository.getByProfile(activeProfile.id).then((e) => {
       setEntries(e as ExtendedEntry[]);
+    });
+    dbListByIndex("daily_photos", "by-profile", activeProfile.id).then((p) => {
+      setDailyPhotos(
+        (p as Array<{ id: string; date: string; caption?: string; createdAt: string }>)
+      );
     });
   }, [activeProfile]);
 
