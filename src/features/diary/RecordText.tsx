@@ -161,16 +161,22 @@ export function RecordText() {
         <Label htmlFor="capsule">Guardar como cápsula del tiempo</Label>
       </div>
       {isCapsule && (
-        <Input
-          type="date"
-          value={unlockDate}
-          onChange={(e) => setUnlockDate(e.target.value)}
-          min={new Date().toISOString().slice(0, 10)}
-        />
+        <div className="space-y-1">
+          <Input
+            type="date"
+            value={unlockDate}
+            onChange={(e) => setUnlockDate(e.target.value)}
+            min={new Date().toISOString().slice(0, 10)}
+            required
+          />
+          {!unlockDate && (
+            <p className="text-xs text-destructive">Debes seleccionar una fecha de desbloqueo</p>
+          )}
+        </div>
       )}
 
       {/* Save */}
-      <Button className="gap-2" onClick={save} disabled={!body.trim() && !title.trim()}>
+      <Button className="gap-2" onClick={save} disabled={(!body.trim() && !title.trim()) || (isCapsule && !unlockDate)}>
         <Save className="h-4 w-4" /> Guardar
       </Button>
     </div>
