@@ -86,7 +86,13 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
   };
 
   const handleAddText = () => {
-    onAdd(createOverlay("text", { packId, key: "text" }, { text: "Texto", fontSize: 28 }));
+    if (!textInput.trim()) return;
+    onAdd(createOverlay("text", { packId, key: "text" }, {
+      text: textInput,
+      fontSize: textSize,
+      textColor,
+      fontFamily: textFont,
+    }));
   };
 
   // ─── Drag handling ─────────────────────────────
