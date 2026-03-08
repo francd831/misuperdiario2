@@ -145,7 +145,7 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
 
       {/* Selected day entries */}
       {selectedDay && (
-        <div key={selectedDay.toISOString().slice(0, 10)} className="flex flex-col gap-2 animate-fade-in">
+        <div key={toLocalDateKey(selectedDay)} className="flex flex-col gap-2 animate-fade-in">
           <p className="text-xs font-semibold uppercase text-muted-foreground animate-fade-in">
             {selectedDay.toLocaleDateString("es", {
               weekday: "long",
