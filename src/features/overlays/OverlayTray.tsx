@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles } from "lucide-react";
+import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles, Image } from "lucide-react";
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
 import { PACK_EFFECTS, effectKey, type EffectDef } from "@/features/effects";
 
