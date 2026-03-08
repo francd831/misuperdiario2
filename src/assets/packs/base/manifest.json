@@ -16,7 +16,13 @@
     "bgBlob4": "330 60% 65%",
     "bgBlob5": "200 70% 55%"
   },
-  "stickers": [],
-  "frames": [],
+  "stickers": {
+    "autoLoad": true,
+    "folder": "stickers"
+  },
+  "frames": {
+    "autoLoad": true,
+    "folder": "frames"
+  },
   "sounds": {}
 }
