@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Settings, Palette, Volume2, HardDrive, LogOut, Camera, RefreshCw, KeyRound } from "lucide-react";
+import { Settings, Palette, HardDrive, LogOut, Camera, RefreshCw, KeyRound } from "lucide-react";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
 import { profileService } from "@/core/auth/profileService";
 import { usePack } from "@/core/packs/PackContext";
@@ -15,10 +14,6 @@ import { dbList } from "@/core/storage/indexeddb";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileAvatar } from "@/features/profiles/ProfileAvatar";
 import { AvatarPicker } from "@/features/profiles/AvatarPicker";
-import { ambientEngine } from "@/core/media/ambient/ambientEngine";
-
-const AMBIENT_KEY = "vd_ambient_enabled";
-const AMBIENT_VOL_KEY = "vd_ambient_volume";
 
 export function SettingsPage() {
   const navigate = useNavigate();
