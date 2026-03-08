@@ -18,7 +18,7 @@ interface Props {
   open: boolean;
   currentAvatar?: string;
   profileName: string;
-  onSelect: (avatar: string) => void;
+  onSelect: (avatar: string) => void | Promise<void>;
   onClose: () => void;
 }
 
