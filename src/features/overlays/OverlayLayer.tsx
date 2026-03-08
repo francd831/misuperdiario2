@@ -312,6 +312,15 @@ export function OverlayLayer({
             {resolveAsset(item)}
           </div>
         ))}
+
+      {/* Effect overlays */}
+      {overlays
+        .filter((o) => o.type === "effect")
+        .map((item) => {
+          const def = parseEffectKey(item.assetRef.key);
+          if (!def) return null;
+          return <EffectRenderer key={item.id} def={def} />;
+        })}
     </div>
   );
 }
