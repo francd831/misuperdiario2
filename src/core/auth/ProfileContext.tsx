@@ -79,6 +79,12 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
 export function useProfile() {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useProfile must be inside ProfileProvider");
+  if (!ctx) {
+    // During HMR the context may momentarily be null — force reload
+    if (import.meta.hot) {
+      window.location.reload();
+    }
+    throw new Error("useProfile must be inside ProfileProvider");
+  }
   return ctx;
 }
