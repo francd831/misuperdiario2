@@ -63,6 +63,12 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
 
+  // Text editor state
+  const [textInput, setTextInput] = useState("Texto");
+  const [textFont, setTextFont] = useState(TEXT_FONTS[0].value);
+  const [textSize, setTextSize] = useState(28);
+  const [textColor, setTextColor] = useState("#ffffff");
+
   const tools = [
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
     { id: "frames" as const, icon: Frame, label: "Marcos" },
