@@ -305,7 +305,33 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                 </div>
               )}
 
-              {/* ─── EFFECTS TAB ─── */}
+              {/* ─── BACKGROUNDS TAB ─── */}
+              {activeTab === "backgrounds" && (
+                <div className="space-y-1.5 py-1">
+                  {backgrounds.length > 0 ? (
+                    <div>
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1 px-1">
+                        {activePack?.name ?? "Pack"}
+                      </p>
+                      <div className="grid grid-cols-4 gap-1.5 px-1">
+                        {backgrounds.map((url, i) => (
+                          <button
+                            key={i}
+                            onClick={() => onAdd(createOverlay("background", { packId, key: `backgrounds/${i}` }))}
+                            className="flex aspect-[3/4] items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-95 overflow-hidden transition-all duration-150 p-0"
+                          >
+                            <img src={url} alt="" className="h-full w-full object-cover pointer-events-none" draggable={false} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground py-8 text-center">
+                      Este pack no incluye fondos
+                    </p>
+                  )}
+                </div>
+              )}
               {activeTab === "effects" && (
                 <div className="space-y-1.5 py-1">
                   {(() => {
