@@ -24,19 +24,18 @@ const DEFAULT_DECORATIONS = ["✨", "⭐", "🌟", "💫", "🎈", "🎉"];
 
 function generateItems(emojis: string[], count: number): FloatingItem[] {
   const items: FloatingItem[] = [];
-  // Use deterministic pseudo-random based on index for consistent layout
   for (let i = 0; i < count; i++) {
     const seed = (i * 7 + 13) % 100;
     const seed2 = (i * 11 + 7) % 100;
     const seed3 = (i * 3 + 17) % 100;
     items.push({
       emoji: emojis[i % emojis.length],
-      size: 18 + (seed % 20),
+      size: 22 + (seed % 28),
       x: (seed * 1.01) % 100,
       y: (seed2 * 1.01) % 100,
-      delay: (seed3 * 0.15),
-      duration: 12 + (seed % 18),
-      opacity: 0.08 + (seed % 12) * 0.01,
+      delay: (seed3 * 0.12),
+      duration: 10 + (seed % 14),
+      opacity: 0.13 + (seed % 15) * 0.015,
       rotation: (seed3 * 3.6) % 360,
     });
   }
@@ -49,30 +48,41 @@ export function PackBackground() {
 
   const items = useMemo(() => {
     const emojis = PACK_DECORATIONS[packId] ?? DEFAULT_DECORATIONS;
-    return generateItems(emojis, 22);
+    return generateItems(emojis, 28);
   }, [packId]);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-      {/* Color blobs layer */}
+      {/* Animated color blobs layer */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 animate-blob-shift"
         style={{
           background: `
-            radial-gradient(ellipse 80% 60% at 5% 95%, hsl(var(--pack-bgBlob1) / 0.30) 0%, transparent 60%),
-            radial-gradient(ellipse 70% 55% at 95% 10%, hsl(var(--pack-bgBlob2) / 0.25) 0%, transparent 55%),
-            radial-gradient(ellipse 65% 55% at 50% 50%, hsl(var(--pack-bgBlob3) / 0.18) 0%, transparent 50%),
-            radial-gradient(ellipse 90% 45% at 85% 85%, hsl(var(--pack-bgBlob4) / 0.22) 0%, transparent 50%),
-            radial-gradient(ellipse 55% 65% at 15% 25%, hsl(var(--pack-bgBlob5) / 0.20) 0%, transparent 50%),
-            hsl(var(--background))
+            radial-gradient(ellipse 85% 70% at 5% 90%, hsl(var(--pack-bgBlob1) / 0.40) 0%, transparent 65%),
+            radial-gradient(ellipse 75% 60% at 92% 8%, hsl(var(--pack-bgBlob2) / 0.35) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 60% at 50% 50%, hsl(var(--pack-bgBlob3) / 0.25) 0%, transparent 55%),
+            radial-gradient(ellipse 95% 50% at 80% 85%, hsl(var(--pack-bgBlob4) / 0.30) 0%, transparent 55%),
+            radial-gradient(ellipse 60% 70% at 15% 20%, hsl(var(--pack-bgBlob5) / 0.28) 0%, transparent 55%)
           `,
         }}
       />
+      {/* Secondary animated blob layer for depth */}
+      <div
+        className="absolute inset-0 animate-blob-shift-reverse"
+        style={{
+          background: `
+            radial-gradient(ellipse 50% 50% at 30% 70%, hsl(var(--pack-bgBlob2) / 0.18) 0%, transparent 50%),
+            radial-gradient(ellipse 60% 40% at 70% 30%, hsl(var(--pack-bgBlob4) / 0.15) 0%, transparent 50%)
+          `,
+        }}
+      />
+      {/* Base tinted background */}
+      <div className="absolute inset-0 -z-10" style={{ background: "hsl(var(--background))" }} />
       {/* Floating emojis layer */}
       {items.map((item, i) => (
         <span
           key={i}
-          className="absolute animate-float select-none"
+          className="absolute select-none animate-float-drift"
           style={{
             left: `${item.x}%`,
             top: `${item.y}%`,
@@ -81,6 +91,7 @@ export function PackBackground() {
             animationDelay: `${item.delay}s`,
             animationDuration: `${item.duration}s`,
             transform: `rotate(${item.rotation}deg)`,
+            filter: `blur(${item.size > 40 ? 1 : 0}px)`,
           }}
         >
           {item.emoji}
