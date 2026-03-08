@@ -16,6 +16,7 @@ import { AdminDashboard } from "@/features/admin/AdminDashboard";
 import { AdminProfiles } from "@/features/admin/AdminProfiles";
 import { AdminContent } from "@/features/admin/AdminContent";
 import { AdminSettings } from "@/features/admin/AdminSettings";
+import { AdminStorage } from "@/features/admin/AdminStorage";
 import { useProfile } from "@/core/auth/ProfileContext";
 import NotFound from "@/pages/NotFound";
 
