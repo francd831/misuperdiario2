@@ -62,7 +62,7 @@ function calcDropPosition(clientX: number, clientY: number): { x: number; y: num
 
 export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(null);
-  const { stickers, frames, activePack } = usePack();
+  const { stickers, frames, backgrounds, activePack } = usePack();
   const packId = activePack?.id ?? "base";
   const [drag, setDrag] = useState<DragState | null>(null);
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
