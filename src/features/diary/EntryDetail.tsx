@@ -18,6 +18,8 @@ export function EntryDetail() {
   const navigate = useNavigate();
   const [entry, setEntry] = useState<ExtendedEntry | null>(null);
   const [showDelete, setShowDelete] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
   const { activePack } = usePack();
 
   useEffect(() => {
