@@ -9,7 +9,12 @@
     "secondary": "25 95% 90%",
     "accent": "174 65% 48%",
     "background": "40 33% 98%",
-    "foreground": "250 25% 15%"
+    "foreground": "250 25% 15%",
+    "bgBlob1": "265 75% 60%",
+    "bgBlob2": "174 65% 48%",
+    "bgBlob3": "25 95% 70%",
+    "bgBlob4": "330 60% 65%",
+    "bgBlob5": "200 70% 55%"
   },
   "stickers": [],
   "frames": [],

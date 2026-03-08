@@ -99,6 +99,12 @@
     --vd-warning: 38 80% 55%;
     --vd-info: 210 70% 60%;
     --vd-locked: 45 80% 55%;
+
+    --pack-bgBlob1: 265 75% 65%;
+    --pack-bgBlob2: 174 55% 45%;
+    --pack-bgBlob3: 25 85% 60%;
+    --pack-bgBlob4: 330 50% 55%;
+    --pack-bgBlob5: 200 60% 50%;
   }
 }
 
