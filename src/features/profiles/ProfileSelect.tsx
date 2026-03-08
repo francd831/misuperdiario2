@@ -116,7 +116,7 @@ export function ProfileSelect() {
 
         {createStep === "name" && (
           <>
-            <p className="text-sm text-muted-foreground">¿Cómo te llamas?</p>
+            <p className="text-sm text-white/70">¿Cómo te llamas?</p>
             <Input
               placeholder="Tu nombre"
               value={newName}
