@@ -117,4 +117,35 @@
     20%, 60% { transform: translateX(-8px); }
     40%, 80% { transform: translateX(8px); }
   }
+
+  .app-bg-fun {
+    position: relative;
+    overflow: hidden;
+  }
+  .app-bg-fun::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 90%, hsla(265, 75%, 60%, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 90% 20%, hsla(174, 65%, 48%, 0.10) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 50% at 50% 50%, hsla(25, 95%, 70%, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 90% 40% at 80% 80%, hsla(330, 60%, 65%, 0.07) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 60% at 20% 30%, hsla(200, 70%, 55%, 0.06) 0%, transparent 50%),
+      hsl(var(--background));
+    animation: bg-drift 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes bg-drift {
+    0% {
+      background-position: 0% 0%, 100% 0%, 50% 50%, 80% 80%, 20% 30%;
+    }
+    50% {
+      background-position: 5% 10%, 95% 15%, 55% 45%, 75% 85%, 25% 25%;
+    }
+    100% {
+      background-position: 10% 5%, 90% 10%, 45% 55%, 85% 75%, 15% 35%;
+    }
+  }
 }
