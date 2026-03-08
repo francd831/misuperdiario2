@@ -4,7 +4,7 @@ import { updateTransform } from "@/core/media/overlays/overlayEngine";
 import { usePack } from "@/core/packs/PackContext";
 import { packLoader } from "@/core/packs/packLoader";
 import { parseAnimatedKey, AnimatedSticker } from "@/features/stickers/AnimatedSticker";
-import { parseAnimatedFrameKey, AnimatedFrame } from "@/features/frames/AnimatedFrame";
+
 
 interface Props {
   overlays: OverlayProject;
@@ -192,11 +192,6 @@ export function OverlayLayer({
     }
 
     if (type === "frame") {
-      // Animated frame
-      const animFrame = parseAnimatedFrameKey(assetRef.key);
-      if (animFrame) {
-        return <AnimatedFrame def={animFrame} />;
-      }
       const idx = parseInt(assetRef.key.replace("frames/", ""), 10);
       const frame = frames[idx];
       const url = typeof frame === "string" ? frame : frame?.file;

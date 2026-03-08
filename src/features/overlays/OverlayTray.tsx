@@ -4,11 +4,14 @@ import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
 import { Sticker, Frame, Type, Trash2, X } from "lucide-react";
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
-import { ANIMATED_FRAMES, animatedFrameKey, AnimatedFrame, type AnimatedFrameDef } from "@/features/frames/AnimatedFrame";
+
 
 type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
-const DEFAULT_EMOJIS = ["⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰"];
+const DEFAULT_EMOJIS = [
+  "⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰",
+  "🎈", "🍭", "🌸", "🐱", "🦋", "🍀", "🎪", "🌙", "🍩", "🐶", "🐻", "🫶",
+];
 
 const TEXT_FONTS = [
   { label: "Sans", value: "sans-serif" },
@@ -288,34 +291,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     </div>
                   )}
 
-                  {/* Animated frames */}
-                  {(() => {
-                    const packFrames = ANIMATED_FRAMES[activePack?.id ?? "base"] ?? ANIMATED_FRAMES.base;
-                    return packFrames && packFrames.length > 0 ? (
-                      <div>
-                        <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                          ✨ Animados
-                        </p>
-                        <div className="grid grid-cols-5 gap-1">
-                          {packFrames.map((def) => {
-                            const key = animatedFrameKey(def);
-                            return (
-                              <button
-                                key={key}
-                                onClick={() => onAdd(createOverlay("frame", { packId, key }, { x: 50, y: 50, scale: 1 }))}
-                                className="relative flex aspect-[4/3] items-center justify-center rounded bg-secondary/60 hover:bg-secondary active:scale-95 overflow-hidden transition-all duration-150 touch-none select-none"
-                              >
-                                <AnimatedFrame def={def} className="rounded" />
-                                <span className="text-lg leading-none z-10">{def.icon}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ) : null;
-                  })()}
-
-                  {frames.length === 0 && !(ANIMATED_FRAMES[activePack?.id ?? "base"]?.length) && (
+                  {frames.length === 0 && (
                     <p className="text-sm text-muted-foreground py-8 text-center">
                       Este pack no incluye marcos
                     </p>
