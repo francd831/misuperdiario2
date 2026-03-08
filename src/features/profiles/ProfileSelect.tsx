@@ -173,7 +173,7 @@ export function ProfileSelect() {
 
   // Profile PIN entry
   if (selected) {
-    const colorIdx = profiles.indexOf(selected) % COLORS.length;
+    const colorIdx = profiles.indexOf(selected);
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-6">
         <div className="absolute inset-0 -z-10"><ShaderAnimation /></div>
