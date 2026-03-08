@@ -163,20 +163,20 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               </button>
             </div>
 
-            <div className="max-h-[32vh] overflow-y-auto px-3 py-3">
+            <div className="max-h-[22vh] overflow-y-auto px-2 py-2">
               {activeTab === "stickers" && (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {stickers.length > 0 && (
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                         {activePack?.name ?? "Pack"}
                       </p>
-                      <div className="grid grid-cols-6 gap-1.5">
+                      <div className="grid grid-cols-8 gap-1">
                         {stickers.map((url, i) => (
                           <button
                             key={i}
                             onPointerDown={(e) => startDrag(e, "sticker", `stickers/${i}`, url)}
-                            className="flex aspect-square items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-90 overflow-hidden transition-all duration-150 p-1 touch-none select-none"
+                            className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 hover:bg-secondary active:scale-90 overflow-hidden transition-all duration-150 p-0.5 touch-none select-none"
                           >
                             <img src={url} alt="" className="h-full w-full object-contain pointer-events-none" draggable={false} />
                           </button>
@@ -185,15 +185,15 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     </div>
                   )}
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                       Emojis
                     </p>
-                    <div className="grid grid-cols-8 gap-1.5">
+                    <div className="grid grid-cols-10 gap-1">
                       {DEFAULT_EMOJIS.map((emoji) => (
                         <button
                           key={emoji}
                           onPointerDown={(e) => startDrag(e, "sticker", emoji, undefined, emoji)}
-                          className="flex aspect-square items-center justify-center rounded-lg bg-secondary/60 text-xl hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
+                          className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 text-base hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                         >
                           {emoji}
                         </button>
@@ -206,14 +206,14 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               {activeTab === "frames" && (
                 <div>
                   {frames.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-1.5">
                       {frames.map((frame, i) => {
                         const url = typeof frame === "string" ? frame : frame?.file;
                         return (
                           <button
                             key={i}
                             onPointerDown={(e) => startDrag(e, "frame", `frames/${i}`, url)}
-                            className="flex aspect-[4/3] items-center justify-center rounded-xl bg-secondary/60 hover:bg-secondary active:scale-95 overflow-hidden transition-all duration-150 p-2 touch-none select-none"
+                            className="flex aspect-[4/3] items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-95 overflow-hidden transition-all duration-150 p-1.5 touch-none select-none"
                           >
                             <img src={url} alt="" className="h-full w-full object-contain pointer-events-none" draggable={false} />
                           </button>
