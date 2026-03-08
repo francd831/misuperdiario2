@@ -206,7 +206,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               {activeTab === "frames" && (
                 <div>
                   {frames.length > 0 ? (
-                    <div className="grid grid-cols-4 gap-1.5">
+                    <div className="grid grid-cols-6 gap-1">
                       {frames.map((frame, i) => {
                         const url = typeof frame === "string" ? frame : frame?.file;
                         return (
