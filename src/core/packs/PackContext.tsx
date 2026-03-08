@@ -85,8 +85,20 @@ export function PackProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const FALLBACK: PackContextValue = {
+  activePack: null,
+  packs: [],
+  unlockedIds: new Set(),
+  stickers: [],
+  frames: [],
+  sounds: [],
+  activatePack: async () => {},
+  unlockPack: async () => {},
+  lockPack: async () => {},
+  refreshEntitlements: async () => {},
+};
+
 export function usePack() {
   const ctx = useContext(PackCtx);
-  if (!ctx) throw new Error("usePack must be used within PackProvider");
-  return ctx;
+  return ctx ?? FALLBACK;
 }
