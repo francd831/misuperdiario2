@@ -73,7 +73,7 @@ export function PhotoDetail() {
   const photoUrl = URL.createObjectURL(photo.blob);
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-background">
+    <div className="fixed inset-0 flex flex-col bg-background h-[100dvh]">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
         <Button variant="ghost" size="icon" onClick={() => navigate("/daily-photo")}>
@@ -97,15 +97,15 @@ export function PhotoDetail() {
       </div>
 
       {/* Photo fits available space */}
-      <div className="flex-1 min-h-0 px-3 pb-1">
+      <div className="flex-1 min-h-0 px-3 pb-1 flex items-center justify-center">
         <OverlayLayer
           overlays={overlays}
           selectedId={selectedId}
           onSelect={setSelectedId}
           onChange={setOverlays}
-          className="rounded-xl h-full"
+          className="rounded-xl max-h-full max-w-full"
         >
-          <img src={photoUrl} alt={photo.date} className="h-full w-full object-contain rounded-xl" />
+          <img src={photoUrl} alt={photo.date} className="max-h-full max-w-full object-contain rounded-xl" />
         </OverlayLayer>
       </div>
 

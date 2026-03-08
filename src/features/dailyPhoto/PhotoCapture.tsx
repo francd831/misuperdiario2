@@ -100,7 +100,7 @@ export function PhotoCapture() {
   // After capture – preview with overlays
   if (photo) {
     return (
-      <div className="fixed inset-0 flex flex-col bg-background">
+      <div className="fixed inset-0 flex flex-col bg-background h-[100dvh]">
         <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
           <Button variant="ghost" size="icon" onClick={() => { setPhoto(null); startCamera(); }}>
             <ArrowLeft className="h-5 w-5" />
@@ -109,15 +109,15 @@ export function PhotoCapture() {
         </div>
 
         {/* Photo fits available space */}
-        <div className="flex-1 min-h-0 px-3 pb-1">
+        <div className="flex-1 min-h-0 px-3 pb-1 flex items-center justify-center">
           <OverlayLayer
             overlays={overlays}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onChange={setOverlays}
-            className="rounded-xl h-full"
+            className="rounded-xl max-h-full max-w-full"
           >
-            <img src={preview} alt="Preview" className="h-full w-full object-contain rounded-xl" />
+            <img src={preview} alt="Preview" className="max-h-full max-w-full object-contain rounded-xl" />
           </OverlayLayer>
         </div>
 
@@ -155,7 +155,7 @@ export function PhotoCapture() {
 
   // Live camera – fullscreen with integrated capture button
   return (
-    <div className="fixed inset-0 flex flex-col bg-black">
+    <div className="fixed inset-0 flex flex-col bg-black h-[100dvh]">
       {/* Camera fills all available space */}
       <div className="relative flex-1 min-h-0">
         <OverlayLayer
