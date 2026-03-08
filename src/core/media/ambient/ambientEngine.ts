@@ -1,421 +1,292 @@
 /**
- * Ambient Sound Engine – procedural audio via Web Audio API.
- * Each pack gets a unique, clearly identifiable soundscape.
+ * Ambient Sound Engine v2 – sporadic, thematic sounds via Web Audio API.
+ * Instead of constant drones, each pack triggers short recognisable sounds
+ * (chimes, plucks, bounces …) at random intervals with silence in between.
  */
 
-interface AmbientNodes {
+interface AmbientState {
   ctx: AudioContext;
   master: GainNode;
-  nodes: AudioNode[];
-  sources: (AudioBufferSourceNode | OscillatorNode)[];
+  timers: ReturnType<typeof setTimeout>[];
+  alive: boolean;
 }
 
-let current: AmbientNodes | null = null;
+let current: AmbientState | null = null;
 let currentPack: string | null = null;
 let _enabled = false;
 
-// ─── Noise buffer generator ──────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────
 
-function createNoiseBuffer(ctx: AudioContext, seconds = 2, type: "white" | "pink" | "brown" = "white"): AudioBuffer {
-  const len = ctx.sampleRate * seconds;
+/** Play a short sine/triangle "ping" with an exponential decay envelope */
+function ping(
+  ctx: AudioContext,
+  dest: AudioNode,
+  freq: number,
+  type: OscillatorType = "sine",
+  volume = 0.12,
+  decay = 0.6,
+) {
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  osc.type = type;
+  osc.frequency.value = freq;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(volume, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+  osc.connect(g).connect(dest);
+  osc.start(now);
+  osc.stop(now + decay + 0.05);
+}
+
+/** Play a quick noise burst (sneaker squeak, crowd clap, etc.) */
+function noiseBurst(
+  ctx: AudioContext,
+  dest: AudioNode,
+  hpFreq: number,
+  volume = 0.08,
+  duration = 0.08,
+) {
+  const now = ctx.currentTime;
+  const len = Math.max(1, Math.floor(ctx.sampleRate * duration));
   const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-  const data = buf.getChannelData(0);
-
-  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-  let last = 0;
-
-  for (let i = 0; i < len; i++) {
-    const white = Math.random() * 2 - 1;
-    if (type === "white") {
-      data[i] = white;
-    } else if (type === "pink") {
-      b0 = 0.99886 * b0 + white * 0.0555179;
-      b1 = 0.99332 * b1 + white * 0.0750759;
-      b2 = 0.969 * b2 + white * 0.153852;
-      b3 = 0.8665 * b3 + white * 0.3104856;
-      b4 = 0.55 * b4 + white * 0.5329522;
-      b5 = -0.7616 * b5 - white * 0.016898;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-      b6 = white * 0.115926;
-    } else {
-      data[i] = (last + 0.02 * white) / 1.02;
-      last = data[i];
-      data[i] *= 3.5;
-    }
-  }
-  return buf;
-}
-
-function loopNoise(ctx: AudioContext, buffer: AudioBuffer, dest: AudioNode): AudioBufferSourceNode {
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
   const src = ctx.createBufferSource();
-  src.buffer = buffer;
-  src.loop = true;
-  src.connect(dest);
-  src.start();
-  return src;
+  src.buffer = buf;
+  const hp = ctx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = hpFreq;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(volume, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  src.connect(hp).connect(g).connect(dest);
+  src.start(now);
+  src.stop(now + duration + 0.02);
 }
 
-// ─── BASE: Naturaleza – pájaros, agua, brisa ─────────────
-
-function buildBase(ctx: AudioContext, master: GainNode): AmbientNodes {
-  const nodes: AudioNode[] = [];
-  const sources: (AudioBufferSourceNode | OscillatorNode)[] = [];
-
-  // Gentle stream (brown noise, moderate)
-  const streamGain = ctx.createGain();
-  streamGain.gain.value = 0.30;
-  const streamLP = ctx.createBiquadFilter();
-  streamLP.type = "lowpass";
-  streamLP.frequency.value = 600;
-  streamGain.connect(streamLP).connect(master);
-  sources.push(loopNoise(ctx, createNoiseBuffer(ctx, 3, "brown"), streamGain));
-  nodes.push(streamGain, streamLP);
-
-  // Bird chirps (two alternating high tones)
-  for (const [freq, rate] of [[2400, 4.2], [3100, 2.8]] as [number, number][]) {
-    const osc = ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.value = freq;
-    const g = ctx.createGain();
-    g.gain.value = 0;
-    osc.connect(g).connect(master);
-    osc.start();
-    sources.push(osc);
-    nodes.push(g);
-
-    const lfo = ctx.createOscillator();
-    lfo.frequency.value = rate;
-    const lg = ctx.createGain();
-    lg.gain.value = 0.025;
-    lfo.connect(lg).connect(g.gain);
-    lfo.start();
-    sources.push(lfo);
-    nodes.push(lg);
+/** Schedule a callback at random intervals (ms range) while alive */
+function scheduleRandom(
+  state: AmbientState,
+  fn: () => void,
+  minMs: number,
+  maxMs: number,
+) {
+  function tick() {
+    if (!state.alive) return;
+    fn();
+    const next = minMs + Math.random() * (maxMs - minMs);
+    state.timers.push(setTimeout(tick, next));
   }
-
-  // Soft harmonic drone (nature hum)
-  for (const freq of [130, 196]) {
-    const osc = ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.value = freq;
-    const g = ctx.createGain();
-    g.gain.value = 0.06;
-    osc.connect(g).connect(master);
-    osc.start();
-    sources.push(osc);
-    nodes.push(g);
-  }
-
-  return { ctx, master, nodes, sources };
+  // First trigger after a random delay
+  const first = minMs + Math.random() * (maxMs - minMs);
+  state.timers.push(setTimeout(tick, first));
 }
 
-// ─── FÚTBOL: Estadio lleno – cánticos, oleadas, bombos ──
+// ─── Soft background pad (very low volume, optional) ─────
 
-function buildFutbol(ctx: AudioContext, master: GainNode): AmbientNodes {
-  const nodes: AudioNode[] = [];
-  const sources: (AudioBufferSourceNode | OscillatorNode)[] = [];
+function softPad(ctx: AudioContext, dest: AudioNode, freqs: number[], vol = 0.025) {
+  const oscs: OscillatorNode[] = [];
+  for (const f of freqs) {
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.value = f;
+    osc.detune.value = (Math.random() - 0.5) * 10;
+    const g = ctx.createGain();
+    g.gain.value = vol;
+    osc.connect(g).connect(dest);
+    osc.start();
+    oscs.push(osc);
+  }
+  return oscs;
+}
 
-  // Main crowd roar (loud pink noise, wide band)
-  const crowdGain = ctx.createGain();
-  crowdGain.gain.value = 0.40;
-  const crowdBP = ctx.createBiquadFilter();
-  crowdBP.type = "bandpass";
-  crowdBP.frequency.value = 800;
-  crowdBP.Q.value = 0.3;
-  crowdGain.connect(crowdBP).connect(master);
-  sources.push(loopNoise(ctx, createNoiseBuffer(ctx, 4, "pink"), crowdGain));
-  nodes.push(crowdGain, crowdBP);
+// ─── BASE: Naturaleza – brisa suave, gotas, pájaros esporádicos ──
 
-  // Chanting layer (higher, rhythmic)
-  const chantGain = ctx.createGain();
-  chantGain.gain.value = 0.20;
-  const chantBP = ctx.createBiquadFilter();
-  chantBP.type = "bandpass";
-  chantBP.frequency.value = 1400;
-  chantBP.Q.value = 2.0;
-  chantGain.connect(chantBP).connect(master);
-  sources.push(loopNoise(ctx, createNoiseBuffer(ctx, 3, "white"), chantGain));
-  nodes.push(chantGain, chantBP);
+function buildBase(state: AmbientState) {
+  const { ctx, master } = state;
 
-  // Rhythmic clapping LFO on chant
-  const clapLfo = ctx.createOscillator();
-  clapLfo.frequency.value = 2.5;
-  const clapG = ctx.createGain();
-  clapG.gain.value = 0.10;
-  clapLfo.connect(clapG).connect(chantGain.gain);
-  clapLfo.start();
-  sources.push(clapLfo);
-  nodes.push(clapG);
+  // Very soft wind pad
+  softPad(ctx, master, [130, 196], 0.02);
 
-  // Slow crowd swell (oleadas)
-  const swellLfo = ctx.createOscillator();
-  swellLfo.frequency.value = 0.06;
-  const swellG = ctx.createGain();
-  swellG.gain.value = 0.15;
-  swellLfo.connect(swellG).connect(crowdGain.gain);
-  swellLfo.start();
-  sources.push(swellLfo);
-  nodes.push(swellG);
+  // Sporadic bird chirps (two alternating pitches)
+  scheduleRandom(state, () => {
+    const freq = Math.random() > 0.5 ? 2400 : 3100;
+    ping(ctx, master, freq, "sine", 0.06, 0.15);
+    // Sometimes a quick double-chirp
+    if (Math.random() > 0.6) {
+      setTimeout(() => ping(ctx, master, freq * 1.1, "sine", 0.04, 0.12), 120);
+    }
+  }, 2000, 6000);
 
-  // Bombo / drum beat (low sine pulse)
-  const drum = ctx.createOscillator();
-  drum.type = "sine";
-  drum.frequency.value = 60;
-  const drumGain = ctx.createGain();
-  drumGain.gain.value = 0;
-  drum.connect(drumGain).connect(master);
-  drum.start();
-  sources.push(drum);
-  nodes.push(drumGain);
+  // Occasional water drop
+  scheduleRandom(state, () => {
+    const freq = 800 + Math.random() * 600;
+    ping(ctx, master, freq, "sine", 0.05, 0.25);
+  }, 3000, 8000);
 
-  const drumLfo = ctx.createOscillator();
-  drumLfo.frequency.value = 1.5; // 90 BPM feel
-  const drumLfoG = ctx.createGain();
-  drumLfoG.gain.value = 0.12;
-  drumLfo.connect(drumLfoG).connect(drumGain.gain);
-  drumLfo.start();
-  sources.push(drumLfo);
-  nodes.push(drumLfoG);
+  // Gentle rustling (very short noise)
+  scheduleRandom(state, () => {
+    noiseBurst(ctx, master, 2000, 0.03, 0.15);
+  }, 4000, 10000);
+}
 
-  // Stadium bass rumble
-  const rumble = ctx.createOscillator();
-  rumble.type = "sine";
-  rumble.frequency.value = 40;
-  const rg = ctx.createGain();
-  rg.gain.value = 0.12;
-  rumble.connect(rg).connect(master);
-  rumble.start();
-  sources.push(rumble);
-  nodes.push(rg);
+// ─── REINO MÁGICO: Campanitas, arpas, destellos cristalinos ──
 
-  return { ctx, master, nodes, sources };
+function buildReinoMagico(state: AmbientState) {
+  const { ctx, master } = state;
+
+  // Very subtle ethereal pad
+  softPad(ctx, master, [261.6, 329.6, 392], 0.018);
+
+  // Bell / chime – pentatonic notes
+  const chimeNotes = [1047, 1175, 1319, 1568, 1760, 2093]; // C6-C7 pentatonic-ish
+  scheduleRandom(state, () => {
+    const note = chimeNotes[Math.floor(Math.random() * chimeNotes.length)];
+    ping(ctx, master, note, "triangle", 0.10, 0.9);
+  }, 1500, 4500);
+
+  // Harp pluck arpeggios (2-4 quick descending notes)
+  const harpNotes = [784, 659, 523, 440, 392]; // G5 → G4
+  scheduleRandom(state, () => {
+    const count = 2 + Math.floor(Math.random() * 3);
+    const start = Math.floor(Math.random() * (harpNotes.length - count));
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        ping(ctx, master, harpNotes[start + i], "triangle", 0.07, 0.5);
+      }, i * 140);
+    }
+  }, 3000, 8000);
+
+  // Crystal sparkle (very high, quick)
+  scheduleRandom(state, () => {
+    const freq = 2600 + Math.random() * 1500;
+    ping(ctx, master, freq, "sine", 0.05, 0.3);
+    if (Math.random() > 0.5) {
+      setTimeout(() => ping(ctx, master, freq * 1.2, "sine", 0.03, 0.2), 100);
+    }
+  }, 2500, 7000);
+
+  // Magic wand whoosh (short filtered noise)
+  scheduleRandom(state, () => {
+    noiseBurst(ctx, master, 3000, 0.04, 0.2);
+  }, 5000, 12000);
+}
+
+// ─── FÚTBOL: Estadio – oleadas de gente, silbatos, palmadas ──
+
+function buildFutbol(state: AmbientState) {
+  const { ctx, master } = state;
+
+  // Low crowd murmur pad (subtle, not overpowering)
+  const murmurLen = ctx.sampleRate * 3;
+  const murmurBuf = ctx.createBuffer(1, murmurLen, ctx.sampleRate);
+  const md = murmurBuf.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < murmurLen; i++) {
+    last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02;
+    md[i] = last * 3.5;
+  }
+  const murmurSrc = ctx.createBufferSource();
+  murmurSrc.buffer = murmurBuf;
+  murmurSrc.loop = true;
+  const murmurG = ctx.createGain();
+  murmurG.gain.value = 0.10;
+  const murmurBP = ctx.createBiquadFilter();
+  murmurBP.type = "bandpass";
+  murmurBP.frequency.value = 600;
+  murmurBP.Q.value = 0.5;
+  murmurSrc.connect(murmurG).connect(murmurBP).connect(master);
+  murmurSrc.start();
+
+  // Sporadic crowd roar swell
+  scheduleRandom(state, () => {
+    const now = ctx.currentTime;
+    murmurG.gain.setValueAtTime(murmurG.gain.value, now);
+    murmurG.gain.linearRampToValueAtTime(0.35, now + 0.8);
+    murmurG.gain.linearRampToValueAtTime(0.10, now + 2.5);
+  }, 5000, 15000);
+
+  // Clapping bursts (quick noise)
+  scheduleRandom(state, () => {
+    const count = 3 + Math.floor(Math.random() * 5);
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => noiseBurst(ctx, master, 2500, 0.06, 0.04), i * 110);
+    }
+  }, 3000, 9000);
+
+  // Whistle
+  scheduleRandom(state, () => {
+    ping(ctx, master, 3200, "sine", 0.08, 0.7);
+  }, 8000, 20000);
+
+  // Drum / bombo hit
+  scheduleRandom(state, () => {
+    ping(ctx, master, 60, "sine", 0.15, 0.3);
+  }, 2000, 5000);
 }
 
 // ─── BALONCESTO: Pabellón – rebotes, zapatillas, bocina ──
 
-function buildBaloncesto(ctx: AudioContext, master: GainNode): AmbientNodes {
-  const nodes: AudioNode[] = [];
-  const sources: (AudioBufferSourceNode | OscillatorNode)[] = [];
+function buildBaloncesto(state: AmbientState) {
+  const { ctx, master } = state;
 
-  // Ball bouncing (punchy low-mid sine, fast rhythm)
-  const bounce = ctx.createOscillator();
-  bounce.type = "sine";
-  bounce.frequency.value = 150;
-  const bounceG = ctx.createGain();
-  bounceG.gain.value = 0;
-  bounce.connect(bounceG).connect(master);
-  bounce.start();
-  sources.push(bounce);
-  nodes.push(bounceG);
-
-  const bounceLfo = ctx.createOscillator();
-  bounceLfo.frequency.value = 1.6;
-  const bounceLfoG = ctx.createGain();
-  bounceLfoG.gain.value = 0.14;
-  bounceLfo.connect(bounceLfoG).connect(bounceG.gain);
-  bounceLfo.start();
-  sources.push(bounceLfo);
-  nodes.push(bounceLfoG);
-
-  // Second bounce (higher, offset rhythm for realism)
-  const bounce2 = ctx.createOscillator();
-  bounce2.type = "triangle";
-  bounce2.frequency.value = 200;
-  const bounce2G = ctx.createGain();
-  bounce2G.gain.value = 0;
-  bounce2.connect(bounce2G).connect(master);
-  bounce2.start();
-  sources.push(bounce2);
-  nodes.push(bounce2G);
-
-  const bounce2Lfo = ctx.createOscillator();
-  bounce2Lfo.frequency.value = 0.9;
-  const bounce2LfoG = ctx.createGain();
-  bounce2LfoG.gain.value = 0.08;
-  bounce2Lfo.connect(bounce2LfoG).connect(bounce2G.gain);
-  bounce2Lfo.start();
-  sources.push(bounce2Lfo);
-  nodes.push(bounce2LfoG);
-
-  // Sneaker squeaks (high-passed noise, sharp bursts)
-  const squeakG = ctx.createGain();
-  squeakG.gain.value = 0;
-  const squeakHP = ctx.createBiquadFilter();
-  squeakHP.type = "highpass";
-  squeakHP.frequency.value = 4000;
-  squeakHP.Q.value = 8;
-  squeakG.connect(squeakHP).connect(master);
-  sources.push(loopNoise(ctx, createNoiseBuffer(ctx, 1, "white"), squeakG));
-  nodes.push(squeakG, squeakHP);
-
-  const squeakLfo = ctx.createOscillator();
-  squeakLfo.frequency.value = 2.2;
-  const squeakLfoG = ctx.createGain();
-  squeakLfoG.gain.value = 0.06;
-  squeakLfo.connect(squeakLfoG).connect(squeakG.gain);
-  squeakLfo.start();
-  sources.push(squeakLfo);
-  nodes.push(squeakLfoG);
-
-  // Indoor hall reverb feel (resonant mid noise)
+  // Light hall ambience pad
+  const hallLen = ctx.sampleRate * 2;
+  const hallBuf = ctx.createBuffer(1, hallLen, ctx.sampleRate);
+  const hd = hallBuf.getChannelData(0);
+  let hlast = 0;
+  for (let i = 0; i < hallLen; i++) {
+    hlast = (hlast + 0.02 * (Math.random() * 2 - 1)) / 1.02;
+    hd[i] = hlast * 3.5;
+  }
+  const hallSrc = ctx.createBufferSource();
+  hallSrc.buffer = hallBuf;
+  hallSrc.loop = true;
   const hallG = ctx.createGain();
-  hallG.gain.value = 0.15;
+  hallG.gain.value = 0.06;
   const hallBP = ctx.createBiquadFilter();
   hallBP.type = "bandpass";
   hallBP.frequency.value = 400;
-  hallBP.Q.value = 3;
-  hallG.connect(hallBP).connect(master);
-  sources.push(loopNoise(ctx, createNoiseBuffer(ctx, 2, "pink"), hallG));
-  nodes.push(hallG, hallBP);
+  hallBP.Q.value = 2;
+  hallSrc.connect(hallG).connect(hallBP).connect(master);
+  hallSrc.start();
 
-  // Small indoor crowd chatter
-  const crowdG = ctx.createGain();
-  crowdG.gain.value = 0.22;
-  const crowdBP = ctx.createBiquadFilter();
-  crowdBP.type = "bandpass";
-  crowdBP.frequency.value = 1000;
-  crowdBP.Q.value = 0.8;
-  crowdG.connect(crowdBP).connect(master);
-  sources.push(loopNoise(ctx, createNoiseBuffer(ctx, 3, "pink"), crowdG));
-  nodes.push(crowdG, crowdBP);
+  // Ball bounce (low thud)
+  scheduleRandom(state, () => {
+    const bounces = 1 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < bounces; i++) {
+      setTimeout(() => {
+        ping(ctx, master, 120 + Math.random() * 60, "sine", 0.12, 0.15);
+      }, i * 200);
+    }
+  }, 2000, 6000);
 
-  // Occasional buzzer tone (very subtle square wave)
-  const buzzer = ctx.createOscillator();
-  buzzer.type = "square";
-  buzzer.frequency.value = 500;
-  const buzzerG = ctx.createGain();
-  buzzerG.gain.value = 0;
-  buzzer.connect(buzzerG).connect(master);
-  buzzer.start();
-  sources.push(buzzer);
-  nodes.push(buzzerG);
+  // Sneaker squeak
+  scheduleRandom(state, () => {
+    noiseBurst(ctx, master, 4000, 0.07, 0.06);
+  }, 3000, 8000);
 
-  const buzzerLfo = ctx.createOscillator();
-  buzzerLfo.frequency.value = 0.1;
-  const buzzerLfoG = ctx.createGain();
-  buzzerLfoG.gain.value = 0.012;
-  buzzerLfo.connect(buzzerLfoG).connect(buzzerG.gain);
-  buzzerLfo.start();
-  sources.push(buzzerLfo);
-  nodes.push(buzzerLfoG);
+  // Crowd reaction burst
+  scheduleRandom(state, () => {
+    const now = ctx.currentTime;
+    hallG.gain.setValueAtTime(hallG.gain.value, now);
+    hallG.gain.linearRampToValueAtTime(0.25, now + 0.4);
+    hallG.gain.linearRampToValueAtTime(0.06, now + 1.8);
+  }, 6000, 14000);
 
-  return { ctx, master, nodes, sources };
-}
-
-// ─── REINO MÁGICO: Bosque encantado – campanas, arpa, destellos ──
-
-function buildReinoMagico(ctx: AudioContext, master: GainNode): AmbientNodes {
-  const nodes: AudioNode[] = [];
-  const sources: (AudioBufferSourceNode | OscillatorNode)[] = [];
-
-  // Ethereal pad chord (C major, triangle waves, louder)
-  for (const freq of [261.6, 329.6, 392]) {
+  // Occasional buzzer
+  scheduleRandom(state, () => {
+    const now = ctx.currentTime;
     const osc = ctx.createOscillator();
-    osc.type = "triangle";
-    osc.frequency.value = freq;
-    osc.detune.value = (Math.random() - 0.5) * 15;
+    osc.type = "square";
+    osc.frequency.value = 440;
     const g = ctx.createGain();
-    g.gain.value = 0.06;
+    g.gain.setValueAtTime(0.06, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
     osc.connect(g).connect(master);
-    osc.start();
-    sources.push(osc);
-    nodes.push(g);
-  }
-
-  // Harp-like arpeggios (sine tones with LFO modulation)
-  const harpFreqs = [523, 659, 784, 1047]; // C5, E5, G5, C6
-  for (let i = 0; i < harpFreqs.length; i++) {
-    const osc = ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.value = harpFreqs[i];
-    const g = ctx.createGain();
-    g.gain.value = 0;
-    osc.connect(g).connect(master);
-    osc.start();
-    sources.push(osc);
-    nodes.push(g);
-
-    const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.4 + i * 0.15; // staggered rates
-    const lg = ctx.createGain();
-    lg.gain.value = 0.025;
-    lfo.connect(lg).connect(g.gain);
-    lfo.start();
-    sources.push(lfo);
-    nodes.push(lg);
-  }
-
-  // Crystal sparkle (very high, pulsing)
-  const sparkle = ctx.createOscillator();
-  sparkle.type = "sine";
-  sparkle.frequency.value = 2637; // E7
-  const sg = ctx.createGain();
-  sg.gain.value = 0;
-  sparkle.connect(sg).connect(master);
-  sparkle.start();
-  sources.push(sparkle);
-  nodes.push(sg);
-
-  const sparkLfo = ctx.createOscillator();
-  sparkLfo.frequency.value = 0.5;
-  const sparkLfoG = ctx.createGain();
-  sparkLfoG.gain.value = 0.02;
-  sparkLfo.connect(sparkLfoG).connect(sg.gain);
-  sparkLfo.start();
-  sources.push(sparkLfo);
-  nodes.push(sparkLfoG);
-
-  // Second sparkle (different pitch)
-  const sparkle2 = ctx.createOscillator();
-  sparkle2.type = "sine";
-  sparkle2.frequency.value = 3520; // A7
-  const sg2 = ctx.createGain();
-  sg2.gain.value = 0;
-  sparkle2.connect(sg2).connect(master);
-  sparkle2.start();
-  sources.push(sparkle2);
-  nodes.push(sg2);
-
-  const spark2Lfo = ctx.createOscillator();
-  spark2Lfo.frequency.value = 0.7;
-  const spark2LfoG = ctx.createGain();
-  spark2LfoG.gain.value = 0.015;
-  spark2Lfo.connect(spark2LfoG).connect(sg2.gain);
-  spark2Lfo.start();
-  sources.push(spark2Lfo);
-  nodes.push(spark2LfoG);
-
-  // Enchanted wind (very soft brown noise)
-  const windG = ctx.createGain();
-  windG.gain.value = 0.12;
-  const wf = ctx.createBiquadFilter();
-  wf.type = "lowpass";
-  wf.frequency.value = 400;
-  windG.connect(wf).connect(master);
-  sources.push(loopNoise(ctx, createNoiseBuffer(ctx, 3, "brown"), windG));
-  nodes.push(windG, wf);
-
-  // Chime bell (high triangle wave, slow pulse)
-  const chime = ctx.createOscillator();
-  chime.type = "triangle";
-  chime.frequency.value = 1568; // G6
-  const chimeG = ctx.createGain();
-  chimeG.gain.value = 0;
-  chime.connect(chimeG).connect(master);
-  chime.start();
-  sources.push(chime);
-  nodes.push(chimeG);
-
-  const chimeLfo = ctx.createOscillator();
-  chimeLfo.frequency.value = 0.25;
-  const chimeLfoG = ctx.createGain();
-  chimeLfoG.gain.value = 0.03;
-  chimeLfo.connect(chimeLfoG).connect(chimeG.gain);
-  chimeLfo.start();
-  sources.push(chimeLfo);
-  nodes.push(chimeLfoG);
-
-  return { ctx, master, nodes, sources };
+    osc.start(now);
+    osc.stop(now + 1.3);
+  }, 15000, 35000);
 }
 
 // ─── Public API ──────────────────────────────────────────
@@ -431,12 +302,13 @@ function getBuilder(packId: string) {
 
 function stopCurrent() {
   if (!current) return;
-  const { ctx, master, sources } = current;
+  const { ctx, master, timers } = current;
+  current.alive = false;
+  timers.forEach(clearTimeout);
   const now = ctx.currentTime;
   master.gain.setValueAtTime(master.gain.value, now);
   master.gain.linearRampToValueAtTime(0, now + 0.5);
   setTimeout(() => {
-    sources.forEach((s) => { try { s.stop(); } catch {} });
     try { ctx.close(); } catch {}
   }, 600);
   current = null;
@@ -451,9 +323,12 @@ function startPack(packId: string) {
   master.gain.value = 0;
   master.connect(ctx.destination);
 
-  const builder = getBuilder(packId);
-  current = builder(ctx, master);
+  const state: AmbientState = { ctx, master, timers: [], alive: true };
+  current = state;
   currentPack = packId;
+
+  const builder = getBuilder(packId);
+  builder(state);
 
   // Fade in
   const now = ctx.currentTime;
