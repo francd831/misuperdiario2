@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Trash2, Lock } from "lucide-react";
+import { ArrowLeft, Trash2, Lock, Play, Pause, RotateCcw } from "lucide-react";
 import { ConfirmDialog } from "@/app/components/ConfirmDialog";
 import { usePack } from "@/core/packs/PackContext";
 import { OverlayLayer } from "@/features/overlays/OverlayLayer";
