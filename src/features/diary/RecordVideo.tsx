@@ -85,16 +85,29 @@ export function RecordVideo() {
   const startRecording = () => {
     if (!streamRef.current) return;
     chunksRef.current = [];
-    const recorder = new MediaRecorder(streamRef.current, { mimeType: "video/webm" });
+
+    // Pick best supported codec with constrained bitrate
+    const mimeOptions = [
+      "video/webm;codecs=vp8,opus",
+      "video/webm;codecs=vp8",
+      "video/webm",
+      "video/mp4",
+    ];
+    const mimeType = mimeOptions.find((m) => MediaRecorder.isTypeSupported(m)) ?? "video/webm";
+
+    const recorder = new MediaRecorder(streamRef.current, {
+      mimeType,
+      videoBitsPerSecond: 1_500_000, // 1.5 Mbps – smooth without huge files
+    });
     recorder.ondataavailable = (e) => {
       if (e.data.size) chunksRef.current.push(e.data);
     };
     recorder.onstop = () => {
-      const b = new Blob(chunksRef.current, { type: "video/webm" });
+      const b = new Blob(chunksRef.current, { type: mimeType });
       setBlob(b);
     };
     recorderRef.current = recorder;
-    recorder.start(1000);
+    recorder.start(500); // smaller chunks = less memory pressure
     setRecording(true);
     setElapsed(0);
   };
