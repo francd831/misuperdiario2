@@ -100,7 +100,7 @@ export function PhotoCapture() {
   // After capture – preview with overlays
   if (photo) {
     return (
-      <div className="fixed inset-0 flex flex-col bg-background">
+      <div className="fixed inset-0 flex flex-col bg-background h-[100dvh]">
         <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
           <Button variant="ghost" size="icon" onClick={() => { setPhoto(null); startCamera(); }}>
             <ArrowLeft className="h-5 w-5" />
