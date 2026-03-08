@@ -8,6 +8,22 @@ type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
 const DEFAULT_EMOJIS = ["⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰"];
 
+const TEXT_FONTS = [
+  { label: "Sans", value: "sans-serif" },
+  { label: "Serif", value: "Georgia, serif" },
+  { label: "Mono", value: "'Courier New', monospace" },
+  { label: "Comic", value: "'Comic Sans MS', cursive" },
+  { label: "Impact", value: "Impact, sans-serif" },
+  { label: "Cursiva", value: "'Brush Script MT', cursive" },
+];
+
+const TEXT_SIZES = [16, 20, 24, 32, 40, 56];
+
+const TEXT_COLORS = [
+  "#ffffff", "#000000", "#ef4444", "#f97316", "#eab308",
+  "#22c55e", "#3b82f6", "#8b5cf6", "#ec4899", "#06b6d4",
+];
+
 interface Props {
   selectedId: string | null;
   overlays: OverlayProject;
