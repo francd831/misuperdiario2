@@ -159,7 +159,7 @@ export async function dbList<T extends StoreNames>(
 }
 
 export async function dbListByIndex(
-  store: "entries" | "daily_photos",
+  store: "entries" | "daily_photos" | "achievements",
   indexName: string,
   value: string
 ): Promise<any[]> {
