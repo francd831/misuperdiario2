@@ -118,6 +118,10 @@ function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
         if (!db.objectStoreNames.contains("avatar_blobs")) {
           db.createObjectStore("avatar_blobs", { keyPath: "id" });
         }
+        if (!db.objectStoreNames.contains("achievements")) {
+          const achStore = db.createObjectStore("achievements", { keyPath: "id" });
+          achStore.createIndex("by-profile", "profileId");
+        }
       },
     });
   }
