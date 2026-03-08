@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
+import { dbListByIndex } from "@/core/storage/indexeddb";
 import { useProfile } from "@/core/auth/ProfileContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Video, Mic, Lock, Search, PenLine, LogOut, Camera, Sparkles } from "lucide-react";
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
-import { DiaryCalendar } from "./DiaryCalendar";
+import { DiaryCalendar, type DailyPhotoItem } from "./DiaryCalendar";
 
 const ACTION_CARDS = [
   {
