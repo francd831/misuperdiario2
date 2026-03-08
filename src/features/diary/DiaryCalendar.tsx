@@ -69,7 +69,7 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
   // Entries + photos for selected day
   const selectedDayEntries = useMemo(() => {
     if (!selectedDay) return [];
-    const key = selectedDay.toISOString().slice(0, 10);
+    const key = toLocalDateKey(selectedDay);
     return entries
       .filter((e) => (e.date || e.createdAt.slice(0, 10)) === key)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
