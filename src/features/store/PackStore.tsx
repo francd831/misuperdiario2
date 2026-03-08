@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Check, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { packLoader } from "@/core/packs/packLoader";
 
 export function PackStore() {
   const { packs, unlockedIds, activePack, activatePack, unlockPack } = usePack();
@@ -28,11 +29,18 @@ export function PackStore() {
         const isFree = pack.free;
         const isUnlocked = isFree || unlockedIds.has(pack.id);
         const isActive = pack.id === activePack?.id;
+        const previewUrl = packLoader.getPackAssetUrl(pack.id, "preview.png");
 
         return (
           <Card key={pack.id} className={`overflow-hidden transition-shadow ${isActive ? "ring-2 ring-primary" : ""}`}>
-            <div className="h-24 bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center">
-              <span className="text-4xl">{pack.id === "reinoMagico" ? "🏰" : "📓"}</span>
+            <div className="h-36 overflow-hidden">
+              {previewUrl ? (
+                <img src={previewUrl} alt={pack.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center">
+                  <span className="text-4xl">📓</span>
+                </div>
+              )}
             </div>
             <CardContent className="flex flex-col gap-3 p-4">
               <div className="flex items-center justify-between">
