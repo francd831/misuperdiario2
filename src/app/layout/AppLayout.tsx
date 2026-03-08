@@ -18,6 +18,7 @@ const NO_NAV_ROUTES = ["/record/video", "/record/audio", "/daily-photo/capture",
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { state, activeProfile } = useProfile();
   const location = useLocation();
+  useAmbientSound();
 
   if (state.status === "loading") {
     return (
