@@ -221,17 +221,17 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                         <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           ✨ Animados
                         </p>
-                        <div className="grid grid-cols-8 gap-0.5">
+                        <div className="grid grid-cols-10 gap-0">
                           {packAnimated.map((def) => {
                             const key = animatedKey(def);
                             return (
                               <button
                                 key={key}
                                 onPointerDown={(e) => startDrag(e, "sticker", key, undefined, def.emoji)}
-                                className="flex flex-col aspect-square items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
+                                className="flex aspect-square items-center justify-center rounded bg-secondary/60 hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                               >
                                 <span
-                                  className="text-xl leading-none"
+                                  className="text-lg leading-none"
                                   style={{ animation: `stk-${def.animation} 1.5s ease-in-out infinite` }}
                                 >
                                   {def.emoji}
