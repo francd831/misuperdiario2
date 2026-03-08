@@ -45,7 +45,7 @@ function uid(): string {
 export function createOverlay(
   type: OverlayType,
   assetRef: OverlayAssetRef,
-  partial?: Partial<OverlayTransform & { zIndex: number; text: string; textColor: string; fontSize: number }>,
+  partial?: Partial<OverlayTransform & { zIndex: number; text: string; textColor: string; fontSize: number; fontFamily: string }>,
 ): OverlayItem {
   return {
     id: uid(),
