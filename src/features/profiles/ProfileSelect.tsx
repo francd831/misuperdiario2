@@ -229,12 +229,12 @@ export function ProfileSelect() {
         {/* Botón crear nuevo perfil */}
         <button
           onClick={() => setCreating(true)}
-          className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-muted-foreground/30 p-6 transition-transform active:scale-95 hover:bg-muted/50"
+          className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-white/30 p-6 transition-transform active:scale-95 hover:bg-white/10"
         >
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted text-3xl">
-            <UserPlus className="h-8 w-8 text-muted-foreground" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-3xl">
+            <UserPlus className="h-8 w-8 text-white" />
           </div>
-          <span className="text-base font-semibold text-muted-foreground">Nuevo</span>
+          <span className="text-base font-semibold text-white/70">Nuevo</span>
         </button>
       </div>
 
