@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, Camera, RefreshCw } from "lucide-react";
+import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, Camera, RefreshCw, KeyRound } from "lucide-react";
 import { LongPress } from "@/app/components/LongPress";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
 import { profileService } from "@/core/auth/profileService";
@@ -221,7 +221,25 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Hidden admin access */}
+      {/* TEMPORAL: Reset admin PIN */}
+      <Button
+        variant="destructive"
+        size="sm"
+        className="gap-2"
+        onClick={async () => {
+          const profiles = await profileRepository.getAll();
+          const admin = profiles.find((p) => p.role === "admin");
+          if (admin) {
+            await profileRepository.save({ ...admin, pin: undefined });
+            toast({ title: "PIN de admin eliminado. Podrás crear uno nuevo al acceder." });
+          } else {
+            toast({ title: "No se encontró perfil de admin", variant: "destructive" });
+          }
+        }}
+      >
+        <KeyRound className="h-4 w-4" /> Resetear PIN de administrador
+      </Button>
+
       {isAdmin ? (
         <Button variant="outline" className="gap-2" onClick={() => navigate("/admin")}>
           <Shield className="h-4 w-4" /> Panel de administración
