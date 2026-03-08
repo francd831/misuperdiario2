@@ -3,17 +3,20 @@ import { profileService } from "@/core/auth/profileService";
 import { useProfile } from "@/core/auth/ProfileContext";
 import type { Profile } from "@/core/storage/repositories/profileRepository";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LongPress } from "@/app/components/LongPress";
-import { Shield, ArrowLeft } from "lucide-react";
+import { Shield, ArrowLeft, UserPlus } from "lucide-react";
 
 const COLORS = [
   "bg-rose-400", "bg-amber-400", "bg-emerald-400", "bg-sky-400",
   "bg-violet-400", "bg-pink-400", "bg-teal-400", "bg-orange-400",
 ];
 
+type CreateStep = "name" | "pin" | "confirm";
+
 export function ProfileSelect() {
-  const { login, refresh } = useProfile();
+  const { login, refresh, createProfile } = useProfile();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [selected, setSelected] = useState<Profile | null>(null);
   const [pin, setPin] = useState("");
@@ -24,10 +27,22 @@ export function ProfileSelect() {
   const [adminPinMode, setAdminPinMode] = useState(false);
   const [adminProfile, setAdminProfile] = useState<Profile | null>(null);
 
-  useEffect(() => {
+  // Create profile state
+  const [creating, setCreating] = useState(false);
+  const [createStep, setCreateStep] = useState<CreateStep>("name");
+  const [newName, setNewName] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [createError, setCreateError] = useState("");
+
+  const loadProfiles = useCallback(() => {
     profileService.getVisibleProfiles().then(setProfiles);
     profileService.getAdminProfile().then((a) => setAdminProfile(a ?? null));
   }, []);
+
+  useEffect(() => {
+    loadProfiles();
+  }, [loadProfiles]);
 
   useEffect(() => {
     if (!lockedUntil) return;
@@ -57,7 +72,86 @@ export function ProfileSelect() {
     }
   }, [attempts, lockedUntil, login]);
 
+  const resetCreate = () => {
+    setCreating(false);
+    setCreateStep("name");
+    setNewName("");
+    setNewPin("");
+    setConfirmPin("");
+    setCreateError("");
+  };
+
+  const handleCreateNext = async () => {
+    if (createStep === "name") {
+      if (newName.trim().length < 2) { setCreateError("Mínimo 2 caracteres"); return; }
+      setCreateError("");
+      setCreateStep("pin");
+    } else if (createStep === "pin") {
+      if (newPin.length < 4) return;
+      setCreateError("");
+      setCreateStep("confirm");
+    } else if (createStep === "confirm") {
+      if (confirmPin !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); return; }
+      await createProfile(newName.trim(), newPin, "user");
+      resetCreate();
+      loadProfiles();
+    }
+  };
+
   const remaining = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
+
+  // Create new profile flow
+  if (creating) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6">
+        <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={resetCreate}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+          <UserPlus className="h-10 w-10 text-primary" />
+        </div>
+        <h1 className="text-2xl font-bold">Nuevo perfil</h1>
+
+        {createStep === "name" && (
+          <>
+            <p className="text-sm text-muted-foreground">¿Cómo te llamas?</p>
+            <Input
+              placeholder="Tu nombre"
+              value={newName}
+              onChange={(e) => { setNewName(e.target.value); setCreateError(""); }}
+              className="max-w-xs text-center text-lg"
+              autoFocus
+              onKeyDown={(e) => e.key === "Enter" && handleCreateNext()}
+            />
+          </>
+        )}
+
+        {createStep === "pin" && (
+          <>
+            <p className="text-sm text-muted-foreground">Crea un PIN de 4 dígitos</p>
+            <InputOTP maxLength={4} value={newPin} onChange={(v) => { setNewPin(v); setCreateError(""); if (v.length === 4) { setCreateStep("confirm"); } }}>
+              <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
+            </InputOTP>
+          </>
+        )}
+
+        {createStep === "confirm" && (
+          <>
+            <p className="text-sm text-muted-foreground">Confirma tu PIN</p>
+            <InputOTP maxLength={4} value={confirmPin} onChange={(v) => { setConfirmPin(v); setCreateError(""); if (v.length === 4) { setTimeout(() => { if (v !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); } else { handleCreateNext(); } }, 200); } }}>
+              <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
+            </InputOTP>
+          </>
+        )}
+
+        {createError && <p className="text-sm text-destructive">{createError}</p>}
+
+        {createStep === "name" && (
+          <Button onClick={handleCreateNext} disabled={newName.trim().length < 2}>Siguiente</Button>
+        )}
+      </div>
+    );
+  }
 
   // Admin PIN entry
   if (adminPinMode && adminProfile) {
@@ -110,33 +204,34 @@ export function ProfileSelect() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6">
       <h1 className="text-3xl font-bold">¿Quién eres?</h1>
 
-      {profiles.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 text-center">
-          <p className="text-4xl">👤</p>
-          <p className="text-muted-foreground">No hay perfiles de usuario todavía.</p>
-          <p className="text-sm text-muted-foreground">
-            Accede como administrador para crear perfiles.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
-          {profiles.map((p, i) => {
-            const color = COLORS[i % COLORS.length];
-            return (
-              <button
-                key={p.id}
-                onClick={() => { setSelected(p); setPin(""); setError(""); setAttempts(0); }}
-                className="flex flex-col items-center gap-3 rounded-2xl p-6 transition-transform active:scale-95 hover:bg-muted/50"
-              >
-                <div className={`flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg ${color}`}>
-                  {p.name.charAt(0).toUpperCase()}
-                </div>
-                <span className="text-base font-semibold">{p.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+        {profiles.map((p, i) => {
+          const color = COLORS[i % COLORS.length];
+          return (
+            <button
+              key={p.id}
+              onClick={() => { setSelected(p); setPin(""); setError(""); setAttempts(0); }}
+              className="flex flex-col items-center gap-3 rounded-2xl p-6 transition-transform active:scale-95 hover:bg-muted/50"
+            >
+              <div className={`flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg ${color}`}>
+                {p.name.charAt(0).toUpperCase()}
+              </div>
+              <span className="text-base font-semibold">{p.name}</span>
+            </button>
+          );
+        })}
+
+        {/* Botón crear nuevo perfil */}
+        <button
+          onClick={() => setCreating(true)}
+          className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-muted-foreground/30 p-6 transition-transform active:scale-95 hover:bg-muted/50"
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted text-3xl">
+            <UserPlus className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <span className="text-base font-semibold text-muted-foreground">Nuevo</span>
+        </button>
+      </div>
 
       {/* Hidden admin access via long press */}
       {adminProfile && (
