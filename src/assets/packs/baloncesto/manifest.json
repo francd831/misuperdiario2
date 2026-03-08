@@ -1,0 +1,29 @@
+{
+  "id": "baloncesto",
+  "name": "Baloncesto",
+  "description": "¡Encesta tus mejores recuerdos con el pack de baloncesto!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "25 90% 52%",
+    "secondary": "210 80% 90%",
+    "accent": "0 75% 55%",
+    "background": "30 25% 97%",
+    "foreground": "25 50% 12%",
+    "bgBlob1": "25 90% 55%",
+    "bgBlob2": "210 80% 55%",
+    "bgBlob3": "0 75% 55%",
+    "bgBlob4": "45 85% 55%",
+    "bgBlob5": "280 50% 55%"
+  },
+  "stickers": {
+    "autoLoad": true,
+    "folder": "stickers"
+  },
+  "frames": {
+    "autoLoad": true,
+    "folder": "frames"
+  },
+  "sounds": {}
+}
