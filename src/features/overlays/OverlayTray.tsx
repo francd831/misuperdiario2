@@ -20,7 +20,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
   const { stickers, frames, activePack } = usePack();
   const packId = activePack?.id ?? "base";
 
-  const selectedItem = selectedId ? overlays.find((o) => o.id === selectedId) : null;
+  
 
   const tools = [
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
