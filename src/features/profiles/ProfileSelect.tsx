@@ -180,9 +180,7 @@ export function ProfileSelect() {
         <Button variant="ghost" size="icon" className="absolute left-4 top-4 text-white" onClick={() => { setSelected(null); setPin(""); setError(""); setAttempts(0); }}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className={`flex h-24 w-24 items-center justify-center rounded-full text-4xl font-bold text-white shadow-lg ${COLORS[colorIdx]}`}>
-          {selected.name.charAt(0).toUpperCase()}
-        </div>
+        <ProfileAvatar avatar={selected.avatar} name={selected.name} colorIndex={profiles.indexOf(selected)} size="lg" />
         <h1 className="text-2xl font-bold text-white drop-shadow-lg">{selected.name}</h1>
         <p className="text-sm text-white/70">Ingresa tu PIN</p>
         <div className={shake ? "animate-shake" : ""}>
