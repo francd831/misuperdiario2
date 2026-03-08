@@ -4,6 +4,8 @@ import { updateTransform } from "@/core/media/overlays/overlayEngine";
 import { usePack } from "@/core/packs/PackContext";
 import { packLoader } from "@/core/packs/packLoader";
 import { parseAnimatedKey, AnimatedSticker } from "@/features/stickers/AnimatedSticker";
+import { parseEffectKey } from "@/features/effects";
+import { EffectRenderer } from "@/features/effects/EffectRenderer";
 
 
 interface Props {
@@ -310,6 +312,15 @@ export function OverlayLayer({
             {resolveAsset(item)}
           </div>
         ))}
+
+      {/* Effect overlays */}
+      {overlays
+        .filter((o) => o.type === "effect")
+        .map((item) => {
+          const def = parseEffectKey(item.assetRef.key);
+          if (!def) return null;
+          return <EffectRenderer key={item.id} def={def} />;
+        })}
     </div>
   );
 }

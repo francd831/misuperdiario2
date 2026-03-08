@@ -2,10 +2,11 @@ import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X, SmilePlus } from "lucide-react";
+import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles } from "lucide-react";
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
+import { PACK_EFFECTS, effectKey, type EffectDef } from "@/features/effects";
 
-type Tab = "emoji" | "stickers" | "frames" | "text" | null;
+type Tab = "emoji" | "stickers" | "frames" | "text" | "effects" | null;
 
 const DEFAULT_EMOJIS = [
   "⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰",
@@ -77,6 +78,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
     { id: "emoji" as const, icon: SmilePlus, label: "Emoji" },
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
     { id: "frames" as const, icon: Frame, label: "Marcos" },
+    { id: "effects" as const, icon: Sparkles, label: "Efectos" },
     { id: "text" as const, icon: Type, label: "Texto" },
   ];
 
@@ -98,6 +100,14 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
       textColor,
       fontFamily: textFont,
     }));
+  };
+
+  const handleAddEffect = (def: EffectDef) => {
+    // Only allow one effect of each type
+    const key = effectKey(def);
+    const exists = overlays.some((o) => o.type === "effect" && o.assetRef.key === key);
+    if (exists) return;
+    onAdd(createOverlay("effect", { packId, key }));
   };
 
   // ─── Drag handling ─────────────────────────────
@@ -291,6 +301,56 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                       Este pack no incluye marcos
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* ─── EFFECTS TAB ─── */}
+              {activeTab === "effects" && (
+                <div className="space-y-1.5 py-1">
+                  {(() => {
+                    const effects = PACK_EFFECTS[activePack?.id ?? ""] ?? [];
+                    const activeEffectKeys = overlays.filter((o) => o.type === "effect").map((o) => o.assetRef.key);
+                    if (effects.length === 0) return (
+                      <p className="text-sm text-muted-foreground py-8 text-center">
+                        Este pack no incluye efectos
+                      </p>
+                    );
+                    return (
+                      <div>
+                        <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 px-1">
+                          ✨ Efectos animados
+                        </p>
+                        <div className="grid grid-cols-3 gap-1.5 px-1">
+                          {effects.map((def) => {
+                            const key = effectKey(def);
+                            const isActive = activeEffectKeys.includes(key);
+                            return (
+                              <button
+                                key={def.id}
+                                onClick={() => handleAddEffect(def)}
+                                className={`flex flex-col items-center gap-1 rounded-xl py-2.5 px-1 transition-all duration-150 ${
+                                  isActive
+                                    ? "bg-primary/20 ring-1 ring-primary/40"
+                                    : "bg-secondary/60 hover:bg-secondary active:scale-95"
+                                }`}
+                              >
+                                <span className="text-2xl">{def.emoji}</span>
+                                <span className="text-[10px] font-medium text-foreground leading-tight text-center">
+                                  {def.label}
+                                </span>
+                                {isActive && (
+                                  <span className="text-[8px] font-bold text-primary uppercase">Activo</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground text-center mt-2">
+                          Toca para activar · Usa 🗑 para quitar
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
