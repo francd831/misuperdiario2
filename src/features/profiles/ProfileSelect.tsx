@@ -184,14 +184,14 @@ export function ProfileSelect() {
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-6">
         <div className="absolute inset-0 -z-10"><ShaderAnimation /></div>
-        <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={() => { setSelected(null); setPin(""); setError(""); setAttempts(0); }}>
+        <Button variant="ghost" size="icon" className="absolute left-4 top-4 text-white" onClick={() => { setSelected(null); setPin(""); setError(""); setAttempts(0); }}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className={`flex h-24 w-24 items-center justify-center rounded-full text-4xl font-bold text-white ${COLORS[colorIdx]}`}>
+        <div className={`flex h-24 w-24 items-center justify-center rounded-full text-4xl font-bold text-white shadow-lg ${COLORS[colorIdx]}`}>
           {selected.name.charAt(0).toUpperCase()}
         </div>
-        <h1 className="text-2xl font-bold">{selected.name}</h1>
-        <p className="text-sm text-muted-foreground">Ingresa tu PIN</p>
+        <h1 className="text-2xl font-bold text-white drop-shadow-lg">{selected.name}</h1>
+        <p className="text-sm text-white/70">Ingresa tu PIN</p>
         <div className={shake ? "animate-shake" : ""}>
           <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(v); setError(""); if (v.length === 4) verify(v, selected.id); }} disabled={!!lockedUntil}>
             <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
