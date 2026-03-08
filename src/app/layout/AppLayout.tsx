@@ -5,6 +5,7 @@ import { AdminNavigation } from "../navigation/AdminNavigation";
 import { useProfile } from "@/core/auth/ProfileContext";
 import { AdminSetup } from "@/features/profiles/AdminSetup";
 import { ProfileSelect } from "@/features/profiles/ProfileSelect";
+import { PackBackground } from "@/features/backgrounds/PackBackground";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -38,12 +39,18 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const showNav = !NO_NAV_ROUTES.some((r) => location.pathname.startsWith(r));
 
   if (isFullScreen && !isAdmin) {
-    return <div className="min-h-screen app-bg-fun">{children}</div>;
+    return (
+      <div className="relative min-h-screen">
+        <PackBackground />
+        <div className="relative z-10">{children}</div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex min-h-screen flex-col text-foreground app-bg-fun">
-      <main className="flex-1">{children}</main>
+    <div className="relative flex min-h-screen flex-col text-foreground">
+      <PackBackground />
+      <main className="relative z-10 flex-1">{children}</main>
       {showNav && (isAdmin ? <AdminNavigation /> : <AppNavigation />)}
     </div>
   );
