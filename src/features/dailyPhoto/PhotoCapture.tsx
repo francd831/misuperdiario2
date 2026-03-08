@@ -144,7 +144,9 @@ export function PhotoCapture() {
 
         <OverlayTray
           selectedId={selectedId}
+          overlays={overlays}
           onAdd={addOverlay}
+          onChange={setOverlays}
           onDelete={deleteSelected}
         />
       </div>
