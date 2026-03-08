@@ -249,6 +249,7 @@ export function RecordVideo() {
             className="h-full w-full object-cover"
             muted
             playsInline
+            style={{ willChange: "auto" }}
           />
         </OverlayLayer>
 
