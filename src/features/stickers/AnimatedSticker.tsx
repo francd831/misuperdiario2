@@ -98,7 +98,7 @@ const SIZE_MAP = {
 
 export function AnimatedSticker({ emoji, animation, size = "md" }: Props) {
   return (
-    <span className={`inline-block leading-none select-none ${SIZE_MAP[size]} ${ANIMATION_STYLES[animation]}`}>
+    <span className={`inline-block leading-none select-none pointer-events-none ${SIZE_MAP[size]} ${ANIMATION_STYLES[animation]}`}>
       {emoji}
     </span>
   );

@@ -183,7 +183,7 @@ export function OverlayLayer({
         return <AnimatedSticker emoji={animated.emoji} animation={animated.animation} size="lg" />;
       }
       if (!assetRef.key.startsWith("stickers/")) {
-        return <span className="text-3xl leading-none select-none">{assetRef.key}</span>;
+        return <span className="text-3xl leading-none select-none pointer-events-none">{assetRef.key}</span>;
       }
       const idx = parseInt(assetRef.key.replace("stickers/", ""), 10);
       const url = stickers[idx];
