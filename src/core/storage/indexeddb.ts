@@ -60,6 +60,13 @@ interface VideoDiarioDB extends DBSchema {
       unlockedAt?: string;
     };
   };
+  avatar_blobs: {
+    key: string;
+    value: {
+      id: string;
+      blob: Blob;
+    };
+  };
 }
 
 export interface StickerOverlay {
@@ -77,7 +84,7 @@ let dbPromise: Promise<IDBPDatabase<VideoDiarioDB>> | null = null;
 
 function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<VideoDiarioDB>(DB_NAME, DB_VERSION, {
+    dbPromise = openDB<VideoDiarioDB>(DB_NAME, 2, {
       upgrade(db) {
         if (!db.objectStoreNames.contains("profiles")) {
           db.createObjectStore("profiles", { keyPath: "id" });
@@ -98,13 +105,16 @@ function getDB(): Promise<IDBPDatabase<VideoDiarioDB>> {
         if (!db.objectStoreNames.contains("entitlements")) {
           db.createObjectStore("entitlements", { keyPath: "packId" });
         }
+        if (!db.objectStoreNames.contains("avatar_blobs")) {
+          db.createObjectStore("avatar_blobs", { keyPath: "id" });
+        }
       },
     });
   }
   return dbPromise;
 }
 
-type StoreNames = "profiles" | "entries" | "daily_photos" | "settings" | "entitlements";
+type StoreNames = "profiles" | "entries" | "daily_photos" | "settings" | "entitlements" | "avatar_blobs";
 
 export async function dbGet<T extends StoreNames>(
   store: T,

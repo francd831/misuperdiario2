@@ -8,11 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LongPress } from "@/app/components/LongPress";
 import { Shield, ArrowLeft, UserPlus } from "lucide-react";
 import ShaderAnimation from "@/components/ui/shader-animation";
-
-const COLORS = [
-  "bg-rose-400", "bg-amber-400", "bg-emerald-400", "bg-sky-400",
-  "bg-violet-400", "bg-pink-400", "bg-teal-400", "bg-orange-400",
-];
+import { ProfileAvatar } from "./ProfileAvatar";
 
 type CreateStep = "name" | "pin" | "confirm";
 
@@ -177,16 +173,14 @@ export function ProfileSelect() {
 
   // Profile PIN entry
   if (selected) {
-    const colorIdx = profiles.indexOf(selected) % COLORS.length;
+    const colorIdx = profiles.indexOf(selected);
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-6">
         <div className="absolute inset-0 -z-10"><ShaderAnimation /></div>
         <Button variant="ghost" size="icon" className="absolute left-4 top-4 text-white" onClick={() => { setSelected(null); setPin(""); setError(""); setAttempts(0); }}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className={`flex h-24 w-24 items-center justify-center rounded-full text-4xl font-bold text-white shadow-lg ${COLORS[colorIdx]}`}>
-          {selected.name.charAt(0).toUpperCase()}
-        </div>
+        <ProfileAvatar avatar={selected.avatar} name={selected.name} colorIndex={profiles.indexOf(selected)} size="lg" />
         <h1 className="text-2xl font-bold text-white drop-shadow-lg">{selected.name}</h1>
         <p className="text-sm text-white/70">Ingresa tu PIN</p>
         <div className={shake ? "animate-shake" : ""}>
@@ -207,21 +201,16 @@ export function ProfileSelect() {
       <h1 className="text-3xl font-bold text-white drop-shadow-lg">¿Quién eres?</h1>
 
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
-        {profiles.map((p, i) => {
-          const color = COLORS[i % COLORS.length];
-          return (
+        {profiles.map((p, i) => (
             <button
               key={p.id}
               onClick={() => { setSelected(p); setPin(""); setError(""); setAttempts(0); }}
               className="flex flex-col items-center gap-3 rounded-2xl p-6 transition-transform active:scale-95 hover:bg-white/10"
             >
-              <div className={`flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg ${color}`}>
-                {p.name.charAt(0).toUpperCase()}
-              </div>
+              <ProfileAvatar avatar={p.avatar} name={p.name} colorIndex={i} size="md" />
               <span className="text-base font-semibold text-white drop-shadow">{p.name}</span>
             </button>
-          );
-        })}
+          ))}
 
         {/* Botón crear nuevo perfil */}
         <button
