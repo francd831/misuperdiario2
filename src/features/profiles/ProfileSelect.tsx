@@ -201,21 +201,16 @@ export function ProfileSelect() {
       <h1 className="text-3xl font-bold text-white drop-shadow-lg">¿Quién eres?</h1>
 
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
-        {profiles.map((p, i) => {
-          const color = COLORS[i % COLORS.length];
-          return (
+        {profiles.map((p, i) => (
             <button
               key={p.id}
               onClick={() => { setSelected(p); setPin(""); setError(""); setAttempts(0); }}
               className="flex flex-col items-center gap-3 rounded-2xl p-6 transition-transform active:scale-95 hover:bg-white/10"
             >
-              <div className={`flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg ${color}`}>
-                {p.name.charAt(0).toUpperCase()}
-              </div>
+              <ProfileAvatar avatar={p.avatar} name={p.name} colorIndex={i} size="md" />
               <span className="text-base font-semibold text-white drop-shadow">{p.name}</span>
             </button>
-          );
-        })}
+          ))}
 
         {/* Botón crear nuevo perfil */}
         <button
