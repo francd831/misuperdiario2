@@ -109,23 +109,34 @@ export function ProfileSelect() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6">
       <h1 className="text-3xl font-bold">¿Quién eres?</h1>
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
-        {profiles.map((p, i) => {
-          const color = COLORS[i % COLORS.length];
-          return (
-            <button
-              key={p.id}
-              onClick={() => { setSelected(p); setPin(""); setError(""); setAttempts(0); }}
-              className="flex flex-col items-center gap-3 rounded-2xl p-6 transition-transform active:scale-95 hover:bg-muted/50"
-            >
-              <div className={`flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg ${color}`}>
-                {p.name.charAt(0).toUpperCase()}
-              </div>
-              <span className="text-base font-semibold">{p.name}</span>
-            </button>
-          );
-        })}
-      </div>
+
+      {profiles.length === 0 ? (
+        <div className="flex flex-col items-center gap-4 text-center">
+          <p className="text-4xl">👤</p>
+          <p className="text-muted-foreground">No hay perfiles de usuario todavía.</p>
+          <p className="text-sm text-muted-foreground">
+            Accede como administrador para crear perfiles.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+          {profiles.map((p, i) => {
+            const color = COLORS[i % COLORS.length];
+            return (
+              <button
+                key={p.id}
+                onClick={() => { setSelected(p); setPin(""); setError(""); setAttempts(0); }}
+                className="flex flex-col items-center gap-3 rounded-2xl p-6 transition-transform active:scale-95 hover:bg-muted/50"
+              >
+                <div className={`flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg ${color}`}>
+                  {p.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-base font-semibold">{p.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Hidden admin access via long press */}
       {adminProfile && (
