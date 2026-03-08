@@ -5,6 +5,7 @@ import type { Profile } from "../storage/repositories/profileRepository";
 type ProfileState =
   | { status: "loading" }
   | { status: "no-profiles" }
+  | { status: "needs-admin" }
   | { status: "select" }
   | { status: "active"; profile: Profile };
 
