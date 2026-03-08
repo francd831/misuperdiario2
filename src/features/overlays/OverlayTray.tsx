@@ -201,14 +201,14 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                       <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                         {activePack?.name ?? "Pack"}
                       </p>
-                      <div className="grid grid-cols-10 gap-0">
+                      <div className="grid grid-cols-12 gap-0">
                         {stickers.map((url, i) => (
                           <button
                             key={i}
                             onPointerDown={(e) => startDrag(e, "sticker", `stickers/${i}`, url)}
                             className="flex aspect-square items-center justify-center rounded bg-secondary/60 hover:bg-secondary active:scale-90 overflow-hidden transition-all duration-150 p-0 touch-none select-none"
                           >
-                            <img src={url} alt="" className="h-[85%] w-[85%] object-contain pointer-events-none" draggable={false} />
+                            <img src={url} alt="" className="h-[92%] w-[92%] object-contain pointer-events-none" draggable={false} />
                           </button>
                         ))}
                       </div>
