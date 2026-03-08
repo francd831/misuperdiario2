@@ -12,8 +12,10 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
-const FULL_SCREEN_ROUTES = ["/record/video", "/record/audio", "/daily-photo/capture", "/lock", "/daily-photo/", "/entry/"];
-const NO_NAV_ROUTES = ["/record/video", "/record/audio", "/daily-photo/capture", "/admin-lock", "/daily-photo/", "/entry/"];
+const FULL_SCREEN_ROUTES = ["/record/video", "/record/audio", "/daily-photo/capture", "/lock"];
+const NO_NAV_ROUTES = ["/record/video", "/record/audio", "/daily-photo/capture", "/admin-lock"];
+/** Routes where a detail view with its own overlay tray needs full screen (no bottom nav) */
+const DETAIL_ROUTE_RE = /^\/(daily-photo|entry)\/[^/]+$/;
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { state, activeProfile } = useProfile();
