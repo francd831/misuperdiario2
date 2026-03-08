@@ -218,7 +218,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     const packAnimated = ANIMATED_STICKERS[activePack?.id ?? "base"] ?? ANIMATED_STICKERS.base;
                     return packAnimated && packAnimated.length > 0 ? (
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                        <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           ✨ Animados
                         </p>
                         <div className="grid grid-cols-5 gap-1">
