@@ -1,0 +1,29 @@
+{
+  "id": "espacio",
+  "name": "Espacio",
+  "description": "¡Explora el universo con planetas, cohetes y estrellas!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "230 75% 55%",
+    "secondary": "260 60% 90%",
+    "accent": "190 80% 50%",
+    "background": "230 25% 10%",
+    "foreground": "220 15% 95%",
+    "bgBlob1": "230 75% 50%",
+    "bgBlob2": "260 60% 55%",
+    "bgBlob3": "190 80% 45%",
+    "bgBlob4": "280 50% 55%",
+    "bgBlob5": "170 60% 45%"
+  },
+  "stickers": {
+    "autoLoad": true,
+    "folder": "stickers"
+  },
+  "frames": {
+    "autoLoad": true,
+    "folder": "frames"
+  },
+  "sounds": {}
+}
