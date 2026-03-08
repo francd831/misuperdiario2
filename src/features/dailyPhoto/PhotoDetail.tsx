@@ -73,7 +73,7 @@ export function PhotoDetail() {
   const photoUrl = URL.createObjectURL(photo.blob);
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-background">
+    <div className="fixed inset-0 flex flex-col bg-background h-[100dvh]">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
         <Button variant="ghost" size="icon" onClick={() => navigate("/daily-photo")}>
