@@ -45,45 +45,27 @@ export const packLoader = {
       .map(([, url]) => url);
   },
 
-  getPackSounds(packId: string, defaultType = "effect"): { key: string; file: string; type: string }[] {
-    const prefix = `/src/assets/packs/${packId}/sounds/`;
-    const items: { key: string; file: string; type: string }[] = [];
-    for (const [key, url] of Object.entries(allPackAssets)) {
-      if (key.startsWith(prefix)) {
-        const filename = key.replace(prefix, "");
-        const name = filename.replace(/\.[^.]+$/, "");
-        items.push({ key: name, file: url, type: defaultType });
-      }
-    }
-    return items;
-  },
-
   async getActivePackAssets() {
     const pack: PackManifest = await packRegistry.getActivePack();
-    const p: any = pack; // safe shim for flexible manifest shapes
+    const p: any = pack;
 
-    // Stickers: prefer autoLoad, else use categories.items if present
     let stickers: string[] = [];
     if (p.stickers?.autoLoad) {
       stickers = this.getPackStickers(pack.id);
     } else if (p.stickers && Array.isArray(p.stickers.categories)) {
       stickers = p.stickers.categories.flatMap((c: any) => c.items ?? []);
     } else if (Array.isArray(p.stickers)) {
-      // manifest might be an array of sticker paths
       stickers = p.stickers.map((s: string) => (typeof s === "string" ? (s.startsWith("/src/") || s.startsWith("http") ? s : this.getPackAssetUrl(pack.id, s)) : undefined)).filter(Boolean) as string[];
     } else {
-      // fallback to scanning
       stickers = this.getPackStickers(pack.id);
     }
 
-    // Frames: support object with autoLoad, items, or simple array fallback
     let frames: { key: string; file: string }[] = [];
     if (p.frames?.autoLoad || p.framesAuto?.autoLoad) {
       frames = this.getPackFrames(pack.id);
     } else if (p.frames && Array.isArray(p.frames.items)) {
       frames = p.frames.items;
     } else if (Array.isArray(p.frames)) {
-      // allow old-style array of {key,file} or strings
       frames = p.frames
         .map((it: any) => {
           if (typeof it === "string") {
@@ -102,10 +84,6 @@ export const packLoader = {
       frames = this.getPackFrames(pack.id);
     }
 
-    return {
-      pack,
-      stickers,
-      frames,
-    };
+    return { pack, stickers, frames };
   },
 };

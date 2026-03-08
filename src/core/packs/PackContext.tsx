@@ -12,7 +12,6 @@ interface PackContextValue {
   stickers: string[];
   frames: { key: string; file: string }[];
   backgrounds: string[];
-  activatePack
   activatePack: (id: string) => Promise<void>;
   unlockPack: (id: string) => Promise<void>;
   lockPack: (id: string) => Promise<void>;
@@ -40,17 +39,14 @@ export function PackProvider({ children }: { children: ReactNode }) {
     setUnlockedIds(new Set(ids));
   }, []);
 
-  // Init on mount
   useEffect(() => {
     const init = async () => {
       const allPacks = packRegistry.listPacks();
       setPacks(allPacks);
-
       const active = await packRegistry.getActivePack();
       setActivePack(active);
       themeEngine.applyTokens(active.theme);
       loadAssets(active.id);
-
       await refreshEntitlements();
     };
     init();

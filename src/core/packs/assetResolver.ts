@@ -16,12 +16,6 @@ export const assetResolver = {
     return packLoader.getPackAssetUrl(pack.id, `frames/${frameId}`);
   },
 
-  async resolveSound(soundKey: string): Promise<string | undefined> {
-    const pack = await packRegistry.getActivePack();
-    const sounds = packLoader.getPackSounds(pack.id);
-    return sounds[soundKey];
-  },
-
   async resolvePreview(): Promise<string | undefined> {
     const pack = await packRegistry.getActivePack();
     return packLoader.getPackAssetUrl(pack.id, "preview/preview.png");
