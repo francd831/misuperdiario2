@@ -200,12 +200,18 @@ export function RecordVideo() {
             <Label htmlFor="capsule">Cápsula del tiempo</Label>
           </div>
           {isCapsule && (
-            <Input
-              type="date"
-              value={unlockDate}
-              onChange={(e) => setUnlockDate(e.target.value)}
-              min={new Date().toISOString().slice(0, 10)}
-            />
+            <div className="space-y-1">
+              <Input
+                type="date"
+                value={unlockDate}
+                onChange={(e) => setUnlockDate(e.target.value)}
+                min={new Date().toISOString().slice(0, 10)}
+                required
+              />
+              {!unlockDate && (
+                <p className="text-xs text-destructive">Debes seleccionar una fecha de desbloqueo</p>
+              )}
+            </div>
           )}
           <div className="flex gap-2">
             <Button
