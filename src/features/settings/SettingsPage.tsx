@@ -86,7 +86,29 @@ export function SettingsPage() {
 
       <Card>
         <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><Settings className="h-4 w-4" />Perfil</CardTitle></CardHeader>
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="flex flex-col gap-4">
+          {/* Avatar */}
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={() => setShowAvatarPicker(true)}
+              className="relative group"
+            >
+              <ProfileAvatar
+                avatar={activeProfile?.avatar}
+                name={activeProfile?.name ?? ""}
+                size="lg"
+              />
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity">
+                <Camera className="h-6 w-6 text-white" />
+              </div>
+            </button>
+            <button
+              onClick={() => setShowAvatarPicker(true)}
+              className="text-xs text-primary font-medium"
+            >
+              Cambiar avatar
+            </button>
+          </div>
           <div className="flex gap-2">
             <Input value={profileName} onChange={(e) => setProfileName(e.target.value)} placeholder="Nombre" className="flex-1" />
             <Button onClick={saveName} size="sm">Guardar</Button>
