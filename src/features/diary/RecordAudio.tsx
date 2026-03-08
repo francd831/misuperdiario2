@@ -2,8 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { CapsuleDatePicker } from "./CapsuleDatePicker";
 import { ArrowLeft, Circle, Square, Mic } from "lucide-react";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { settingsRepository } from "@/core/storage/repositories/settingsRepository";
@@ -112,18 +111,12 @@ export function RecordAudio() {
         <h2 className="text-xl font-bold">Guardar grabación</h2>
         <audio src={URL.createObjectURL(blob)} controls className="w-full" />
         <Input placeholder="Título (opcional)" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <div className="flex items-center gap-3">
-          <Switch checked={isCapsule} onCheckedChange={setIsCapsule} id="capsule" />
-          <Label htmlFor="capsule">Guardar como cápsula del tiempo</Label>
-        </div>
-        {isCapsule && (
-          <div className="space-y-1">
-            <Input type="date" value={unlockDate} onChange={(e) => setUnlockDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} required />
-            {!unlockDate && (
-              <p className="text-xs text-destructive">Debes seleccionar una fecha de desbloqueo</p>
-            )}
-          </div>
-        )}
+        <CapsuleDatePicker
+          isCapsule={isCapsule}
+          onCapsuleChange={setIsCapsule}
+          unlockDate={unlockDate}
+          onUnlockDateChange={setUnlockDate}
+        />
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1" onClick={() => setBlob(null)}>Repetir</Button>
           <Button className="flex-1" onClick={save} disabled={isCapsule && !unlockDate}>Guardar</Button>
