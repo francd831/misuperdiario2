@@ -6,6 +6,7 @@ import { useProfile } from "@/core/auth/ProfileContext";
 import { AdminSetup } from "@/features/profiles/AdminSetup";
 import { ProfileSelect } from "@/features/profiles/ProfileSelect";
 import { PackBackground } from "@/features/backgrounds/PackBackground";
+import { useAmbientSound } from "@/hooks/useAmbientSound";
 
 interface AppLayoutProps {
   children: ReactNode;
