@@ -182,7 +182,8 @@ export function ProfileSelect() {
   if (selected) {
     const colorIdx = profiles.indexOf(selected) % COLORS.length;
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6">
+      <div className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-6">
+        <div className="absolute inset-0 -z-10"><ShaderAnimation /></div>
         <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={() => { setSelected(null); setPin(""); setError(""); setAttempts(0); }}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
