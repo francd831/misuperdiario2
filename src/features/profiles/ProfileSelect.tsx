@@ -5,7 +5,7 @@ import type { Profile } from "@/core/storage/repositories/profileRepository";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LongPress } from "@/app/components/LongPress";
+
 import { Shield, ArrowLeft, UserPlus } from "lucide-react";
 import ShaderAnimation from "@/components/ui/shader-animation";
 import { ProfileAvatar } from "./ProfileAvatar";
