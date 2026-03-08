@@ -78,6 +78,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
     { id: "emoji" as const, icon: SmilePlus, label: "Emoji" },
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
     { id: "frames" as const, icon: Frame, label: "Marcos" },
+    { id: "backgrounds" as const, icon: Image, label: "Fondos" },
     { id: "effects" as const, icon: Sparkles, label: "Efectos" },
     { id: "text" as const, icon: Type, label: "Texto" },
   ];
