@@ -80,7 +80,7 @@ export function PackProvider({ children }: { children: ReactNode }) {
   return (
     <PackCtx.Provider value={{
       activePack, packs, unlockedIds,
-      stickers, frames, sounds,
+      stickers, frames, backgrounds, sounds,
       activatePack, unlockPack, lockPack, refreshEntitlements,
     }}>
       {children}
