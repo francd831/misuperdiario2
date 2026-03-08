@@ -85,7 +85,7 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
 
   // Custom day content with colored dots
   function DayWithDots(props: DayContentProps) {
-    const dayKey = props.date.toISOString().slice(0, 10);
+    const dayKey = toLocalDateKey(props.date);
     const types = dayTypesMap.get(dayKey);
 
     return (
