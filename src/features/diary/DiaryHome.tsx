@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { entryRepository } from "@/core/storage/repositories/entryRepository";
+import { dbListByIndex } from "@/core/storage/indexeddb";
 import { useProfile } from "@/core/auth/ProfileContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Video, Mic, Lock, Search, PenLine, LogOut, Camera, Sparkles } from "lucide-react";
 import type { ExtendedEntry } from "./types";
 import { isUnlocked } from "./types";
-import { DiaryCalendar } from "./DiaryCalendar";
+import { DiaryCalendar, type DailyPhotoItem } from "./DiaryCalendar";
 
 const ACTION_CARDS = [
   {
@@ -56,6 +57,7 @@ function getGreeting(): string {
 
 export function DiaryHome() {
   const [entries, setEntries] = useState<ExtendedEntry[]>([]);
+  const [dailyPhotos, setDailyPhotos] = useState<DailyPhotoItem[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [showEntries, setShowEntries] = useState(false);
@@ -66,6 +68,11 @@ export function DiaryHome() {
     if (!activeProfile) return;
     entryRepository.getByProfile(activeProfile.id).then((e) => {
       setEntries(e as ExtendedEntry[]);
+    });
+    dbListByIndex("daily_photos", "by-profile", activeProfile.id).then((p) => {
+      setDailyPhotos(
+        (p as Array<{ id: string; date: string; caption?: string; createdAt: string }>)
+      );
     });
   }, [activeProfile]);
 
@@ -141,7 +148,7 @@ export function DiaryHome() {
       </div>
 
       {/* Calendar */}
-      <DiaryCalendar entries={entries} />
+      <DiaryCalendar entries={entries} dailyPhotos={dailyPhotos} />
 
       {/* Entries section */}
       {entries.length > 0 && (
