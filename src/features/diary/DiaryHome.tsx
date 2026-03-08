@@ -106,13 +106,21 @@ export function DiaryHome() {
 
   return (
     <div className="flex flex-col gap-5 px-4 pb-24 pt-4">
+      {/* Celebration modal */}
+      {celebration && (
+        <AchievementCelebration achievement={celebration} onDismiss={dismissCelebration} />
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{getGreeting()}</p>
-          <h1 className="text-2xl font-bold text-foreground">
-            {activeProfile?.name ?? "Mi Diario"} ✨
-          </h1>
+        <div className="flex items-center gap-2">
+          <div>
+            <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+            <h1 className="text-2xl font-bold text-foreground">
+              {activeProfile?.name ?? "Mi Diario"} ✨
+            </h1>
+          </div>
+          <StreakIndicator streak={streak} />
         </div>
         <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={logout}>
           <LogOut className="h-4 w-4" />
