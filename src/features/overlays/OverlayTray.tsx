@@ -171,7 +171,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                         {activePack?.name ?? "Pack"}
                       </p>
-                      <div className="grid grid-cols-8 gap-1">
+                      <div className="grid grid-cols-10 gap-0.5">
                         {stickers.map((url, i) => (
                           <button
                             key={i}
@@ -206,7 +206,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               {activeTab === "frames" && (
                 <div>
                   {frames.length > 0 ? (
-                    <div className="grid grid-cols-4 gap-1.5">
+                    <div className="grid grid-cols-6 gap-1">
                       {frames.map((frame, i) => {
                         const url = typeof frame === "string" ? frame : frame?.file;
                         return (
