@@ -1,0 +1,25 @@
+{
+  "id": "escuelaMagia",
+  "name": "Escuela de Magia",
+  "description": "¡Hechizos, pociones y aventuras mágicas te esperan!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "260 65% 45%",
+    "secondary": "45 80% 88%",
+    "accent": "35 85% 55%",
+    "background": "260 20% 97%",
+    "foreground": "260 45% 12%",
+    "bgBlob1": "260 65% 50%",
+    "bgBlob2": "45 80% 60%",
+    "bgBlob3": "35 85% 55%",
+    "bgBlob4": "180 40% 50%",
+    "bgBlob5": "320 50% 55%"
+  },
+  "filter": "saturate(1.2) contrast(1.05)",
+  "stickers": { "autoLoad": true, "folder": "stickers" },
+  "frames": { "autoLoad": true, "folder": "frames" },
+  "backgrounds": { "autoLoad": true, "folder": "backgrounds" },
+  "sounds": {}
+}

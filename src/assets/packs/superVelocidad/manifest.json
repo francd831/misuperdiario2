@@ -1,0 +1,25 @@
+{
+  "id": "superVelocidad",
+  "name": "Super Velocidad",
+  "description": "¡Acelera a fondo con coches, carreras y trofeos!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "0 75% 50%",
+    "secondary": "45 90% 88%",
+    "accent": "210 70% 50%",
+    "background": "0 15% 97%",
+    "foreground": "0 40% 12%",
+    "bgBlob1": "0 75% 55%",
+    "bgBlob2": "45 90% 60%",
+    "bgBlob3": "210 70% 55%",
+    "bgBlob4": "30 80% 55%",
+    "bgBlob5": "160 50% 45%"
+  },
+  "filter": "contrast(1.1) saturate(1.15)",
+  "stickers": { "autoLoad": true, "folder": "stickers" },
+  "frames": { "autoLoad": true, "folder": "frames" },
+  "backgrounds": { "autoLoad": true, "folder": "backgrounds" },
+  "sounds": {}
+}

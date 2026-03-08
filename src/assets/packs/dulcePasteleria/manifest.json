@@ -1,0 +1,25 @@
+{
+  "id": "dulcePasteleria",
+  "name": "Dulce Pastelería",
+  "description": "¡Endulza tus recuerdos con donuts, cupcakes y caramelos!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "330 70% 65%",
+    "secondary": "40 80% 90%",
+    "accent": "280 50% 70%",
+    "background": "330 30% 97%",
+    "foreground": "330 40% 15%",
+    "bgBlob1": "330 70% 65%",
+    "bgBlob2": "40 80% 65%",
+    "bgBlob3": "280 50% 70%",
+    "bgBlob4": "180 50% 65%",
+    "bgBlob5": "15 80% 65%"
+  },
+  "filter": "saturate(1.15) hue-rotate(-5deg)",
+  "stickers": { "autoLoad": true, "folder": "stickers" },
+  "frames": { "autoLoad": true, "folder": "frames" },
+  "backgrounds": { "autoLoad": true, "folder": "backgrounds" },
+  "sounds": {}
+}

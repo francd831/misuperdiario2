@@ -1,0 +1,25 @@
+{
+  "id": "artePintura",
+  "name": "Arte y Pintura",
+  "description": "¡Pinta tu diario con pinceles, colores y creatividad!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "340 65% 55%",
+    "secondary": "50 75% 90%",
+    "accent": "200 70% 55%",
+    "background": "40 25% 97%",
+    "foreground": "340 35% 15%",
+    "bgBlob1": "340 65% 55%",
+    "bgBlob2": "50 75% 60%",
+    "bgBlob3": "200 70% 55%",
+    "bgBlob4": "120 55% 50%",
+    "bgBlob5": "280 55% 55%"
+  },
+  "filter": "saturate(1.3) brightness(1.05)",
+  "stickers": { "autoLoad": true, "folder": "stickers" },
+  "frames": { "autoLoad": true, "folder": "frames" },
+  "backgrounds": { "autoLoad": true, "folder": "backgrounds" },
+  "sounds": {}
+}

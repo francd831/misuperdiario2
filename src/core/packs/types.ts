@@ -13,9 +13,11 @@ export interface PackManifest {
     foreground: string;
     [key: string]: string;
   };
-  stickers?: string[];
-  frames?: string[];
-  sounds?: { [key: string]: string };
+  stickers?: string[] | { autoLoad?: boolean; folder?: string; categories?: any[] };
+  frames?: string[] | { autoLoad?: boolean; folder?: string; items?: any[] };
+  backgrounds?: { autoLoad?: boolean; folder?: string };
+  sounds?: { [key: string]: string } | { autoLoad?: boolean; defaultType?: string };
+  filter?: string;
   intro?: string;
   preview?: string;
 }
