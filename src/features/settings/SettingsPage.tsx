@@ -221,22 +221,6 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Admin access */}
-      <div className="mt-8 mb-4">
-        {isAdmin ? (
-          <Button variant="outline" className="w-full gap-2" onClick={() => navigate("/admin")}>
-            <Shield className="h-4 w-4" /> Panel de administración
-          </Button>
-        ) : (
-          <button
-            onClick={() => navigate("/admin-lock")}
-            className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
-          >
-            <Shield className="h-4 w-4" />
-            <span>Acceso administrador</span>
-          </button>
-        )}
-      </div>
 
       {activeProfile && (
         <AvatarPicker

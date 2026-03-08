@@ -224,15 +224,17 @@ export function ProfileSelect() {
         </button>
       </div>
 
-      {/* Hidden admin access via long press */}
+      {/* Admin access */}
       {adminProfile && (
-        <LongPress onLongPress={() => setAdminPinMode(true)} duration={2500}>
-          <div className="flex items-center justify-center py-4 opacity-30">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-              <Shield className="h-4 w-4 text-muted-foreground" />
-            </div>
+        <button
+          onClick={() => setAdminPinMode(true)}
+          className="flex flex-col items-center gap-2"
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30">
+            <Shield className="h-8 w-8 text-white" />
           </div>
-        </LongPress>
+          <span className="text-base font-semibold text-white/70">Admin</span>
+        </button>
       )}
     </div>
   );
