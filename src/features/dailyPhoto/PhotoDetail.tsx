@@ -140,7 +140,9 @@ export function PhotoDetail() {
       {/* Editor tray */}
       <OverlayTray
         selectedId={selectedId}
+        overlays={overlays}
         onAdd={addOverlay}
+        onChange={setOverlays}
         onDelete={deleteSelected}
       />
 

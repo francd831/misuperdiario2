@@ -205,7 +205,9 @@ export function RecordVideo() {
 
         <OverlayTray
           selectedId={selectedId}
+          overlays={overlays}
           onAdd={addOverlay}
+          onChange={setOverlays}
           onDelete={deleteSelected}
         />
       </div>
@@ -275,7 +277,9 @@ export function RecordVideo() {
       {/* Overlay tray sits below the camera */}
       <OverlayTray
         selectedId={selectedId}
+        overlays={overlays}
         onAdd={addOverlay}
+        onChange={setOverlays}
         onDelete={deleteSelected}
       />
     </div>
