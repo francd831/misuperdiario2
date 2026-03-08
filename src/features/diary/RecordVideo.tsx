@@ -145,64 +145,69 @@ export function RecordVideo() {
   // Post-recording save form
   if (blob) {
     return (
-      <div className="flex min-h-[100dvh] flex-col pb-24">
-        <h2 className="px-4 pt-4 text-xl font-bold">Guardar grabación</h2>
-        <div className="px-4 pt-4">
+      <div className="fixed inset-0 flex flex-col bg-background">
+        <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
+          <Button variant="ghost" size="icon" onClick={() => { setBlob(null); startCamera(); }}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="text-lg font-bold">Guardar grabación</h2>
+        </div>
+
+        {/* Video fits available space */}
+        <div className="flex-1 min-h-0 px-3 pb-1">
           <OverlayLayer
             overlays={overlays}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onChange={setOverlays}
-            className="rounded-xl"
+            className="rounded-xl h-full"
           >
             <video
               src={recordedVideoUrl}
               controls
-              className="w-full rounded-xl"
+              className="h-full w-full object-contain rounded-xl"
             />
           </OverlayLayer>
         </div>
-        <OverlayTray
-          selectedId={selectedId}
-          onAdd={addOverlay}
-          onDelete={deleteSelected}
-        />
-        <div className="px-4 pt-4">
+
+        {/* Bottom controls */}
+        <div className="shrink-0 space-y-2 px-4 pb-3 pt-1 max-h-[40vh] overflow-y-auto">
           <Input
             placeholder="Título (opcional)"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-        </div>
-        <div className="flex items-center gap-3 px-4 pt-2">
-          <Switch checked={isCapsule} onCheckedChange={setIsCapsule} id="capsule" />
-          <Label htmlFor="capsule">Guardar como cápsula del tiempo</Label>
-        </div>
-        {isCapsule && (
-          <div className="px-4 pt-2">
+          <div className="flex items-center gap-3">
+            <Switch checked={isCapsule} onCheckedChange={setIsCapsule} id="capsule" />
+            <Label htmlFor="capsule">Cápsula del tiempo</Label>
+          </div>
+          {isCapsule && (
             <Input
               type="date"
               value={unlockDate}
               onChange={(e) => setUnlockDate(e.target.value)}
               min={new Date().toISOString().slice(0, 10)}
             />
+          )}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => { setBlob(null); startCamera(); }}
+            >
+              Repetir
+            </Button>
+            <Button className="flex-1" onClick={save}>
+              Guardar
+            </Button>
           </div>
-        )}
-        <div className="flex gap-2 px-4 pt-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => {
-              setBlob(null);
-              startCamera();
-            }}
-          >
-            Repetir
-          </Button>
-          <Button className="flex-1" onClick={save}>
-            Guardar
-          </Button>
         </div>
+
+        <OverlayTray
+          selectedId={selectedId}
+          onAdd={addOverlay}
+          onDelete={deleteSelected}
+        />
       </div>
     );
   }
