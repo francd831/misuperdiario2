@@ -12,7 +12,7 @@ interface PackContextValue {
   stickers: string[];
   frames: { key: string; file: string }[];
   backgrounds: string[];
-  sounds: { key: string; file: string; type: string }[];
+  activatePack
   activatePack: (id: string) => Promise<void>;
   unlockPack: (id: string) => Promise<void>;
   lockPack: (id: string) => Promise<void>;
