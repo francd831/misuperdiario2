@@ -216,12 +216,12 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                       Emojis
                     </p>
-                    <div className="grid grid-cols-10 gap-1">
+                    <div className="grid grid-cols-10 gap-0">
                       {DEFAULT_EMOJIS.map((emoji) => (
                         <button
                           key={emoji}
                           onPointerDown={(e) => startDrag(e, "sticker", emoji, undefined, emoji)}
-                          className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 text-base hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
+                          className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 text-xl hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                         >
                           {emoji}
                         </button>

@@ -73,10 +73,7 @@ export function RecordAudio() {
     }
   }, []);
 
-  const stopRecording = () => {
-    recorderRef.current?.stop();
-    setRecording(false);
-  };
+  // stopRecording moved above startRecording as useCallback
 
   const save = async () => {
     if (!blob) return;
