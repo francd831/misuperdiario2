@@ -192,12 +192,12 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
               </button>
             </div>
 
-            <div className="max-h-[22vh] overflow-y-auto px-2 py-2">
+            <div className="max-h-[20vh] overflow-y-auto px-1 py-1.5">
               {activeTab === "stickers" && (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {stickers.length > 0 && (
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                         {activePack?.name ?? "Pack"}
                       </p>
                       <div className="grid grid-cols-10 gap-0">
@@ -205,9 +205,9 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                           <button
                             key={i}
                             onPointerDown={(e) => startDrag(e, "sticker", `stickers/${i}`, url)}
-                            className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 hover:bg-secondary active:scale-90 overflow-hidden transition-all duration-150 p-0 touch-none select-none"
+                            className="flex aspect-square items-center justify-center rounded bg-secondary/60 hover:bg-secondary active:scale-90 overflow-hidden transition-all duration-150 p-0 touch-none select-none"
                           >
-                            <img src={url} alt="" className="h-full w-full object-contain pointer-events-none" draggable={false} />
+                            <img src={url} alt="" className="h-[85%] w-[85%] object-contain pointer-events-none" draggable={false} />
                           </button>
                         ))}
                       </div>
@@ -218,10 +218,10 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                     const packAnimated = ANIMATED_STICKERS[activePack?.id ?? "base"] ?? ANIMATED_STICKERS.base;
                     return packAnimated && packAnimated.length > 0 ? (
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                        <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           ✨ Animados
                         </p>
-                        <div className="grid grid-cols-5 gap-1">
+                        <div className="grid grid-cols-8 gap-0.5">
                           {packAnimated.map((def) => {
                             const key = animatedKey(def);
                             return (
@@ -231,7 +231,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                                 className="flex flex-col aspect-square items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                               >
                                 <span
-                                  className="text-2xl"
+                                  className="text-xl leading-none"
                                   style={{ animation: `stk-${def.animation} 1.5s ease-in-out infinite` }}
                                 >
                                   {def.emoji}
@@ -245,7 +245,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                   })()}
 
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                    <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                       Emojis
                     </p>
                     <div className="grid grid-cols-10 gap-0">
@@ -253,7 +253,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                         <button
                           key={emoji}
                           onPointerDown={(e) => startDrag(e, "sticker", emoji, undefined, emoji)}
-                          className="flex aspect-square items-center justify-center rounded-md bg-secondary/60 text-xl hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
+                          className="flex aspect-square items-center justify-center rounded bg-secondary/60 text-lg hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                         >
                           {emoji}
                         </button>
