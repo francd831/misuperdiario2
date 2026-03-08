@@ -205,8 +205,9 @@ export function ProfileSelect() {
 
   // Profile grid
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-6">
-      <h1 className="text-3xl font-bold">¿Quién eres?</h1>
+    <div className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-6">
+      <div className="absolute inset-0 -z-10"><ShaderAnimation /></div>
+      <h1 className="text-3xl font-bold text-white drop-shadow-lg">¿Quién eres?</h1>
 
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
         {profiles.map((p, i) => {
