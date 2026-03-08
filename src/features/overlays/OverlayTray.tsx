@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
 import { Sticker, Frame, Type, Trash2, X } from "lucide-react";
+import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
 
 type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
