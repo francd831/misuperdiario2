@@ -31,7 +31,26 @@ export type EffectAnimation =
   | "nba-scoreboard"
   | "meteors"
   | "shooting-stars"
-  | "planet-orbit";
+  | "planet-orbit"
+  // New unique animations for themed packs
+  | "candy-rain"
+  | "sweet-pop"
+  | "frosting-wave"
+  | "paw-walk"
+  | "hearts-rise"
+  | "bubbles-float"
+  | "spell-cast"
+  | "rune-glow"
+  | "potion-bubble"
+  | "wave-rock"
+  | "cannon-blast"
+  | "treasure-sparkle"
+  | "speed-lines"
+  | "drift-smoke"
+  | "finish-flag"
+  | "paint-drip-down"
+  | "brush-sweep"
+  | "color-splat";
 
 export const PACK_EFFECTS: Record<string, EffectDef[]> = {
   reinoMagico: [
