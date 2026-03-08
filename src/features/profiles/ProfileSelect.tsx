@@ -160,13 +160,13 @@ export function ProfileSelect() {
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-6">
         <div className="absolute inset-0 -z-10"><ShaderAnimation /></div>
-        <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={() => { setAdminPinMode(false); setPin(""); setError(""); setAttempts(0); }}>
+        <Button variant="ghost" size="icon" className="absolute left-4 top-4 text-white" onClick={() => { setAdminPinMode(false); setPin(""); setError(""); setAttempts(0); }}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-          <Shield className="h-10 w-10 text-primary" />
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+          <Shield className="h-10 w-10 text-white" />
         </div>
-        <h1 className="text-2xl font-bold">PIN Admin</h1>
+        <h1 className="text-2xl font-bold text-white drop-shadow-lg">PIN Admin</h1>
         <div className={shake ? "animate-shake" : ""}>
           <InputOTP maxLength={4} value={pin} onChange={(v) => { setPin(v); setError(""); if (v.length === 4) verify(v, adminProfile.id); }} disabled={!!lockedUntil}>
             <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
