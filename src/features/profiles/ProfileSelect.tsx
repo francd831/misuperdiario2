@@ -137,7 +137,7 @@ export function ProfileSelect() {
         {createStep === "confirm" && (
           <>
             <p className="text-sm text-white/70">Confirma tu PIN</p>
-            <InputOTP maxLength={4} value={confirmPin} onChange={(v) => { setConfirmPin(v); setCreateError(""); if (v.length === 4) { setTimeout(async () => { if (v !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); } else { await createProfile(newName.trim(), newPin, "user"); resetCreate(); loadProfiles(); } }, 200); } }}>
+            <InputOTP maxLength={4} value={confirmPin} onChange={async (v) => { const normalized = normalizePin(v); setConfirmPin(normalized); setCreateError(""); if (normalized.length === 4) { if (normalized !== newPin) { setCreateError("Los PINs no coinciden"); setConfirmPin(""); return; } await createProfile(newName.trim(), newPin, "user"); resetCreate(); loadProfiles(); } }}>
               <InputOTPGroup>{[0,1,2,3].map(i => <InputOTPSlot key={i} index={i} className="h-14 w-14 text-xl" />)}</InputOTPGroup>
             </InputOTP>
           </>
