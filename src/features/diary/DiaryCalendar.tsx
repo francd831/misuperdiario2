@@ -8,6 +8,14 @@ import { isUnlocked } from "./types";
 import { cn } from "@/lib/utils";
 import type { DayContentProps } from "react-day-picker";
 
+/** Format a Date as "YYYY-MM-DD" in local time (avoids UTC shift) */
+function toLocalDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 /** Color dot config per entry type */
 const TYPE_COLORS: Record<string, string> = {
   video: "bg-[hsl(265,70%,58%)]",
