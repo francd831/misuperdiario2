@@ -67,6 +67,7 @@ export function DiaryHome() {
   const [showEntries, setShowEntries] = useState(false);
   const navigate = useNavigate();
   const { activeProfile, logout } = useProfile();
+  const { streak, unlocked, celebration, dismissCelebration } = useAchievements();
 
   useEffect(() => {
     if (!activeProfile) return;
