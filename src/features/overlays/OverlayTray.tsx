@@ -42,11 +42,6 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
     onAdd(createOverlay("text", { packId, key: "text" }, { text: "Texto", fontSize: 28 }));
   };
 
-  const patchSelected = (patch: Partial<OverlayItem["transform"]>) => {
-    if (!selectedId) return;
-    onChange(overlays.map((o) => (o.id === selectedId ? updateTransform(o, patch) : o)));
-  };
-
   return (
     <div className="relative z-30 flex flex-col">
       {/* Transform controls – shown when an item is selected */}
