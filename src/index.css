@@ -48,6 +48,13 @@
     --vd-warning: 38 92% 50%;
     --vd-info: 210 80% 56%;
     --vd-locked: 45 93% 58%;
+
+    /* Background gradient blobs – overridden per pack by themeEngine */
+    --pack-bgBlob1: 265 75% 60%;
+    --pack-bgBlob2: 174 65% 48%;
+    --pack-bgBlob3: 25 95% 70%;
+    --pack-bgBlob4: 330 60% 65%;
+    --pack-bgBlob5: 200 70% 55%;
   }
 
   .dark {
