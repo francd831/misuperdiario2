@@ -6,7 +6,6 @@ import { useProfile } from "@/core/auth/ProfileContext";
 import { AdminSetup } from "@/features/profiles/AdminSetup";
 import { ProfileSelect } from "@/features/profiles/ProfileSelect";
 import { PackBackground } from "@/features/backgrounds/PackBackground";
-import { useAmbientSound } from "@/hooks/useAmbientSound";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -20,7 +19,6 @@ const DETAIL_ROUTE_RE = /^\/(daily-photo|entry)\/[^/]+$/;
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { state, activeProfile } = useProfile();
   const location = useLocation();
-  useAmbientSound();
 
   if (state.status === "loading") {
     return (

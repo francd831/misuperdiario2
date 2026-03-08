@@ -20,6 +20,5 @@
   "filter": "sepia(0.15) saturate(1.2)",
   "stickers": { "autoLoad": true, "folder": "stickers" },
   "frames": { "autoLoad": true, "folder": "frames" },
-  "backgrounds": { "autoLoad": true, "folder": "backgrounds" },
-  "sounds": {}
+  "backgrounds": { "autoLoad": true, "folder": "backgrounds" }
 }

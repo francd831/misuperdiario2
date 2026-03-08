@@ -12,7 +12,6 @@ interface PackContextValue {
   stickers: string[];
   frames: { key: string; file: string }[];
   backgrounds: string[];
-  sounds: { key: string; file: string; type: string }[];
   activatePack: (id: string) => Promise<void>;
   unlockPack: (id: string) => Promise<void>;
   lockPack: (id: string) => Promise<void>;
@@ -28,13 +27,11 @@ export function PackProvider({ children }: { children: ReactNode }) {
   const [stickers, setStickers] = useState<string[]>([]);
   const [frames, setFrames] = useState<{ key: string; file: string }[]>([]);
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
-  const [sounds, setSounds] = useState<{ key: string; file: string; type: string }[]>([]);
 
   const loadAssets = useCallback((packId: string) => {
     setStickers(packLoader.getPackStickers(packId));
     setFrames(packLoader.getPackFrames(packId));
     setBackgrounds(packLoader.getPackBackgrounds(packId));
-    setSounds(packLoader.getPackSounds(packId));
   }, []);
 
   const refreshEntitlements = useCallback(async () => {
@@ -42,17 +39,14 @@ export function PackProvider({ children }: { children: ReactNode }) {
     setUnlockedIds(new Set(ids));
   }, []);
 
-  // Init on mount
   useEffect(() => {
     const init = async () => {
       const allPacks = packRegistry.listPacks();
       setPacks(allPacks);
-
       const active = await packRegistry.getActivePack();
       setActivePack(active);
       themeEngine.applyTokens(active.theme);
       loadAssets(active.id);
-
       await refreshEntitlements();
     };
     init();
@@ -80,7 +74,7 @@ export function PackProvider({ children }: { children: ReactNode }) {
   return (
     <PackCtx.Provider value={{
       activePack, packs, unlockedIds,
-      stickers, frames, backgrounds, sounds,
+      stickers, frames, backgrounds,
       activatePack, unlockPack, lockPack, refreshEntitlements,
     }}>
       {children}
@@ -95,7 +89,6 @@ const FALLBACK: PackContextValue = {
   stickers: [],
   frames: [],
   backgrounds: [],
-  sounds: [],
   activatePack: async () => {},
   unlockPack: async () => {},
   lockPack: async () => {},

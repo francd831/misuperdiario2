@@ -16,7 +16,6 @@ export interface PackManifest {
   stickers?: string[] | { autoLoad?: boolean; folder?: string; categories?: any[] };
   frames?: string[] | { autoLoad?: boolean; folder?: string; items?: any[] };
   backgrounds?: { autoLoad?: boolean; folder?: string };
-  sounds?: { [key: string]: string } | { autoLoad?: boolean; defaultType?: string };
   filter?: string;
   intro?: string;
   preview?: string;
