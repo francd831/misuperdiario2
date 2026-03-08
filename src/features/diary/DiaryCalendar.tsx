@@ -137,8 +137,8 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
 
       {/* Selected day entries */}
       {selectedDay && (
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-semibold uppercase text-muted-foreground">
+        <div key={selectedDay.toISOString().slice(0, 10)} className="flex flex-col gap-2 animate-fade-in">
+          <p className="text-xs font-semibold uppercase text-muted-foreground animate-fade-in">
             {selectedDay.toLocaleDateString("es", {
               weekday: "long",
               day: "numeric",
@@ -148,16 +148,17 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
           </p>
 
           {selectedDayEntries.length === 0 && selectedDayPhotos.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4 animate-fade-in">
               Sin entradas este día
             </p>
           ) : (
             <>
               {/* Daily photos */}
-              {selectedDayPhotos.map((photo) => (
+              {selectedDayPhotos.map((photo, i) => (
                 <Card
                   key={photo.id}
-                  className="cursor-pointer transition-shadow hover:shadow-md"
+                  className="cursor-pointer transition-shadow hover:shadow-md animate-scale-in"
+                  style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
                   onClick={() => navigate(`/daily-photo/${photo.id}`)}
                 >
                   <CardContent className="flex items-center gap-3 p-3">
@@ -175,10 +176,11 @@ export function DiaryCalendar({ entries, dailyPhotos = [] }: Props) {
               ))}
 
               {/* Diary entries */}
-              {selectedDayEntries.map((entry) => (
+              {selectedDayEntries.map((entry, i) => (
                 <Card
                   key={entry.id}
-                  className="cursor-pointer transition-shadow hover:shadow-md"
+                  className="cursor-pointer transition-shadow hover:shadow-md animate-scale-in"
+                  style={{ animationDelay: `${(selectedDayPhotos.length + i) * 60}ms`, animationFillMode: "backwards" }}
                   onClick={() => navigate(`/entry/${entry.id}`)}
                 >
                   <CardContent className="flex items-center gap-3 p-3">
