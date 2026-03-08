@@ -54,6 +54,19 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     refresh();
   }, [refresh]);
 
+  // Auto-logout when app goes to background / screen off
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        profileService.logout();
+        setActiveProfile(null);
+        setState({ status: "select" });
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
   const login = useCallback((profileId: string) => {
     profileService.login(profileId);
     refresh();
