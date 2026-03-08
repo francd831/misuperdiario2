@@ -8,7 +8,10 @@ import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/featu
 
 type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
-const DEFAULT_EMOJIS = ["⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰"];
+const DEFAULT_EMOJIS = [
+  "⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰",
+  "🎈", "🍭", "🌸", "🐱", "🦋", "🍀", "🎪", "🌙", "🍩", "🐶", "🐻", "🫶",
+];
 
 const TEXT_FONTS = [
   { label: "Sans", value: "sans-serif" },
