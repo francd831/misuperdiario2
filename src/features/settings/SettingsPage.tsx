@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Settings, Palette, Volume2, HardDrive, Shield, LogOut, Camera } from "lucide-react";
 import { LongPress } from "@/app/components/LongPress";
 import { profileRepository } from "@/core/storage/repositories/profileRepository";
@@ -15,6 +16,10 @@ import { dbList } from "@/core/storage/indexeddb";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileAvatar } from "@/features/profiles/ProfileAvatar";
 import { AvatarPicker } from "@/features/profiles/AvatarPicker";
+import { ambientEngine } from "@/core/media/ambient/ambientEngine";
+
+const AMBIENT_KEY = "vd_ambient_enabled";
+const AMBIENT_VOL_KEY = "vd_ambient_volume";
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -25,7 +30,8 @@ export function SettingsPage() {
   const [activePack, setActivePack] = useState("");
   const [storageInfo, setStorageInfo] = useState("");
   const [newPin, setNewPin] = useState("");
-  const [ambientSound, setAmbientSound] = useState(false);
+  const [ambientSound, setAmbientSound] = useState(() => localStorage.getItem(AMBIENT_KEY) === "1");
+  const [ambientVolume, setAmbientVolume] = useState(() => parseInt(localStorage.getItem(AMBIENT_VOL_KEY) || "60", 10));
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const isAdmin = activeProfile?.role === "admin";
