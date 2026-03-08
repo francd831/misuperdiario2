@@ -1,0 +1,25 @@
+{
+  "id": "animalesDivertidos",
+  "name": "Animales Divertidos",
+  "description": "¡Llena tu diario de amigos peludos, emplumados y escamosos!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "145 55% 45%",
+    "secondary": "35 75% 90%",
+    "accent": "25 80% 55%",
+    "background": "100 25% 97%",
+    "foreground": "145 35% 15%",
+    "bgBlob1": "145 55% 50%",
+    "bgBlob2": "35 75% 60%",
+    "bgBlob3": "25 80% 55%",
+    "bgBlob4": "200 50% 55%",
+    "bgBlob5": "60 60% 55%"
+  },
+  "filter": "saturate(1.1) brightness(1.05)",
+  "stickers": { "autoLoad": true, "folder": "stickers" },
+  "frames": { "autoLoad": true, "folder": "frames" },
+  "backgrounds": { "autoLoad": true, "folder": "backgrounds" },
+  "sounds": {}
+}

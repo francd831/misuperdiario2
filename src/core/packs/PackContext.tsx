@@ -11,6 +11,7 @@ interface PackContextValue {
   unlockedIds: Set<string>;
   stickers: string[];
   frames: { key: string; file: string }[];
+  backgrounds: string[];
   sounds: { key: string; file: string; type: string }[];
   activatePack: (id: string) => Promise<void>;
   unlockPack: (id: string) => Promise<void>;
@@ -26,11 +27,13 @@ export function PackProvider({ children }: { children: ReactNode }) {
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
   const [stickers, setStickers] = useState<string[]>([]);
   const [frames, setFrames] = useState<{ key: string; file: string }[]>([]);
+  const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [sounds, setSounds] = useState<{ key: string; file: string; type: string }[]>([]);
 
   const loadAssets = useCallback((packId: string) => {
     setStickers(packLoader.getPackStickers(packId));
     setFrames(packLoader.getPackFrames(packId));
+    setBackgrounds(packLoader.getPackBackgrounds(packId));
     setSounds(packLoader.getPackSounds(packId));
   }, []);
 
@@ -77,7 +80,7 @@ export function PackProvider({ children }: { children: ReactNode }) {
   return (
     <PackCtx.Provider value={{
       activePack, packs, unlockedIds,
-      stickers, frames, sounds,
+      stickers, frames, backgrounds, sounds,
       activatePack, unlockPack, lockPack, refreshEntitlements,
     }}>
       {children}
@@ -91,6 +94,7 @@ const FALLBACK: PackContextValue = {
   unlockedIds: new Set(),
   stickers: [],
   frames: [],
+  backgrounds: [],
   sounds: [],
   activatePack: async () => {},
   unlockPack: async () => {},

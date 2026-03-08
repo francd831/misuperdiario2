@@ -2,11 +2,11 @@ import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles } from "lucide-react";
+import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles, Image } from "lucide-react";
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
 import { PACK_EFFECTS, effectKey, type EffectDef } from "@/features/effects";
 
-type Tab = "emoji" | "stickers" | "frames" | "text" | "effects" | null;
+type Tab = "emoji" | "stickers" | "frames" | "text" | "effects" | "backgrounds" | null;
 
 const DEFAULT_EMOJIS = [
   "⭐", "❤️", "🎉", "🌈", "🦄", "🎵", "🌟", "🎀", "🔥", "💎", "😂", "🥰",
@@ -62,7 +62,7 @@ function calcDropPosition(clientX: number, clientY: number): { x: number; y: num
 
 export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(null);
-  const { stickers, frames, activePack } = usePack();
+  const { stickers, frames, backgrounds, activePack } = usePack();
   const packId = activePack?.id ?? "base";
   const [drag, setDrag] = useState<DragState | null>(null);
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
@@ -78,6 +78,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
     { id: "emoji" as const, icon: SmilePlus, label: "Emoji" },
     { id: "stickers" as const, icon: Sticker, label: "Stickers" },
     { id: "frames" as const, icon: Frame, label: "Marcos" },
+    { id: "backgrounds" as const, icon: Image, label: "Fondos" },
     { id: "effects" as const, icon: Sparkles, label: "Efectos" },
     { id: "text" as const, icon: Type, label: "Texto" },
   ];
@@ -304,7 +305,33 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                 </div>
               )}
 
-              {/* ─── EFFECTS TAB ─── */}
+              {/* ─── BACKGROUNDS TAB ─── */}
+              {activeTab === "backgrounds" && (
+                <div className="space-y-1.5 py-1">
+                  {backgrounds.length > 0 ? (
+                    <div>
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mb-1 px-1">
+                        {activePack?.name ?? "Pack"}
+                      </p>
+                      <div className="grid grid-cols-4 gap-1.5 px-1">
+                        {backgrounds.map((url, i) => (
+                          <button
+                            key={i}
+                            onClick={() => onAdd(createOverlay("background", { packId, key: `backgrounds/${i}` }))}
+                            className="flex aspect-[3/4] items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-95 overflow-hidden transition-all duration-150 p-0"
+                          >
+                            <img src={url} alt="" className="h-full w-full object-cover pointer-events-none" draggable={false} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground py-8 text-center">
+                      Este pack no incluye fondos
+                    </p>
+                  )}
+                </div>
+              )}
               {activeTab === "effects" && (
                 <div className="space-y-1.5 py-1">
                   {(() => {

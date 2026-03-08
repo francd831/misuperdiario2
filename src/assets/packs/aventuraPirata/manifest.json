@@ -1,0 +1,25 @@
+{
+  "id": "aventuraPirata",
+  "name": "Aventura Pirata",
+  "description": "¡Zarpa hacia el tesoro con piratas y mapas del tesoro!",
+  "version": "1.0.0",
+  "author": "Video Diario",
+  "free": false,
+  "theme": {
+    "primary": "195 70% 40%",
+    "secondary": "35 65% 88%",
+    "accent": "15 75% 50%",
+    "background": "195 20% 97%",
+    "foreground": "195 40% 12%",
+    "bgBlob1": "195 70% 45%",
+    "bgBlob2": "35 65% 55%",
+    "bgBlob3": "15 75% 50%",
+    "bgBlob4": "160 45% 45%",
+    "bgBlob5": "50 70% 55%"
+  },
+  "filter": "sepia(0.15) saturate(1.2)",
+  "stickers": { "autoLoad": true, "folder": "stickers" },
+  "frames": { "autoLoad": true, "folder": "frames" },
+  "backgrounds": { "autoLoad": true, "folder": "backgrounds" },
+  "sounds": {}
+}
