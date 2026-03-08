@@ -230,7 +230,10 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
                                 onPointerDown={(e) => startDrag(e, "sticker", key, undefined, def.emoji)}
                                 className="flex flex-col aspect-square items-center justify-center rounded-lg bg-secondary/60 hover:bg-secondary active:scale-90 transition-all duration-150 touch-none select-none"
                               >
-                                <span className={`text-2xl animate-[stk-${def.animation}_1.5s_ease-in-out_infinite]`}>
+                                <span
+                                  className="text-2xl"
+                                  style={{ animation: `stk-${def.animation} 1.5s ease-in-out infinite` }}
+                                >
                                   {def.emoji}
                                 </span>
                               </button>
