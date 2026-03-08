@@ -32,6 +32,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Ensure admin exists even if user profiles are present
+    const admin = await profileService.getAdminProfile();
+    if (!admin) {
+      setState({ status: "needs-admin" });
+      setActiveProfile(null);
+      return;
+    }
+
     const active = await profileService.getActiveProfile();
     if (active) {
       setState({ status: "active", profile: active });
