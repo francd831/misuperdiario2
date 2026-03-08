@@ -163,6 +163,9 @@ export function DiaryHome() {
       {/* Calendar */}
       <DiaryCalendar entries={entries} dailyPhotos={dailyPhotos} />
 
+      {/* Achievements */}
+      <AchievementBadges unlocked={unlocked} />
+
       {/* Entries section */}
       {entries.length > 0 && (
         <div className="flex flex-col gap-3">
