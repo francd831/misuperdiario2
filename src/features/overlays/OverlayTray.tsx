@@ -4,6 +4,7 @@ import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
 import { Sticker, Frame, Type, Trash2, X } from "lucide-react";
 import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
+import { ANIMATED_FRAMES, animatedFrameKey, AnimatedFrame, type AnimatedFrameDef } from "@/features/frames/AnimatedFrame";
 
 type Tab = "stickers" | "frames" | "backgrounds" | "text" | null;
 
