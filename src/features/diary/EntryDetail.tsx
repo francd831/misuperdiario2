@@ -22,7 +22,46 @@ export function EntryDetail() {
   const [showDelete, setShowDelete] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState<number>(1);
+  const [reversed, setReversed] = useState(false);
+  const reverseRaf = useRef<number | null>(null);
   const { activePack } = usePack();
+
+  // Reverse playback via requestAnimationFrame stepping
+  const stopReverse = useCallback(() => {
+    if (reverseRaf.current) {
+      cancelAnimationFrame(reverseRaf.current);
+      reverseRaf.current = null;
+    }
+  }, []);
+
+  const startReverse = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    const step = () => {
+      if (!videoRef.current) return;
+      const dt = (1 / 30) * speed; // ~30fps scaled by speed
+      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - dt);
+      if (videoRef.current.currentTime <= 0) {
+        setPlaying(false);
+        stopReverse();
+        return;
+      }
+      reverseRaf.current = requestAnimationFrame(step);
+    };
+    reverseRaf.current = requestAnimationFrame(step);
+  }, [speed, stopReverse]);
+
+  // Sync playbackRate when speed changes
+  useEffect(() => {
+    if (videoRef.current && !reversed) {
+      videoRef.current.playbackRate = speed;
+    }
+  }, [speed, reversed]);
+
+  // Cleanup reverse on unmount
+  useEffect(() => () => stopReverse(), [stopReverse]);
 
   useEffect(() => {
     if (id) entryRepository.getById(id).then((e) => setEntry((e as ExtendedEntry) ?? null));
