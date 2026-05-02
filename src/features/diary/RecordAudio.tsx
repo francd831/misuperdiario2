@@ -28,8 +28,15 @@ export function RecordAudio() {
 
   useEffect(() => {
     settingsRepository.get().then((s) => {
-      if (typeof (s as any).maxAudioSeconds === "number") setMaxSeconds((s as any).maxAudioSeconds);
+      if (typeof s.maxAudioSeconds === "number") setMaxSeconds(s.maxAudioSeconds);
     });
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop();
+    }
+    setRecording(false);
   }, []);
 
   // Timer effect — only increments elapsed, does NOT stop recording
@@ -44,14 +51,7 @@ export function RecordAudio() {
     if (recording && elapsed >= maxSeconds) {
       stopRecording();
     }
-  }, [elapsed, maxSeconds, recording]);
-
-  const stopRecording = useCallback(() => {
-    if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      recorderRef.current.stop();
-    }
-    setRecording(false);
-  }, []);
+  }, [elapsed, maxSeconds, recording, stopRecording]);
 
   const startRecording = useCallback(async () => {
     try {
@@ -90,7 +90,7 @@ export function RecordAudio() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    await entryRepository.save(entry as any);
+    await entryRepository.save(entry);
     navigate("/");
   };
 

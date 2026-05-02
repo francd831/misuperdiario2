@@ -9,9 +9,15 @@ import { entryRepository } from "@/core/storage/repositories/entryRepository";
 import { useProfile } from "@/core/auth/ProfileContext";
 import type { ExtendedEntry } from "./types";
 
+type SpeechRecognitionConstructor = new () => SpeechRecognition;
+type SpeechRecognitionWindow = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
+
 /** Check browser support for Web Speech API */
-function getSpeechRecognition(): any {
-  const w = window as any;
+function getSpeechRecognition(): SpeechRecognitionConstructor | null {
+  const w = window as SpeechRecognitionWindow;
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
 }
 
@@ -24,7 +30,7 @@ export function RecordText() {
   const [unlockDate, setUnlockDate] = useState("");
   const [listening, setListening] = useState(false);
   const [speechSupported] = useState(() => !!getSpeechRecognition());
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const baseTextRef = useRef("");
 
@@ -101,7 +107,7 @@ export function RecordText() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    await entryRepository.save(entry as any);
+    await entryRepository.save(entry);
     navigate("/");
   };
 

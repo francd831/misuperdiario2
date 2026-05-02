@@ -14,7 +14,7 @@ export function useLock() {
   useEffect(() => {
     const init = async () => {
       // Ensure default profile exists
-      let profile = await profileRepository.getById(DEFAULT_PROFILE_ID);
+      const profile = await profileRepository.getById(DEFAULT_PROFILE_ID);
       if (!profile) {
         await profileRepository.save({
           id: DEFAULT_PROFILE_ID,

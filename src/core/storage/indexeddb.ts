@@ -8,6 +8,8 @@ interface VideoDiarioDB extends DBSchema {
       name: string;
       avatar?: string;
       pin?: string;
+      role?: "admin" | "user";
+      activePackId?: string;
       createdAt: string;
       updatedAt: string;
     };
@@ -22,8 +24,16 @@ interface VideoDiarioDB extends DBSchema {
       videoUrl?: string;
       audioUrl?: string;
       stickerOverlays?: StickerOverlay[];
+      overlayProject?: unknown;
       mood?: string;
       note?: string;
+      title?: string;
+      duration?: number;
+      type?: "video" | "audio" | "text";
+      isLocked?: boolean;
+      unlockAt?: string;
+      mediaBlob?: Blob;
+      photoBlob?: Blob;
       createdAt: string;
       updatedAt: string;
     };
@@ -37,6 +47,9 @@ interface VideoDiarioDB extends DBSchema {
       date: string;
       blob: Blob;
       thumbnailBlob?: Blob;
+      caption?: string;
+      overlayProject?: unknown;
+      stickerOverlays?: StickerOverlay[];
       createdAt: string;
     };
     indexes: { "by-profile": string; "by-date": string };
@@ -160,11 +173,11 @@ export async function dbList<T extends StoreNames>(
 
 export async function dbListByIndex(
   store: "entries" | "daily_photos" | "achievements",
-  indexName: string,
+  indexName: "by-profile" | "by-date",
   value: string
-): Promise<any[]> {
+): Promise<Array<VideoDiarioDB["entries" | "daily_photos" | "achievements"]["value"]>> {
   const db = await getDB();
-  return db.getAllFromIndex(store, indexName as any, value as any);
+  return db.getAllFromIndex(store, indexName as never, value as never);
 }
 
 export { getDB };

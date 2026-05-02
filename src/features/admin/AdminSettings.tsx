@@ -22,11 +22,14 @@ export function AdminSettings() {
   const [packs, setPacks] = useState<{ id: string; name: string; unlocked: boolean }[]>([]);
   const [capsules, setCapsules] = useState<ExtendedEntry[]>([]);
 
+  const getErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : "Error inesperado";
+
   useEffect(() => {
     const load = async () => {
       const s = await settingsRepository.get();
-      if (typeof (s as any).maxVideoSeconds === "number") setMaxVideo((s as any).maxVideoSeconds);
-      if (typeof (s as any).maxAudioSeconds === "number") setMaxAudio((s as any).maxAudioSeconds);
+      if (typeof s.maxVideoSeconds === "number") setMaxVideo(s.maxVideoSeconds);
+      if (typeof s.maxAudioSeconds === "number") setMaxAudio(s.maxAudioSeconds);
 
       const allPacks = packRegistry.listPacks();
       const packList = await Promise.all(
@@ -42,7 +45,7 @@ export function AdminSettings() {
 
   const saveLimits = async () => {
     const s = await settingsRepository.get();
-    await settingsRepository.save({ ...s, maxVideoSeconds: maxVideo, maxAudioSeconds: maxAudio } as any);
+    await settingsRepository.save({ ...s, maxVideoSeconds: maxVideo, maxAudioSeconds: maxAudio });
     toast({ title: "Límites guardados" });
   };
 
@@ -51,8 +54,8 @@ export function AdminSettings() {
     try {
       await backupService.exportBackup();
       toast({ title: "Backup exportado" });
-    } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } catch (error) {
+      toast({ title: "Error", description: getErrorMessage(error), variant: "destructive" });
     }
     setProcessing(false);
   };
@@ -68,8 +71,8 @@ export function AdminSettings() {
       try {
         await backupService.importBackup(file);
         toast({ title: "Backup importado" });
-      } catch (err: any) {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
+      } catch (error) {
+        toast({ title: "Error", description: getErrorMessage(error), variant: "destructive" });
       }
       setProcessing(false);
     };
@@ -84,7 +87,7 @@ export function AdminSettings() {
   };
 
   const unlockCapsule = async (entry: ExtendedEntry) => {
-    await entryRepository.save({ ...entry, isLocked: false } as any);
+    await entryRepository.save({ ...entry, isLocked: false });
     setCapsules((prev) => prev.filter((c) => c.id !== entry.id));
     toast({ title: "Cápsula desbloqueada" });
   };

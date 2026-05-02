@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { dbListByIndex } from "@/core/storage/indexeddb";
 import { useProfile } from "@/core/auth/ProfileContext";
@@ -14,6 +14,26 @@ interface DailyPhoto {
   thumbnailBlob?: Blob;
   caption?: string;
   createdAt: string;
+}
+
+function PhotoGridItem({ photo, onOpen }: { photo: DailyPhoto; onOpen: () => void }) {
+  const url = useMemo(() => URL.createObjectURL(photo.thumbnailBlob || photo.blob), [photo]);
+
+  useEffect(() => {
+    return () => URL.revokeObjectURL(url);
+  }, [url]);
+
+  return (
+    <div
+      className="relative cursor-pointer overflow-hidden rounded-lg aspect-square"
+      onClick={onOpen}
+    >
+      <img src={url} alt={photo.date} className="h-full w-full object-cover" />
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 p-1">
+        <p className="text-[10px] text-white">{new Date(photo.date).toLocaleDateString("es", { day: "numeric", month: "short" })}</p>
+      </div>
+    </div>
+  );
 }
 
 export function PhotoList() {
@@ -65,21 +85,13 @@ export function PhotoList() {
       )}
 
       <div className="grid grid-cols-3 gap-2">
-        {photos.map((p) => {
-          const url = URL.createObjectURL(p.thumbnailBlob || p.blob);
-          return (
-            <div
-              key={p.id}
-              className="relative cursor-pointer overflow-hidden rounded-lg aspect-square"
-              onClick={() => navigate(`/daily-photo/${p.id}`)}
-            >
-              <img src={url} alt={p.date} className="h-full w-full object-cover" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 p-1">
-                <p className="text-[10px] text-white">{new Date(p.date).toLocaleDateString("es", { day: "numeric", month: "short" })}</p>
-              </div>
-            </div>
-          );
-        })}
+        {photos.map((p) => (
+          <PhotoGridItem
+            key={p.id}
+            photo={p}
+            onOpen={() => navigate(`/daily-photo/${p.id}`)}
+          />
+        ))}
       </div>
     </div>
   );

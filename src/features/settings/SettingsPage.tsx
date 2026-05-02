@@ -38,8 +38,8 @@ export function SettingsPage() {
     const load = async () => {
       const entries = await dbList("entries");
       const photos = await dbList("daily_photos");
-      const myEntries = entries.filter((e: any) => e.profileId === activeProfile.id);
-      const myPhotos = photos.filter((p: any) => p.profileId === activeProfile.id);
+      const myEntries = entries.filter((e) => e.profileId === activeProfile.id);
+      const myPhotos = photos.filter((p) => p.profileId === activeProfile.id);
       setStorageInfo(`${myEntries.length} entradas · ${myPhotos.length} fotos`);
     };
     load();

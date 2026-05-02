@@ -88,13 +88,13 @@ export function evaluateAchievements(
 
 /** Get stored achievements for a profile */
 export async function getStoredAchievements(profileId: string): Promise<UnlockedAchievement[]> {
-  return dbListByIndex("achievements" as any, "by-profile", profileId);
+  return dbListByIndex("achievements", "by-profile", profileId) as Promise<UnlockedAchievement[]>;
 }
 
 /** Save a newly unlocked achievement */
 export async function saveAchievement(profileId: string, achievementId: string): Promise<void> {
   const id = `${profileId}-${achievementId}`;
-  await dbSet("achievements" as any, {
+  await dbSet("achievements", {
     id,
     profileId,
     achievementId,

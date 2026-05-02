@@ -36,7 +36,7 @@ export function RecordVideo() {
 
   useEffect(() => {
     settingsRepository.get().then((s) => {
-      if (typeof (s as any).maxVideoSeconds === "number") setMaxSeconds((s as any).maxVideoSeconds);
+      if (typeof s.maxVideoSeconds === "number") setMaxSeconds(s.maxVideoSeconds);
     });
   }, []);
 
@@ -130,11 +130,11 @@ export function RecordVideo() {
       isLocked: isCapsule,
       unlockAt: isCapsule && unlockDate ? new Date(unlockDate).toISOString() : undefined,
       mediaBlob: blob,
+      overlayProject: overlays,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    (entry as any).overlayProject = overlays;
-    await entryRepository.save(entry as any);
+    await entryRepository.save(entry);
     navigate("/");
   };
 

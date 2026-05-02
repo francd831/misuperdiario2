@@ -2,8 +2,8 @@ import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { usePack } from "@/core/packs/PackContext";
 import { createOverlay, type OverlayItem, type OverlayProject } from "@/core/media/overlays/overlayEngine";
-import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles, Image } from "lucide-react";
-import { ANIMATED_STICKERS, animatedKey, type AnimatedStickerDef } from "@/features/stickers/AnimatedSticker";
+import { Sticker, Frame, Type, Trash2, X, SmilePlus, Sparkles } from "lucide-react";
+import { ANIMATED_STICKERS, animatedKey } from "@/features/stickers/AnimatedSticker";
 import { PACK_EFFECTS, effectKey, type EffectDef } from "@/features/effects";
 
 type Tab = "emoji" | "stickers" | "frames" | "text" | "effects" | null;
@@ -85,13 +85,13 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
 
   const toggleTab = (id: Tab) => setActiveTab((prev) => (prev === id ? null : id));
 
-  const handleAddSticker = (key: string) => {
+  const handleAddSticker = useCallback((key: string) => {
     onAdd(createOverlay("sticker", { packId, key }));
-  };
+  }, [onAdd, packId]);
 
-  const handleAddFrame = (idx: number) => {
+  const handleAddFrame = useCallback((idx: number) => {
     onAdd(createOverlay("frame", { packId, key: `frames/${idx}` }, { x: 50, y: 50, scale: 1 }));
-  };
+  }, [onAdd, packId]);
 
   const handleAddText = () => {
     if (!textInput.trim()) return;
@@ -166,7 +166,7 @@ export function OverlayTray({ selectedId, overlays, onAdd, onChange, onDelete }:
 
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
-  }, [packId, onAdd]);
+  }, [handleAddFrame, handleAddSticker, packId, onAdd]);
 
   return (
     <>

@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -131,8 +132,8 @@ export default {
           "50%": { opacity: "0.85", filter: "brightness(1.4)" },
         },
         "frm-rainbow": {
-          "0%": { "--frm-angle": "0deg" } as any,
-          "100%": { "--frm-angle": "360deg" } as any,
+          "0%": { "--frm-angle": "0deg" } as Record<string, string>,
+          "100%": { "--frm-angle": "360deg" } as Record<string, string>,
         },
         "frm-dash-march": {
           "0%": { strokeDashoffset: "0" },
@@ -174,5 +175,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;

@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Play, Pause } from "lucide-react";
 import { timelapseService } from "@/core/media/timelapse/timelapseService";
+import { useProfile } from "@/core/auth/ProfileContext";
 
 export function TimelapsePlayer() {
   const navigate = useNavigate();
@@ -14,14 +15,22 @@ export function TimelapsePlayer() {
   const [speed, setSpeed] = useState(500);
   const [range, setRange] = useState("all");
   const cancelRef = useRef<(() => void) | null>(null);
+  const urlsRef = useRef<string[]>([]);
+  const { activeProfile } = useProfile();
+  const profileId = activeProfile?.id ?? "default";
 
   useEffect(() => {
-    timelapseService.loadFrames("default").then((f) => {
+    timelapseService.loadFrames(profileId).then((f) => {
       const urls = timelapseService.createObjectUrls(f);
+      urlsRef.current = urls;
       setFrames(f.map((frame, i) => ({ date: frame.date, url: urls[i] })));
     });
-    return () => { cancelRef.current?.(); };
-  }, []);
+    return () => {
+      cancelRef.current?.();
+      timelapseService.revokeObjectUrls(urlsRef.current);
+      urlsRef.current = [];
+    };
+  }, [profileId]);
 
   const filteredFrames = (() => {
     if (range === "all") return frames;

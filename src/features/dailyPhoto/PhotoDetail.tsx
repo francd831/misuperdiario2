@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,28 +10,44 @@ import { OverlayLayer } from "@/features/overlays/OverlayLayer";
 import { OverlayTray } from "@/features/overlays/OverlayTray";
 import { useOverlayProject } from "@/features/overlays/useOverlayProject";
 import { migrateLegacyOverlays, type OverlayProject } from "@/core/media/overlays/overlayEngine";
+import { useProfile } from "@/core/auth/ProfileContext";
+
+interface DailyPhotoDetail {
+  id: string;
+  profileId: string;
+  date: string;
+  blob: Blob;
+  caption?: string;
+  overlayProject?: OverlayProject;
+  stickerOverlays?: Array<{ stickerId: string; x: number; y: number; scale: number; rotation: number }>;
+  createdAt: string;
+}
 
 export function PhotoDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [photo, setPhoto] = useState<any>(null);
+  const [photo, setPhoto] = useState<DailyPhotoDetail | null>(null);
   const [allIds, setAllIds] = useState<string[]>([]);
   const [caption, setCaption] = useState("");
   const [showDelete, setShowDelete] = useState(false);
   const { activePack } = usePack();
+  const { activeProfile } = useProfile();
+  const profileId = activeProfile?.id ?? "default";
 
   useEffect(() => {
     if (!id) return;
     dbGet("daily_photos", id).then((p) => {
       if (p) {
-        setPhoto(p);
-        setCaption((p as any).caption || "");
+        const dailyPhoto = p as DailyPhotoDetail;
+        setPhoto(dailyPhoto);
+        setCaption(dailyPhoto.caption || "");
       }
     });
-    dbListByIndex("daily_photos", "by-profile", "default").then((all) => {
-      setAllIds(all.sort((a: any, b: any) => b.date.localeCompare(a.date)).map((p: any) => p.id));
+    dbListByIndex("daily_photos", "by-profile", profileId).then((all) => {
+      const photos = all as DailyPhotoDetail[];
+      setAllIds(photos.sort((a, b) => b.date.localeCompare(a.date)).map((p) => p.id));
     });
-  }, [id]);
+  }, [id, profileId]);
 
   const initialOverlays: OverlayProject =
     photo?.overlayProject ??
@@ -48,6 +64,13 @@ export function PhotoDetail() {
 
   const { overlays, selectedId, setSelectedId, setOverlays, addOverlay, deleteSelected } =
     useOverlayProject(initialOverlays, persist);
+
+  const photoUrl = useMemo(() => (photo ? URL.createObjectURL(photo.blob) : ""), [photo]);
+
+  useEffect(() => {
+    if (!photoUrl) return;
+    return () => URL.revokeObjectURL(photoUrl);
+  }, [photoUrl]);
 
   if (!photo)
     return (
@@ -69,8 +92,6 @@ export function PhotoDetail() {
     await dbDelete("daily_photos", photo.id);
     navigate("/daily-photo");
   };
-
-  const photoUrl = URL.createObjectURL(photo.blob);
 
   return (
     <div className="fixed inset-0 flex flex-col bg-background h-[100dvh]">
