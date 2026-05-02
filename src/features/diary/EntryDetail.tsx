@@ -68,14 +68,14 @@ export function EntryDetail() {
   }, [id]);
 
   const initialOverlays: OverlayProject =
-    (entry as any)?.overlayProject ??
+    entry?.overlayProject ??
     (entry?.stickerOverlays?.length
       ? migrateLegacyOverlays(entry.stickerOverlays, activePack?.id ?? "base")
       : []);
 
   const persist = async (project: OverlayProject) => {
     if (!entry) return;
-    const updated = { ...entry, overlayProject: project } as any;
+    const updated = { ...entry, overlayProject: project };
     await entryRepository.save(updated);
     setEntry(updated);
   };

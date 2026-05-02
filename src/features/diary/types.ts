@@ -1,4 +1,5 @@
 import type { DiaryEntry } from "@/core/storage/repositories/entryRepository";
+import type { OverlayProject } from "@/core/media/overlays/overlayEngine";
 
 export type EntryType = "video" | "audio" | "text";
 
@@ -10,6 +11,7 @@ export interface ExtendedEntry extends DiaryEntry {
   isLocked?: boolean;
   unlockAt?: string;
   mediaBlob?: Blob;
+  overlayProject?: OverlayProject;
 }
 
 export function isUnlocked(entry: ExtendedEntry): boolean {

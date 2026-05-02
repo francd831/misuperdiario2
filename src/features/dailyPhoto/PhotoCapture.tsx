@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,11 @@ import { useProfile } from "@/core/auth/ProfileContext";
 import { OverlayLayer } from "@/features/overlays/OverlayLayer";
 import { OverlayTray } from "@/features/overlays/OverlayTray";
 import { useOverlayProject } from "@/features/overlays/useOverlayProject";
-import type { OverlayProject } from "@/core/media/overlays/overlayEngine";
+
+interface ExistingDailyPhoto {
+  id: string;
+  profileId: string;
+}
 
 export function PhotoCapture() {
   const navigate = useNavigate();
@@ -24,8 +28,17 @@ export function PhotoCapture() {
   const { overlays, selectedId, setSelectedId, setOverlays, addOverlay, deleteSelected } =
     useOverlayProject([]);
 
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, []);
+
   const startCamera = useCallback(async () => {
     try {
+      stopCamera();
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1920 } },
       });
@@ -37,11 +50,17 @@ export function PhotoCapture() {
     } catch {
       setPermError("No se pudo acceder a la cámara.");
     }
-  }, []);
+  }, [stopCamera]);
 
-  useState(() => {
+  useEffect(() => {
     startCamera();
-  });
+    return () => stopCamera();
+  }, [startCamera, stopCamera]);
+
+  useEffect(() => {
+    if (!preview) return;
+    return () => URL.revokeObjectURL(preview);
+  }, [preview]);
 
   const capture = () => {
     const video = videoRef.current;
@@ -59,7 +78,7 @@ export function PhotoCapture() {
         if (blob) {
           setPhoto(blob);
           setPreview(URL.createObjectURL(blob));
-          streamRef.current?.getTracks().forEach((t) => t.stop());
+          stopCamera();
         }
       },
       "image/jpeg",
@@ -70,9 +89,9 @@ export function PhotoCapture() {
   const save = async () => {
     if (!photo) return;
     const today = new Date().toISOString().slice(0, 10);
-    const existing = await dbListByIndex("daily_photos", "by-date", today);
+    const existing = await dbListByIndex("daily_photos", "by-date", today) as ExistingDailyPhoto[];
     for (const e of existing) {
-      if ((e as any).profileId === profileId) await dbDelete("daily_photos", e.id);
+      if (e.profileId === profileId) await dbDelete("daily_photos", e.id);
     }
     await dbSet("daily_photos", {
       id: crypto.randomUUID(),
@@ -82,7 +101,7 @@ export function PhotoCapture() {
       caption,
       overlayProject: overlays,
       createdAt: new Date().toISOString(),
-    } as any);
+    });
     navigate("/daily-photo");
   };
 
@@ -102,7 +121,7 @@ export function PhotoCapture() {
     return (
       <div className="fixed inset-0 flex flex-col bg-background h-[100dvh]">
         <div className="flex items-center gap-3 px-4 pt-3 pb-1 shrink-0">
-          <Button variant="ghost" size="icon" onClick={() => { setPhoto(null); startCamera(); }}>
+          <Button variant="ghost" size="icon" onClick={() => { setPhoto(null); setPreview(""); startCamera(); }}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h2 className="text-lg font-bold">Tu foto de hoy</h2>
@@ -132,7 +151,7 @@ export function PhotoCapture() {
             <Button
               variant="outline"
               className="flex-1 gap-1"
-              onClick={() => { setPhoto(null); startCamera(); }}
+              onClick={() => { setPhoto(null); setPreview(""); startCamera(); }}
             >
               <RotateCcw className="h-4 w-4" /> Repetir
             </Button>
@@ -180,7 +199,7 @@ export function PhotoCapture() {
             size="icon"
             className="text-white bg-black/30 rounded-full"
             onClick={() => {
-              streamRef.current?.getTracks().forEach((t) => t.stop());
+              stopCamera();
               navigate(-1);
             }}
           >

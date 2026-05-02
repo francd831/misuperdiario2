@@ -35,10 +35,16 @@ export function ProfileAvatar({ avatar, name, colorIndex = 0, size = "md", class
   useEffect(() => {
     if (!avatar?.startsWith("custom:")) return;
     const key = avatar.replace("custom:", "");
-    dbGet("avatar_blobs", key).then((record: any) => {
-      if (record?.blob) setCustomUrl(URL.createObjectURL(record.blob));
+    let objectUrl: string | null = null;
+    dbGet("avatar_blobs", key).then((record) => {
+      if (record?.blob) {
+        objectUrl = URL.createObjectURL(record.blob);
+        setCustomUrl(objectUrl);
+      }
     });
-    return () => { if (customUrl) URL.revokeObjectURL(customUrl); };
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [avatar]);
 
   // Custom photo

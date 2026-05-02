@@ -1,5 +1,6 @@
 import { dbList, dbListByIndex } from "@/core/storage/indexeddb";
 import { profileRepository, type Profile } from "@/core/storage/repositories/profileRepository";
+import type { ExtendedEntry } from "@/features/diary/types";
 
 export interface ProfileStorageInfo {
   profileId: string;
@@ -17,14 +18,15 @@ export interface StorageSummary {
   totalBytes: number;
 }
 
-function blobSize(val: any): number {
+type BlobLikeRecord = Record<string, unknown>;
+
+function blobSize(val: unknown): number {
   let size = 0;
   if (!val) return size;
   if (val instanceof Blob) return val.size;
   if (typeof val === "string") return val.length * 2; // rough estimate
   if (typeof val === "object") {
-    for (const k of Object.keys(val)) {
-      const v = val[k];
+    for (const v of Object.values(val as BlobLikeRecord)) {
       if (v instanceof Blob) size += v.size;
       else if (typeof v === "string" && v.startsWith("data:")) size += v.length;
     }
@@ -41,23 +43,22 @@ export async function calculateStorageUsage(): Promise<StorageSummary> {
 
   const result: ProfileStorageInfo[] = userProfiles.map((p) => {
     const profile = p as Profile;
-    const profileEntries = allEntries.filter((e: any) => e.profileId === profile.id);
-    const profilePhotos = allPhotos.filter((ph: any) => ph.profileId === profile.id);
+    const profileEntries = allEntries.filter((e) => e.profileId === profile.id);
+    const profilePhotos = allPhotos.filter((ph) => ph.profileId === profile.id);
 
     let entryBytes = 0;
     for (const e of profileEntries) {
       entryBytes += blobSize(e);
       // Check common blob fields
-      const entry = e as any;
+      const entry = e as ExtendedEntry & { photoBlob?: Blob };
       if (entry.mediaBlob instanceof Blob) entryBytes += entry.mediaBlob.size;
       if (entry.photoBlob instanceof Blob) entryBytes += entry.photoBlob.size;
     }
 
     let photoBytes = 0;
     for (const ph of profilePhotos) {
-      const photo = ph as any;
-      if (photo.blob instanceof Blob) photoBytes += photo.blob.size;
-      if (photo.thumbnailBlob instanceof Blob) photoBytes += photo.thumbnailBlob.size;
+      if (ph.blob instanceof Blob) photoBytes += ph.blob.size;
+      if (ph.thumbnailBlob instanceof Blob) photoBytes += ph.thumbnailBlob.size;
     }
 
     return {
