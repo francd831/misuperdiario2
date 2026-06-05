@@ -13,8 +13,8 @@ export interface PackManifest {
     foreground: string;
     [key: string]: string;
   };
-  stickers?: string[] | { autoLoad?: boolean; folder?: string; categories?: any[] };
-  frames?: string[] | { autoLoad?: boolean; folder?: string; items?: any[] };
+  stickers?: string[] | { autoLoad?: boolean; folder?: string; categories?: { items?: string[] }[] };
+  frames?: string[] | { autoLoad?: boolean; folder?: string; items?: { key?: string; file: string }[] };
   backgrounds?: { autoLoad?: boolean; folder?: string };
   filter?: string;
   intro?: string;
