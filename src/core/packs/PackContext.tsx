@@ -28,10 +28,11 @@ export function PackProvider({ children }: { children: ReactNode }) {
   const [frames, setFrames] = useState<{ key: string; file: string }[]>([]);
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
 
-  const loadAssets = useCallback((packId: string) => {
-    setStickers(packLoader.getPackStickers(packId));
-    setFrames(packLoader.getPackFrames(packId));
-    setBackgrounds(packLoader.getPackBackgrounds(packId));
+  const loadAssets = useCallback((pack: PackManifest) => {
+    const assets = packLoader.resolvePackAssets(pack);
+    setStickers(assets.stickers);
+    setFrames(assets.frames);
+    setBackgrounds(assets.backgrounds);
   }, []);
 
   const refreshEntitlements = useCallback(async () => {
@@ -46,7 +47,7 @@ export function PackProvider({ children }: { children: ReactNode }) {
       const active = await packRegistry.getActivePack();
       setActivePack(active);
       themeEngine.applyTokens(active.theme);
-      loadAssets(active.id);
+      loadAssets(active);
       await refreshEntitlements();
     };
     init();
@@ -58,7 +59,7 @@ export function PackProvider({ children }: { children: ReactNode }) {
     if (!pack) return;
     setActivePack(pack);
     themeEngine.applyTokens(pack.theme);
-    loadAssets(pack.id);
+    loadAssets(pack);
   }, [loadAssets]);
 
   const unlockPack = useCallback(async (id: string) => {
