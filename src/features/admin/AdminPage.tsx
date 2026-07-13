@@ -1,6 +1,9 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { DatabaseBackup, HardDrive, ShieldCheck, UsersRound } from "lucide-react";
 import { useProfiles } from "../../core/profiles/ProfileContext";
+import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
+import type { StoragePolicy } from "../../core/profiles/types";
+import { estimateStorageUsage, formatBytes, type StorageUsageSummary } from "../../core/storage/storageUsage";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
 
@@ -11,6 +14,18 @@ export default function AdminPage() {
   const [childName, setChildName] = useState("");
   const [childPin, setChildPin] = useState("");
   const [message, setMessage] = useState("");
+  const [policy, setPolicy] = useState<StoragePolicy | null>(null);
+  const [usage, setUsage] = useState<StorageUsageSummary | null>(null);
+
+  async function refreshStorage() {
+    const [nextPolicy, nextUsage] = await Promise.all([storagePolicyRepository.get(), estimateStorageUsage()]);
+    setPolicy(nextPolicy);
+    setUsage(nextUsage);
+  }
+
+  useEffect(() => {
+    void refreshStorage();
+  }, []);
 
   async function handleCreateAdmin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,6 +122,19 @@ export default function AdminPage() {
       <section className="status-panel">
         <h2>Perfiles infantiles</h2>
         <p>{children.length === 0 ? "Aun no hay perfiles." : `${children.length} perfil(es) creados.`}</p>
+      </section>
+
+      <section className="status-panel">
+        <h2>Almacenamiento local</h2>
+        <p>
+          Usado: {usage ? formatBytes(usage.totalBytes) : "-"} de {policy ? formatBytes(policy.maxTotalStorageBytes) : "-"}.
+        </p>
+        <p>
+          Entradas: {usage ? formatBytes(usage.entriesBytes) : "-"} · Fotos: {usage ? formatBytes(usage.dailyPhotosBytes) : "-"}.
+        </p>
+        <button className="secondary-action" type="button" onClick={() => void refreshStorage()}>
+          Actualizar uso
+        </button>
       </section>
 
       <div className="grid-two">

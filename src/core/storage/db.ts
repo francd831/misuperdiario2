@@ -1,4 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
+import type { DailyPhoto } from "../daily-photo/types";
 import type { DiaryEntry } from "../diary/types";
 import type { Profile, StoragePolicy } from "../profiles/types";
 
@@ -23,10 +24,18 @@ interface SuperDiarioDB extends DBSchema {
       "by-profile-type": [string, string];
     };
   };
+  dailyPhotos: {
+    key: string;
+    value: DailyPhoto;
+    indexes: {
+      "by-profile": string;
+      "by-profile-date": [string, string];
+    };
+  };
 }
 
 const DB_NAME = "mi-super-diario";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<SuperDiarioDB>> | null = null;
 
@@ -47,6 +56,12 @@ export function getDB() {
         store.createIndex("by-profile", "profileId");
         store.createIndex("by-profile-date", ["profileId", "date"]);
         store.createIndex("by-profile-type", ["profileId", "type"]);
+      }
+
+      if (!db.objectStoreNames.contains("dailyPhotos")) {
+        const store = db.createObjectStore("dailyPhotos", { keyPath: "id" });
+        store.createIndex("by-profile", "profileId");
+        store.createIndex("by-profile-date", ["profileId", "date"]);
       }
     },
   });
@@ -70,12 +85,20 @@ export async function dbSet<StoreName extends keyof SuperDiarioDB>(
   await db.put(storeName, value);
 }
 
+export async function dbDelete<StoreName extends keyof SuperDiarioDB>(
+  storeName: StoreName,
+  key: SuperDiarioDB[StoreName]["key"],
+) {
+  const db = await getDB();
+  await db.delete(storeName, key);
+}
+
 export async function dbList<StoreName extends keyof SuperDiarioDB>(storeName: StoreName) {
   const db = await getDB();
   return db.getAll(storeName);
 }
 
-export async function dbListByIndex<StoreName extends "profiles" | "entries">(
+export async function dbListByIndex<StoreName extends "profiles" | "entries" | "dailyPhotos">(
   storeName: StoreName,
   indexName: keyof SuperDiarioDB[StoreName]["indexes"],
   value: string | [string, string],
