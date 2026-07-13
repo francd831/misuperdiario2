@@ -1,5 +1,5 @@
 :root {
-  color: #23212a;
+  color: #262330;
   background: #fff9f0;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -19,6 +19,11 @@ body {
   margin: 0;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 button,
 input,
 textarea,
@@ -26,27 +31,37 @@ select {
   font: inherit;
 }
 
-.app-shell {
-  display: grid;
+.app-frame {
   min-height: 100vh;
-  gap: 24px;
-  align-content: center;
-  padding: 32px clamp(20px, 5vw, 64px);
   background:
-    radial-gradient(circle at top left, rgba(255, 183, 77, 0.28), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(79, 190, 166, 0.22), transparent 32%),
-    #fff9f0;
+    radial-gradient(circle at 0 0, rgba(255, 195, 92, 0.32), transparent 34%),
+    radial-gradient(circle at 100% 20%, rgba(83, 190, 168, 0.22), transparent 30%),
+    linear-gradient(180deg, #fff9f0 0%, #fff3f6 100%);
 }
 
-.hero,
-.panel {
-  width: min(720px, 100%);
+.app-main {
+  width: min(980px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 18px 96px;
+}
+
+.welcome-screen {
+  display: grid;
+  min-height: 100vh;
+  align-content: center;
+  gap: 28px;
+  padding: 32px 22px;
+}
+
+.welcome-copy {
+  max-width: 680px;
 }
 
 .eyebrow {
-  margin: 0 0 12px;
-  color: #6b5b2e;
-  font-size: 0.8rem;
+  margin: 0 0 10px;
+  color: #7d5a14;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -59,42 +74,277 @@ p {
 }
 
 h1 {
-  max-width: 12ch;
-  margin-bottom: 16px;
-  color: #2f2747;
-  font-size: clamp(3rem, 10vw, 6.5rem);
-  line-height: 0.95;
+  margin-bottom: 14px;
+  color: #312945;
+  font-size: clamp(2.5rem, 9vw, 5.8rem);
+  line-height: 0.98;
   letter-spacing: 0;
 }
 
-.lead {
-  max-width: 620px;
-  margin-bottom: 0;
-  color: #4d465b;
-  font-size: clamp(1.05rem, 2vw, 1.35rem);
+h2 {
+  margin-bottom: 8px;
+  color: #312945;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+
+p {
+  color: #575066;
   line-height: 1.55;
 }
 
-.panel {
-  border: 1px solid rgba(47, 39, 71, 0.14);
+.welcome-copy p:not(.eyebrow),
+.page-header__description {
+  max-width: 680px;
+  font-size: clamp(1rem, 2vw, 1.22rem);
+}
+
+.welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primary-action,
+.secondary-action,
+.icon-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.primary-action {
+  background: #312945;
+  color: #fff;
+  padding: 0 18px;
+  box-shadow: 0 14px 28px rgba(49, 41, 69, 0.18);
+}
+
+.secondary-action,
+.icon-action {
+  border: 1px solid rgba(49, 41, 69, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  color: #312945;
+  padding: 0 16px;
+}
+
+.icon-action {
+  width: 44px;
+  padding: 0;
+}
+
+.welcome-note,
+.toolbar-placeholder {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(49, 41, 69, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 10px 14px;
+  color: #575066;
+  font-size: 0.92rem;
+}
+
+.page-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.page-stack--admin {
+  padding-top: 18px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-header h1 {
+  max-width: 11ch;
+  font-size: clamp(2.2rem, 8vw, 4rem);
+}
+
+.page-header__action {
+  padding-top: 8px;
+}
+
+.grid-two,
+.action-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.action-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-link {
+  display: block;
+}
+
+.feature-card,
+.status-panel,
+.empty-state,
+.media-placeholder {
+  border: 1px solid rgba(49, 41, 69, 0.12);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.72);
-  padding: 20px;
-  box-shadow: 0 18px 45px rgba(47, 39, 71, 0.08);
+  box-shadow: 0 14px 36px rgba(49, 41, 69, 0.07);
 }
 
-.panel h2 {
-  margin-bottom: 14px;
-  font-size: 1.1rem;
-}
-
-ol {
+.feature-card {
   display: grid;
-  gap: 10px;
-  margin: 0;
-  padding-left: 22px;
+  min-height: 132px;
+  align-content: start;
+  gap: 14px;
+  padding: 16px;
 }
 
-li {
-  line-height: 1.4;
+.feature-card__icon {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.68);
+  color: #312945;
+}
+
+.feature-card p,
+.status-panel p,
+.empty-state p {
+  margin-bottom: 0;
+  font-size: 0.94rem;
+}
+
+.feature-card--mint {
+  background: #e8f8ef;
+}
+
+.feature-card--sun {
+  background: #fff1c7;
+}
+
+.feature-card--berry {
+  background: #ffe4ee;
+}
+
+.feature-card--sky {
+  background: #e5f3ff;
+}
+
+.feature-card--paper {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.status-panel,
+.empty-state,
+.media-placeholder {
+  padding: 20px;
+}
+
+.empty-state,
+.media-placeholder,
+.loading-screen {
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.media-placeholder {
+  min-height: 420px;
+  color: #7a7385;
+  font-weight: 800;
+}
+
+.bottom-nav {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  max-width: 760px;
+  margin: 0 auto;
+  border: 1px solid rgba(49, 41, 69, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px;
+  box-shadow: 0 18px 40px rgba(49, 41, 69, 0.16);
+  backdrop-filter: blur(16px);
+}
+
+.bottom-nav__item {
+  display: grid;
+  min-height: 56px;
+  place-items: center;
+  gap: 2px;
+  border-radius: 6px;
+  color: #7a7385;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.bottom-nav__item.active {
+  background: #312945;
+  color: #fff;
+}
+
+.loading-screen {
+  min-height: 100vh;
+  background: #fff9f0;
+}
+
+.loading-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #312945;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (min-width: 720px) {
+  .app-main {
+    padding: 36px 28px 112px;
+  }
+
+  .grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-nav__item span {
+    font-size: 0.66rem;
+  }
 }
