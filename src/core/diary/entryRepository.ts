@@ -1,5 +1,5 @@
 import { dbGet, dbListByIndex, dbSet } from "../storage/db";
-import type { CreateTextEntryInput, DiaryEntry, EntryType } from "./types";
+import type { CreateMediaEntryInput, CreateTextEntryInput, DiaryEntry, EntryType } from "./types";
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -42,6 +42,27 @@ export const entryRepository = {
       date: today(),
       title: input.title?.trim() || undefined,
       note: input.note.trim(),
+      isLocked: Boolean(input.isLocked),
+      unlockAt: input.unlockAt || undefined,
+      createdAt,
+      updatedAt: createdAt,
+    };
+
+    await dbSet("entries", entry);
+    return entry;
+  },
+
+  async createMediaEntry(input: CreateMediaEntryInput) {
+    const createdAt = now();
+    const entry: DiaryEntry = {
+      id: crypto.randomUUID(),
+      profileId: input.profileId,
+      type: input.type,
+      date: today(),
+      title: input.title?.trim() || undefined,
+      note: input.note?.trim() || undefined,
+      durationSeconds: input.durationSeconds,
+      mediaBlob: input.mediaBlob,
       isLocked: Boolean(input.isLocked),
       unlockAt: input.unlockAt || undefined,
       createdAt,

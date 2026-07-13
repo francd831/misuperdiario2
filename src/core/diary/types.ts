@@ -22,3 +22,14 @@ export interface CreateTextEntryInput {
   isLocked?: boolean;
   unlockAt?: string;
 }
+
+export interface CreateMediaEntryInput {
+  profileId: string;
+  type: "audio" | "video";
+  title?: string;
+  note?: string;
+  durationSeconds: number;
+  mediaBlob: Blob;
+  isLocked?: boolean;
+  unlockAt?: string;
+}

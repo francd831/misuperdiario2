@@ -36,4 +36,19 @@ describe("entryRepository", () => {
     expect(entry.type).toBe("text");
     expect(entry.note).toBe("Hoy he escrito mi primer recuerdo.");
   });
+
+  it("creates media entries attached to a profile", async () => {
+    const mediaBlob = new Blob(["audio"], { type: "audio/webm" });
+    const entry = await entryRepository.createMediaEntry({
+      profileId: "profile-1",
+      type: "audio",
+      durationSeconds: 12,
+      mediaBlob,
+    });
+
+    expect(entry.profileId).toBe("profile-1");
+    expect(entry.type).toBe("audio");
+    expect(entry.durationSeconds).toBe(12);
+    expect(entry.mediaBlob).toBe(mediaBlob);
+  });
 });

@@ -181,6 +181,28 @@ p {
   box-shadow: 0 14px 36px rgba(49, 41, 69, 0.07);
 }
 
+.entry-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.entry-card__body audio,
+.entry-card__body video {
+  width: 100%;
+  max-height: 320px;
+  margin-top: 10px;
+  border-radius: 8px;
+  background: #262330;
+}
+
+.entry-card__meta {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
 .entry-card h2,
 .entry-card p {
   margin-bottom: 6px;
@@ -201,6 +223,60 @@ p {
   padding: 5px 9px;
   font-size: 0.72rem;
   font-weight: 900;
+}
+
+.recorder-panel {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(49, 41, 69, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 16px;
+  box-shadow: 0 14px 36px rgba(49, 41, 69, 0.07);
+}
+
+.recorder-panel video,
+.recorder-panel audio,
+.audio-placeholder {
+  width: 100%;
+  border-radius: 8px;
+  background: #262330;
+}
+
+.recorder-panel video,
+.audio-placeholder {
+  aspect-ratio: 16 / 10;
+}
+
+.audio-placeholder {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+}
+
+.recorder-panel audio {
+  background: transparent;
+}
+
+.recorder-panel__timer {
+  margin-bottom: 0;
+  color: #312945;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.recorder-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.recorder-panel__actions button {
+  border: 0;
+  cursor: pointer;
 }
 
 .page-stack {
