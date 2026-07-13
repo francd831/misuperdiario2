@@ -1,5 +1,6 @@
 import { Camera, Mic, PenLine, Video } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useProfiles } from "../../core/profiles/ProfileContext";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
 
@@ -11,12 +12,19 @@ const actions = [
 ];
 
 export default function HomePage() {
+  const { activeProfile, logout } = useProfiles();
+
   return (
     <section className="page-stack">
       <PageHeader
         eyebrow="Inicio"
-        title="Que quieres guardar hoy?"
-        description="Accesos principales del diario infantil. En Fase 2 se conectara al perfil activo."
+        title={`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}
+        description="Que quieres guardar hoy?"
+        action={
+          <button className="secondary-action" type="button" onClick={() => void logout()}>
+            Salir
+          </button>
+        }
       />
 
       <div className="action-grid">

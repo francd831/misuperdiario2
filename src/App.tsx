@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./app/layout/AppLayout";
+import { useProfiles } from "./core/profiles/ProfileContext";
 import { LoadingScreen } from "./shared/ui/LoadingScreen";
 
 const WelcomePage = lazy(() => import("./features/onboarding/WelcomePage"));
@@ -16,6 +17,10 @@ const AdminPage = lazy(() => import("./features/admin/AdminPage"));
 const NotFoundPage = lazy(() => import("./features/system/NotFoundPage"));
 
 export default function App() {
+  const { status } = useProfiles();
+
+  if (status === "loading") return <LoadingScreen />;
+
   return (
     <Suspense fallback={<LoadingScreen />}>
       <Routes>

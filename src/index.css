@@ -248,8 +248,59 @@ p {
 
 .status-panel,
 .empty-state,
-.media-placeholder {
+.media-placeholder,
+.form-panel {
   padding: 20px;
+}
+
+.form-panel {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(49, 41, 69, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 14px 36px rgba(49, 41, 69, 0.07);
+}
+
+.form-panel label {
+  display: grid;
+  gap: 6px;
+  color: #4f485d;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.form-panel input,
+.form-panel select {
+  min-height: 46px;
+  border: 1px solid rgba(49, 41, 69, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: #262330;
+  padding: 0 12px;
+}
+
+.form-panel .primary-action {
+  width: fit-content;
+  border: 0;
+  cursor: pointer;
+}
+
+.form-panel .primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.form-error {
+  margin-bottom: 0;
+  color: #ad2f45;
+  font-weight: 700;
+}
+
+.form-success {
+  margin-bottom: 0;
+  color: #267256;
+  font-weight: 700;
 }
 
 .empty-state,
