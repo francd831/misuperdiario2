@@ -52,6 +52,7 @@ export const dailyPhotoRepository = {
       blob: input.blob,
       thumbnailBlob: input.thumbnailBlob,
       caption: input.caption?.trim() || undefined,
+      overlayProject: input.overlayProject,
       createdAt: existing?.createdAt ?? timestamp,
       updatedAt: timestamp,
     };

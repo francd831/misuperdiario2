@@ -1,3 +1,5 @@
+import type { OverlayProject } from "../overlays/types";
+
 export interface DailyPhoto {
   id: string;
   profileId: string;
@@ -5,6 +7,7 @@ export interface DailyPhoto {
   blob: Blob;
   thumbnailBlob?: Blob;
   caption?: string;
+  overlayProject?: OverlayProject;
   createdAt: string;
   updatedAt: string;
 }
@@ -14,4 +17,5 @@ export interface SaveDailyPhotoInput {
   blob: Blob;
   thumbnailBlob?: Blob;
   caption?: string;
+  overlayProject?: OverlayProject;
 }

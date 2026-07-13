@@ -4,18 +4,25 @@ import { Link } from "react-router-dom";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
+import type { OverlayProject } from "../../core/overlays/types";
+import { packService } from "../../core/packs/packService";
+import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { PageHeader } from "../../shared/ui/PageHeader";
+import { StickerCanvas } from "../stickers/StickerCanvas";
+import { StickerTray } from "../stickers/StickerTray";
 
 function PhotoThumb({ photo }: { photo: DailyPhoto }) {
   const url = useObjectUrl(photo.thumbnailBlob ?? photo.blob);
+  const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
 
   return (
     <article className="photo-tile">
       {url && <img src={url} alt={photo.caption || `Foto del ${photo.date}`} />}
+      <StickerCanvas overlays={photo.overlayProject ?? []} packs={packs} />
       <span>{new Date(photo.date).toLocaleDateString("es", { day: "numeric", month: "short" })}</span>
     </article>
   );
@@ -30,7 +37,10 @@ export default function DailyPhotoPage() {
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
   const [caption, setCaption] = useState("");
   const [error, setError] = useState("");
+  const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
+  const [overlays, setOverlays] = useState<OverlayProject>([]);
   const capturedUrl = useObjectUrl(capturedBlob);
+  const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
   const hasToday = useMemo(() => photos.some((photo) => photo.date === new Date().toISOString().slice(0, 10)), [photos]);
 
   const stopCamera = useCallback(() => {
@@ -56,6 +66,7 @@ export default function DailyPhotoPage() {
   async function startCamera() {
     setError("");
     setCapturedBlob(null);
+    setOverlays([]);
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("Este navegador no permite usar la camara desde la web.");
@@ -107,15 +118,34 @@ export default function DailyPhotoPage() {
           blob: capturedBlob,
           thumbnailBlob,
           caption,
+          overlayProject: overlays,
         },
         policy.allowDailyPhotoReplacement,
       );
       setCapturedBlob(null);
       setCaption("");
+      setOverlays([]);
       await refreshPhotos();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo guardar la foto.");
     }
+  }
+
+  function addSticker(sticker: PackAsset) {
+    setOverlays((current) => [
+      ...current,
+      {
+        id: crypto.randomUUID(),
+        kind: "sticker",
+        packId: sticker.packId,
+        assetId: sticker.id,
+        x: 50,
+        y: 50,
+        scale: 1,
+        rotation: 0,
+        zIndex: current.length + 1,
+      },
+    ]);
   }
 
   return (
@@ -139,11 +169,14 @@ export default function DailyPhotoPage() {
       )}
 
       <section className="recorder-panel">
-        {capturedUrl ? (
-          <img className="camera-preview" src={capturedUrl} alt="Foto capturada" />
-        ) : (
-          <video ref={videoRef} className="camera-preview" muted playsInline />
-        )}
+        <div className="sticker-stage">
+          {capturedUrl ? (
+            <img className="camera-preview" src={capturedUrl} alt="Foto capturada" />
+          ) : (
+            <video ref={videoRef} className="camera-preview" muted playsInline />
+          )}
+          <StickerCanvas overlays={overlays} packs={packs} />
+        </div>
 
         <div className="recorder-panel__actions">
           {!capturedBlob ? (
@@ -169,10 +202,13 @@ export default function DailyPhotoPage() {
       </section>
 
       {capturedBlob && (
-        <label className="form-panel">
-          Caption
-          <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Opcional" />
-        </label>
+        <>
+          <label className="form-panel">
+            Caption
+            <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Opcional" />
+          </label>
+          <StickerTray stickers={activePack?.stickers ?? []} onSelect={addSticker} />
+        </>
       )}
 
       {error && <p className="form-error">{error}</p>}

@@ -1,3 +1,5 @@
+import type { OverlayProject } from "../overlays/types";
+
 export type EntryType = "text" | "audio" | "video";
 
 export interface DiaryEntry {
@@ -9,6 +11,7 @@ export interface DiaryEntry {
   note?: string;
   durationSeconds?: number;
   mediaBlob?: Blob;
+  overlayProject?: OverlayProject;
   isLocked: boolean;
   unlockAt?: string;
   createdAt: string;

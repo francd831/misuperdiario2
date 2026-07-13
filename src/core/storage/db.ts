@@ -1,6 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import type { DailyPhoto } from "../daily-photo/types";
 import type { DiaryEntry } from "../diary/types";
+import type { PackEntitlement } from "../packs/types";
 import type { Profile, StoragePolicy } from "../profiles/types";
 
 interface SuperDiarioDB extends DBSchema {
@@ -32,10 +33,18 @@ interface SuperDiarioDB extends DBSchema {
       "by-profile-date": [string, string];
     };
   };
+  packEntitlements: {
+    key: string;
+    value: PackEntitlement;
+    indexes: {
+      "by-profile": string;
+      "by-pack": string;
+    };
+  };
 }
 
 const DB_NAME = "mi-super-diario";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 let dbPromise: Promise<IDBPDatabase<SuperDiarioDB>> | null = null;
 
@@ -62,6 +71,12 @@ export function getDB() {
         const store = db.createObjectStore("dailyPhotos", { keyPath: "id" });
         store.createIndex("by-profile", "profileId");
         store.createIndex("by-profile-date", ["profileId", "date"]);
+      }
+
+      if (!db.objectStoreNames.contains("packEntitlements")) {
+        const store = db.createObjectStore("packEntitlements", { keyPath: "id" });
+        store.createIndex("by-profile", "profileId");
+        store.createIndex("by-pack", "packId");
       }
     },
   });
@@ -98,7 +113,7 @@ export async function dbList<StoreName extends keyof SuperDiarioDB>(storeName: S
   return db.getAll(storeName);
 }
 
-export async function dbListByIndex<StoreName extends "profiles" | "entries" | "dailyPhotos">(
+export async function dbListByIndex<StoreName extends "profiles" | "entries" | "dailyPhotos" | "packEntitlements">(
   storeName: StoreName,
   indexName: keyof SuperDiarioDB[StoreName]["indexes"],
   value: string | [string, string],
