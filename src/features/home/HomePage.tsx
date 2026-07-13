@@ -9,10 +9,10 @@ import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
 
 const actions = [
-  { to: "/record/video", title: "Grabar video", description: "Hasta el limite configurado por admin.", icon: <Video size={24} />, tone: "berry" as const },
-  { to: "/record/audio", title: "Grabar voz", description: "Mensajes de audio cortos y privados.", icon: <Mic size={24} />, tone: "sun" as const },
-  { to: "/record/text", title: "Escribir", description: "Texto libre y capsulas del tiempo.", icon: <PenLine size={24} />, tone: "mint" as const },
-  { to: "/daily-photo", title: "Foto diaria", description: "Una foto al dia para el timelapse.", icon: <Camera size={24} />, tone: "sky" as const },
+  { to: "/record/video", title: "Video", description: "Guarda una mini pelicula de hoy.", icon: <Video size={28} />, tone: "berry" as const, badge: "accion" },
+  { to: "/record/audio", title: "Voz", description: "Cuenta algo con tus propias palabras.", icon: <Mic size={28} />, tone: "sun" as const, badge: "sonido" },
+  { to: "/record/text", title: "Escribir", description: "Una idea, un secreto o una capsula.", icon: <PenLine size={28} />, tone: "mint" as const, badge: "diario" },
+  { to: "/daily-photo", title: "Foto diaria", description: "Una imagen para ver como cambia el tiempo.", icon: <Camera size={28} />, tone: "sky" as const, badge: "hoy" },
 ];
 
 export default function HomePage() {
@@ -45,9 +45,9 @@ export default function HomePage() {
   return (
     <section className="page-stack">
       <PageHeader
-        eyebrow="Inicio"
+        eyebrow="Tu espacio"
         title={`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}
-        description="Que quieres guardar hoy?"
+        description="Elige una forma de guardar el recuerdo de hoy."
         action={
           <button className="secondary-action" type="button" onClick={() => void logout()}>
             Salir
@@ -69,12 +69,14 @@ export default function HomePage() {
           description="Usalas para comprar packs en la tienda."
           icon={<Star size={24} />}
           tone="sun"
+          badge="monedero"
         />
         <FeatureCard
           title={`${achievements.length} logros`}
           description="Los logros dan estrellas una sola vez."
           icon={<Trophy size={24} />}
           tone="mint"
+          badge="progreso"
         />
       </div>
     </section>
