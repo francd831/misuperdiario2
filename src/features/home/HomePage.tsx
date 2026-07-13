@@ -1,6 +1,10 @@
-import { Camera, Mic, PenLine, Video } from "lucide-react";
+import { Camera, Mic, PenLine, Star, Trophy, Video } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { achievementService } from "../../core/achievements/achievementService";
+import type { ProfileAchievement } from "../../core/achievements/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
+import { walletService } from "../../core/wallet/walletService";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
 
@@ -13,6 +17,30 @@ const actions = [
 
 export default function HomePage() {
   const { activeProfile, logout } = useProfiles();
+  const [balance, setBalance] = useState(0);
+  const [achievements, setAchievements] = useState<ProfileAchievement[]>([]);
+
+  useEffect(() => {
+    if (!activeProfile) return;
+    let alive = true;
+
+    void Promise.all([
+      walletService.getBalance(activeProfile.id),
+      achievementService.listUnlocked(activeProfile.id),
+    ]).then(([nextBalance, nextAchievements]) => {
+      if (!alive) return;
+      setBalance(nextBalance);
+      setAchievements(nextAchievements);
+    }).catch(() => {
+      if (!alive) return;
+      setBalance(0);
+      setAchievements([]);
+    });
+
+    return () => {
+      alive = false;
+    };
+  }, [activeProfile]);
 
   return (
     <section className="page-stack">
@@ -35,10 +63,20 @@ export default function HomePage() {
         ))}
       </div>
 
-      <section className="status-panel">
-        <h2>Estado beta</h2>
-        <p>Racha, estrellas y ultimos recuerdos apareceran aqui cuando conectemos persistencia.</p>
-      </section>
+      <div className="grid-two">
+        <FeatureCard
+          title={`${balance} estrellas`}
+          description="Usalas para comprar packs en la tienda."
+          icon={<Star size={24} />}
+          tone="sun"
+        />
+        <FeatureCard
+          title={`${achievements.length} logros`}
+          description="Los logros dan estrellas una sola vez."
+          icon={<Trophy size={24} />}
+          tone="mint"
+        />
+      </div>
     </section>
   );
 }

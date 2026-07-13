@@ -1,4 +1,5 @@
 import { profileRepository } from "../profiles/profileRepository";
+import { walletService } from "../wallet/walletService";
 import { entitlementRepository } from "./entitlementRepository";
 import { packLoader } from "./packLoader";
 
@@ -24,6 +25,16 @@ export const packService = {
     if (!pack) throw new Error("Pack no encontrado.");
     if (pack.free) return undefined;
     return entitlementRepository.unlock(profileId, packId, "admin");
+  },
+
+  async purchasePack(profileId: string, packId: string) {
+    const pack = packLoader.getPack(packId);
+    if (!pack) throw new Error("Pack no encontrado.");
+    if (pack.free) return entitlementRepository.unlock(profileId, packId, "free");
+    if (await this.isUnlocked(profileId, packId)) return undefined;
+    const price = pack.priceStars ?? 60;
+    await walletService.spendStars(profileId, price, `Compra de pack: ${pack.name}`, `purchase-pack:${packId}`, { packId });
+    return entitlementRepository.unlock(profileId, packId, "purchase");
   },
 
   async setActivePack(profileId: string, packId: string) {

@@ -1,4 +1,5 @@
 import { hashPin, isValidPin, verifyPin } from "../auth/pinService";
+import { walletService } from "../wallet/walletService";
 import { profileRepository } from "./profileRepository";
 import type { Profile, ProfileRole } from "./types";
 
@@ -54,6 +55,7 @@ export const profileService = {
 
     const profile = createProfileModel(name, "child", cleanPin ? await hashPin(cleanPin) : undefined);
     await profileRepository.save(profile);
+    await walletService.addStars(profile.id, 20, "Bienvenida", "welcome-stars");
     return profile;
   },
 

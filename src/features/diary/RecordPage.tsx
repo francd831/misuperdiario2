@@ -1,6 +1,7 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Circle, Square } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { achievementService } from "../../core/achievements/achievementService";
 import { entryRepository } from "../../core/diary/entryRepository";
 import type { EntryType } from "../../core/diary/types";
 import { getMediaConstraints, getSupportedRecordingMimeType } from "../../core/media/recording";
@@ -106,6 +107,7 @@ export default function RecordPage() {
       isLocked,
       unlockAt: isLocked ? new Date(unlockAt).toISOString() : undefined,
     });
+    await achievementService.syncProfile(activeProfile.id);
 
     navigate("/diary");
   }
@@ -178,6 +180,7 @@ export default function RecordPage() {
       isLocked,
       unlockAt: isLocked ? new Date(unlockAt).toISOString() : undefined,
     });
+    await achievementService.syncProfile(activeProfile.id);
 
     navigate("/diary");
   }

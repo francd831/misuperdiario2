@@ -3,6 +3,8 @@ import type { DailyPhoto } from "../daily-photo/types";
 import type { DiaryEntry } from "../diary/types";
 import type { PackEntitlement } from "../packs/types";
 import type { Profile, StoragePolicy } from "../profiles/types";
+import type { WalletTransaction } from "../wallet/types";
+import type { ProfileAchievement } from "../achievements/types";
 
 interface SuperDiarioDB extends DBSchema {
   profiles: {
@@ -41,10 +43,24 @@ interface SuperDiarioDB extends DBSchema {
       "by-pack": string;
     };
   };
+  walletTransactions: {
+    key: string;
+    value: WalletTransaction;
+    indexes: {
+      "by-profile": string;
+    };
+  };
+  achievements: {
+    key: string;
+    value: ProfileAchievement;
+    indexes: {
+      "by-profile": string;
+    };
+  };
 }
 
 const DB_NAME = "mi-super-diario";
-const DB_VERSION = 4;
+const DB_VERSION = 6;
 
 let dbPromise: Promise<IDBPDatabase<SuperDiarioDB>> | null = null;
 
@@ -77,6 +93,16 @@ export function getDB() {
         const store = db.createObjectStore("packEntitlements", { keyPath: "id" });
         store.createIndex("by-profile", "profileId");
         store.createIndex("by-pack", "packId");
+      }
+
+      if (!db.objectStoreNames.contains("walletTransactions")) {
+        const store = db.createObjectStore("walletTransactions", { keyPath: "id" });
+        store.createIndex("by-profile", "profileId");
+      }
+
+      if (!db.objectStoreNames.contains("achievements")) {
+        const store = db.createObjectStore("achievements", { keyPath: "id" });
+        store.createIndex("by-profile", "profileId");
       }
     },
   });
@@ -113,7 +139,9 @@ export async function dbList<StoreName extends keyof SuperDiarioDB>(storeName: S
   return db.getAll(storeName);
 }
 
-export async function dbListByIndex<StoreName extends "profiles" | "entries" | "dailyPhotos" | "packEntitlements">(
+export async function dbListByIndex<
+  StoreName extends "profiles" | "entries" | "dailyPhotos" | "packEntitlements" | "walletTransactions" | "achievements"
+>(
   storeName: StoreName,
   indexName: keyof SuperDiarioDB[StoreName]["indexes"],
   value: string | [string, string],

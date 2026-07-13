@@ -3,19 +3,24 @@ import { Check, Lock, ShoppingBag, Star } from "lucide-react";
 import { packService } from "../../core/packs/packService";
 import type { PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
+import { walletService } from "../../core/wallet/walletService";
+import type { WalletSummary } from "../../core/wallet/types";
 import { PageHeader } from "../../shared/ui/PageHeader";
 
 export default function StorePage() {
   const { activeProfile, refresh } = useProfiles();
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set(["base"]));
+  const [wallet, setWallet] = useState<WalletSummary>({ balance: 0, transactions: [] });
   const [message, setMessage] = useState("");
+  const [messageTone, setMessageTone] = useState<"success" | "error">("success");
 
   const activePackId = activeProfile?.activePackId ?? "base";
 
   async function refreshEntitlements() {
     if (!activeProfile) return;
     setUnlockedIds(await packService.listUnlockedPackIds(activeProfile.id));
+    setWallet(await walletService.getSummary(activeProfile.id));
   }
 
   useEffect(() => {
@@ -27,12 +32,18 @@ export default function StorePage() {
     [packs, unlockedIds],
   );
 
-  async function unlockPack(packId: string) {
+  async function buyPack(packId: string) {
     if (!activeProfile) return;
     setMessage("");
-    await packService.unlockForBeta(activeProfile.id, packId);
-    await refreshEntitlements();
-    setMessage("Pack desbloqueado para la beta. En Fase 6 se descontaran estrellas.");
+    try {
+      await packService.purchasePack(activeProfile.id, packId);
+      await refreshEntitlements();
+      setMessageTone("success");
+      setMessage("Pack comprado con estrellas.");
+    } catch (error) {
+      setMessageTone("error");
+      setMessage(error instanceof Error ? error.message : "No se pudo comprar el pack.");
+    }
   }
 
   async function activatePack(packId: string) {
@@ -41,8 +52,10 @@ export default function StorePage() {
     try {
       await packService.setActivePack(activeProfile.id, packId);
       await refresh();
+      setMessageTone("success");
       setMessage("Pack activado.");
     } catch (error) {
+      setMessageTone("error");
       setMessage(error instanceof Error ? error.message : "No se pudo activar el pack.");
     }
   }
@@ -52,10 +65,10 @@ export default function StorePage() {
       <PageHeader
         eyebrow="Tienda"
         title="Packs por estrellas"
-        description="Explora packs cosmeticos. El cobro con estrellas se conectara al monedero en Fase 6."
+        description={`Saldo actual: ${wallet.balance} estrellas.`}
       />
 
-      {message && <p className="form-success">{message}</p>}
+      {message && <p className={messageTone === "success" ? "form-success" : "form-error"}>{message}</p>}
 
       <div className="pack-grid">
         {sortedPacks.map(({ manifest, previewUrl, stickers, frames }) => {
@@ -75,8 +88,8 @@ export default function StorePage() {
                 </p>
                 <div className="pack-card__actions">
                   {!unlocked ? (
-                    <button className="primary-action" type="button" onClick={() => void unlockPack(manifest.id)}>
-                      Desbloquear beta
+                    <button className="primary-action" type="button" onClick={() => void buyPack(manifest.id)}>
+                      Comprar
                     </button>
                   ) : (
                     <button className="secondary-action" type="button" disabled={active} onClick={() => void activatePack(manifest.id)}>
@@ -89,6 +102,21 @@ export default function StorePage() {
           );
         })}
       </div>
+
+      <section className="status-panel">
+        <h2>Ultimos movimientos</h2>
+        {wallet.transactions.length === 0 ? (
+          <p>Aun no hay movimientos.</p>
+        ) : (
+          <div className="transaction-list">
+            {wallet.transactions.slice(0, 5).map((transaction) => (
+              <p key={transaction.id}>
+                <strong>{transaction.amount > 0 ? "+" : ""}{transaction.amount}</strong> {transaction.reason}
+              </p>
+            ))}
+          </div>
+        )}
+      </section>
     </section>
   );
 }

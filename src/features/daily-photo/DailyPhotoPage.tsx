@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Camera, Play, RotateCcw, Save } from "lucide-react";
 import { Link } from "react-router-dom";
+import { achievementService } from "../../core/achievements/achievementService";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
@@ -122,6 +123,7 @@ export default function DailyPhotoPage() {
         },
         policy.allowDailyPhotoReplacement,
       );
+      await achievementService.syncProfile(activeProfile.id);
       setCapturedBlob(null);
       setCaption("");
       setOverlays([]);
