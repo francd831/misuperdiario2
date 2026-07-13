@@ -1,33 +1,31 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
-import { AppLayout } from "@/app/layout/AppLayout";
-import { AppRoutes } from "@/app/routes/AppRoutes";
-import { PackProvider } from "@/core/packs/PackContext";
-import { ProfileProvider } from "@/core/auth/ProfileContext";
-import "@/assets/styles/tokens.css";
-import "@/assets/styles/themes.css";
+const milestones = [
+  "Fundacion PWA, perfiles, admin y PIN seguro",
+  "Diario con texto, audio, video y capsulas",
+  "Foto diaria, timelapse y control de almacenamiento",
+  "Packs, stickers, recompensas y tienda por estrellas",
+  "Backups completos y tests criticos",
+];
 
-const queryClient = new QueryClient();
+export default function App() {
+  return (
+    <main className="app-shell">
+      <section className="hero" aria-labelledby="app-title">
+        <p className="eyebrow">Rebuild desde especificacion</p>
+        <h1 id="app-title">Mi Super Diario</h1>
+        <p className="lead">
+          Diario creativo privado para guardar recuerdos con texto, voz, video,
+          fotos diarias, stickers y recompensas.
+        </p>
+      </section>
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ProfileProvider>
-          <PackProvider>
-            <AppLayout>
-              <AppRoutes />
-            </AppLayout>
-          </PackProvider>
-        </ProfileProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+      <section className="panel" aria-labelledby="next-title">
+        <h2 id="next-title">Ruta de construccion</h2>
+        <ol>
+          {milestones.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+      </section>
+    </main>
+  );
+}

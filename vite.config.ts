@@ -4,7 +4,6 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -21,10 +20,10 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.ico", "robots.txt", "pwa-icon-192.png", "pwa-icon-512.png"],
       manifest: {
         name: "Mi Super Diario",
-        short_name: "MiDiario",
-        description: "Tu diario visual personal para niños",
+        short_name: "Super Diario",
+        description: "Diario creativo privado para guardar recuerdos con texto, voz, video, fotos y stickers.",
         theme_color: "#7c3aed",
-        background_color: "#faf8f5",
+        background_color: "#fff9f0",
         display: "standalone",
         orientation: "portrait",
         scope: "/",
@@ -43,12 +42,18 @@ export default defineConfig(({ mode }) => ({
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
-            options: { cacheName: "google-fonts-cache", expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+            options: {
+              cacheName: "google-fonts-cache",
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
           },
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
-            options: { cacheName: "google-fonts-webfonts", expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+            options: {
+              cacheName: "google-fonts-webfonts",
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
           },
         ],
       },

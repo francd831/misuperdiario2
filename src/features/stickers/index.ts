@@ -1,2 +1,0 @@
-// Stickers feature barrel
-export {};

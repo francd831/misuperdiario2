@@ -1,2 +1,0 @@
-// Settings feature barrel
-export {};
