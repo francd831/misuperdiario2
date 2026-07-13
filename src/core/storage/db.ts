@@ -134,6 +134,11 @@ export async function dbDelete<StoreName extends keyof SuperDiarioDB>(
   await db.delete(storeName, key);
 }
 
+export async function dbClear<StoreName extends keyof SuperDiarioDB>(storeName: StoreName) {
+  const db = await getDB();
+  await db.clear(storeName);
+}
+
 export async function dbList<StoreName extends keyof SuperDiarioDB>(storeName: StoreName) {
   const db = await getDB();
   return db.getAll(storeName);

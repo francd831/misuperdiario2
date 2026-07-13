@@ -1,5 +1,6 @@
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { DatabaseBackup, HardDrive, ShieldCheck, UsersRound } from "lucide-react";
+import { backupService } from "../../core/backups/backupService";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import type { StoragePolicy } from "../../core/profiles/types";
@@ -8,12 +9,15 @@ import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
 
 export default function AdminPage() {
-  const { status, children, createAdmin, createChild } = useProfiles();
+  const { status, children, createAdmin, createChild, refresh } = useProfiles();
   const [adminName, setAdminName] = useState("");
   const [adminPin, setAdminPin] = useState("");
   const [childName, setChildName] = useState("");
   const [childPin, setChildPin] = useState("");
   const [message, setMessage] = useState("");
+  const [backupMessage, setBackupMessage] = useState("");
+  const [backupBusy, setBackupBusy] = useState(false);
+  const [backupMessageTone, setBackupMessageTone] = useState<"success" | "error">("success");
   const [policy, setPolicy] = useState<StoragePolicy | null>(null);
   const [usage, setUsage] = useState<StorageUsageSummary | null>(null);
 
@@ -50,6 +54,52 @@ export default function AdminPage() {
       setMessage("Perfil infantil creado.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo crear el perfil.");
+    }
+  }
+
+  async function handleExportBackup() {
+    setBackupBusy(true);
+    setBackupMessage("");
+    try {
+      const blob = await backupService.createBackupBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = backupService.makeFilename();
+      link.click();
+      URL.revokeObjectURL(url);
+      setBackupMessageTone("success");
+      setBackupMessage("Backup exportado.");
+    } catch (error) {
+      setBackupMessageTone("error");
+      setBackupMessage(error instanceof Error ? error.message : "No se pudo exportar el backup.");
+    } finally {
+      setBackupBusy(false);
+    }
+  }
+
+  async function handleImportBackup(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!window.confirm("Importar este backup reemplazara los datos locales actuales de Mi Super Diario. Continuar?")) {
+      return;
+    }
+
+    setBackupBusy(true);
+    setBackupMessage("");
+    try {
+      const result = await backupService.importBackup(file);
+      await Promise.all([refresh(), refreshStorage()]);
+      setBackupMessageTone("success");
+      setBackupMessage(
+        `Backup importado: ${result.counts.profiles} perfiles, ${result.counts.entries} entradas y ${result.counts.dailyPhotos} fotos.`,
+      );
+    } catch (error) {
+      setBackupMessageTone("error");
+      setBackupMessage(error instanceof Error ? error.message : "No se pudo importar el backup.");
+    } finally {
+      setBackupBusy(false);
     }
   }
 
@@ -135,6 +185,21 @@ export default function AdminPage() {
         <button className="secondary-action" type="button" onClick={() => void refreshStorage()}>
           Actualizar uso
         </button>
+      </section>
+
+      <section className="status-panel">
+        <h2>Backups</h2>
+        <p>Exporta perfiles, entradas, fotos, stickers aplicados, packs comprados, estrellas y logros.</p>
+        {backupMessage && <p className={backupMessageTone === "success" ? "form-success" : "form-error"}>{backupMessage}</p>}
+        <div className="inline-actions">
+          <button className="primary-action" type="button" disabled={backupBusy} onClick={() => void handleExportBackup()}>
+            Exportar backup
+          </button>
+          <label className="secondary-action secondary-action--file">
+            Importar backup
+            <input accept=".zip,application/zip" disabled={backupBusy} type="file" onChange={(event) => void handleImportBackup(event)} />
+          </label>
+        </div>
       </section>
 
       <div className="grid-two">

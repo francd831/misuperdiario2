@@ -105,6 +105,12 @@ p {
   gap: 12px;
 }
 
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .primary-action,
 .secondary-action,
 .icon-action {
@@ -135,6 +141,25 @@ p {
 .icon-action {
   width: 44px;
   padding: 0;
+}
+
+.primary-action:disabled,
+.secondary-action:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.secondary-action--file {
+  cursor: pointer;
+}
+
+.secondary-action--file input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .welcome-note,
