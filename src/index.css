@@ -502,16 +502,17 @@ p {
 .tool-button {
   position: relative;
   display: grid;
-  min-height: 188px;
-  align-content: end;
-  gap: 6px;
+  min-height: 230px;
+  grid-template-rows: minmax(132px, 1fr) auto;
+  gap: 12px;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.78);
   border-radius: 32px;
-  color: #fff;
+  color: var(--ink);
   padding: 16px;
+  background: rgba(255, 255, 255, 0.78);
   box-shadow:
-    inset 0 -8px 0 rgba(33, 25, 43, 0.12),
+    inset 0 -8px 0 rgba(33, 25, 43, 0.08),
     var(--shadow);
   transition:
     transform 150ms ease,
@@ -529,51 +530,267 @@ p {
 .tool-button::before {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 24% 20%, rgba(255, 255, 255, 0.5), transparent 24%),
-    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.22), transparent 18%);
+  background: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.84), transparent 36%);
   content: "";
 }
 
 .tool-button::after {
   position: absolute;
-  right: -32px;
-  top: -24px;
-  width: 118px;
-  height: 118px;
-  border-radius: 36px;
-  background: rgba(255, 255, 255, 0.18);
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  height: 1px;
+  background: rgba(48, 35, 61, 0.1);
   content: "";
-  transform: rotate(18deg);
 }
 
 .tool-button--berry {
-  background: linear-gradient(145deg, #ff5f8f, #a855f7);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 46%),
+    linear-gradient(145deg, #fff3f7, #ffd0df);
 }
 
 .tool-button--sun {
-  background: linear-gradient(145deg, #ffbf42, #ff7b54);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), transparent 46%),
+    linear-gradient(145deg, #fff4ca, #ffd685);
 }
 
 .tool-button--mint {
-  background: linear-gradient(145deg, #44d6a2, #25a8df);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), transparent 46%),
+    linear-gradient(145deg, #e3fbef, #b4f0d6);
 }
 
 .tool-button--sky {
-  background: linear-gradient(145deg, #63b8ff, #7367ff);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), transparent 46%),
+    linear-gradient(145deg, #e1f4ff, #b5d9ff);
 }
 
-.tool-button__icon {
+.tool-scene {
   position: relative;
   z-index: 1;
-  display: grid;
-  width: 72px;
-  height: 72px;
-  place-items: center;
-  border: 3px solid rgba(255, 255, 255, 0.7);
+  display: block;
+  min-height: 138px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.76);
   border-radius: 26px;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 24px rgba(33, 25, 43, 0.14);
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 -8px 0 rgba(48, 35, 61, 0.06);
+}
+
+.tool-scene__spotlight,
+.tool-scene__main,
+.tool-scene__avatar,
+.tool-scene__prop,
+.tool-scene__line {
+  position: absolute;
+  z-index: 1;
+}
+
+.tool-scene__spotlight {
+  inset: 0;
+  z-index: 0;
+}
+
+.tool-scene__main {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 4px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+  box-shadow: 0 16px 30px rgba(48, 35, 61, 0.18);
+}
+
+.tool-scene__avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.86);
+  border-radius: 16px;
+  background: #fff4bf;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 950;
+  box-shadow: 0 12px 20px rgba(48, 35, 61, 0.14);
+}
+
+.tool-scene__prop {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--ink);
+  box-shadow: 0 10px 20px rgba(48, 35, 61, 0.14);
+}
+
+.tool-scene__line {
+  display: block;
+  border-radius: 999px;
+}
+
+.tool-scene--video {
+  background:
+    linear-gradient(90deg, rgba(48, 35, 61, 0.22) 8px, transparent 8px) 0 0 / 28px 100%,
+    radial-gradient(circle at 78% 28%, rgba(255, 255, 255, 0.72), transparent 18%),
+    linear-gradient(145deg, #3a2857, #ff5f8f);
+}
+
+.tool-scene--video .tool-scene__spotlight {
+  background: conic-gradient(from 210deg at 70% 10%, rgba(255, 245, 186, 0.7), transparent 28%, transparent);
+}
+
+.tool-scene--video .tool-scene__main {
+  right: 26px;
+  bottom: 22px;
+  background: #21192b;
+}
+
+.tool-scene--video .tool-scene__avatar {
+  left: 26px;
+  bottom: 26px;
+}
+
+.tool-scene--video .tool-scene__prop {
+  top: 18px;
+  left: 24px;
+  transform: rotate(-9deg);
+}
+
+.tool-scene--video .tool-scene__line--one,
+.tool-scene--video .tool-scene__line--two {
+  top: 18px;
+  width: 36px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.tool-scene--video .tool-scene__line--one {
+  right: 24px;
+}
+
+.tool-scene--video .tool-scene__line--two {
+  right: 68px;
+}
+
+.tool-scene--voice {
+  background:
+    radial-gradient(circle at 25% 28%, rgba(255, 255, 255, 0.72), transparent 20%),
+    linear-gradient(145deg, #ffb33e, #ff6f59);
+}
+
+.tool-scene--voice .tool-scene__spotlight {
+  background:
+    radial-gradient(circle at 68% 58%, transparent 20px, rgba(255, 255, 255, 0.26) 22px, transparent 24px),
+    radial-gradient(circle at 68% 58%, transparent 42px, rgba(255, 255, 255, 0.18) 44px, transparent 46px);
+}
+
+.tool-scene--voice .tool-scene__main {
+  right: 30px;
+  top: 34px;
+  background: #7c3f20;
+}
+
+.tool-scene--voice .tool-scene__avatar {
+  left: 28px;
+  bottom: 24px;
+}
+
+.tool-scene--voice .tool-scene__line--one,
+.tool-scene--voice .tool-scene__line--two {
+  left: 76px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.tool-scene--voice .tool-scene__line--one {
+  top: 54px;
+  width: 44px;
+}
+
+.tool-scene--voice .tool-scene__line--two {
+  top: 78px;
+  width: 62px;
+}
+
+.tool-scene--write {
+  background:
+    linear-gradient(0deg, rgba(48, 35, 61, 0.08) 1px, transparent 1px) 0 0 / 100% 18px,
+    linear-gradient(145deg, #56d6a6, #3ca9ff);
+}
+
+.tool-scene--write .tool-scene__main {
+  right: 24px;
+  bottom: 24px;
+  background: #0f7f70;
+  transform: rotate(-8deg);
+}
+
+.tool-scene--write .tool-scene__avatar {
+  left: 24px;
+  top: 24px;
+}
+
+.tool-scene--write .tool-scene__line--one,
+.tool-scene--write .tool-scene__line--two {
+  left: 28px;
+  height: 9px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.tool-scene--write .tool-scene__line--one {
+  bottom: 48px;
+  width: 86px;
+}
+
+.tool-scene--write .tool-scene__line--two {
+  bottom: 30px;
+  width: 62px;
+}
+
+.tool-scene--photo {
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.68), transparent 20%),
+    linear-gradient(145deg, #5db9ff, #7a67ff);
+}
+
+.tool-scene--photo .tool-scene__main {
+  left: 50%;
+  top: 50%;
+  background: #25356f;
+  transform: translate(-50%, -46%);
+}
+
+.tool-scene--photo .tool-scene__main::after {
+  position: absolute;
+  right: -18px;
+  bottom: -24px;
+  left: -18px;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  content: "";
+}
+
+.tool-scene--photo .tool-scene__avatar {
+  right: 24px;
+  bottom: 22px;
+}
+
+.tool-scene--photo .tool-scene__line--one {
+  top: 22px;
+  left: 24px;
+  width: 52px;
+  height: 52px;
+  border: 8px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
 }
 
 .tool-button__reward {
@@ -595,9 +812,16 @@ p {
 }
 
 .tool-button__title,
-.tool-button__description {
+.tool-button__description,
+.tool-button__copy {
   position: relative;
   z-index: 1;
+}
+
+.tool-button__copy {
+  display: grid;
+  gap: 4px;
+  padding: 0 2px 2px;
 }
 
 .tool-button__title {
@@ -607,7 +831,7 @@ p {
 }
 
 .tool-button__description {
-  color: rgba(255, 255, 255, 0.84);
+  color: rgba(48, 35, 61, 0.68);
   font-size: 0.92rem;
   font-weight: 800;
 }

@@ -1,4 +1,4 @@
-import { Camera, ChevronRight, LogOut, Mic, PenLine, ShoppingBag, Sparkles, Star, Trophy, Video } from "lucide-react";
+import { Camera, ChevronRight, Clapperboard, LogOut, Mic, PenLine, ShoppingBag, Sparkles, Star, Trophy, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
@@ -9,34 +9,39 @@ import { walletService } from "../../core/wallet/walletService";
 const actions = [
   {
     to: "/record/video",
-    title: "Camara cine",
+    title: "Video",
     description: "Graba una mini pelicula",
-    icon: <Video size={34} />,
+    icon: <Video size={38} />,
+    prop: <Clapperboard size={30} />,
     className: "tool-button--berry",
+    sceneClass: "tool-scene--video",
     reward: "+15",
   },
   {
     to: "/record/audio",
-    title: "Orbe de voz",
+    title: "Voz",
     description: "Cuenta algo de hoy",
-    icon: <Mic size={34} />,
+    icon: <Mic size={38} />,
     className: "tool-button--sun",
+    sceneClass: "tool-scene--voice",
     reward: "+10",
   },
   {
     to: "/record/text",
-    title: "Cuaderno magico",
+    title: "Escribir",
     description: "Escribe un recuerdo",
-    icon: <PenLine size={34} />,
+    icon: <PenLine size={38} />,
     className: "tool-button--mint",
+    sceneClass: "tool-scene--write",
     reward: "+10",
   },
   {
     to: "/daily-photo",
-    title: "Foto diaria",
+    title: "Foto",
     description: "Captura el dia",
-    icon: <Camera size={34} />,
+    icon: <Camera size={38} />,
     className: "tool-button--sky",
+    sceneClass: "tool-scene--photo",
     reward: "+10",
   },
 ];
@@ -112,9 +117,18 @@ export default function HomePage() {
             <span className="tool-button__reward">
               <Star size={13} fill="currentColor" /> {action.reward}
             </span>
-            <span className="tool-button__icon">{action.icon}</span>
-            <span className="tool-button__title">{action.title}</span>
-            <span className="tool-button__description">{action.description}</span>
+            <span className={`tool-scene ${action.sceneClass}`} aria-hidden="true">
+              <span className="tool-scene__spotlight" />
+              <span className="tool-scene__avatar">{playerInitial}</span>
+              <span className="tool-scene__main">{action.icon}</span>
+              {action.prop && <span className="tool-scene__prop">{action.prop}</span>}
+              <span className="tool-scene__line tool-scene__line--one" />
+              <span className="tool-scene__line tool-scene__line--two" />
+            </span>
+            <span className="tool-button__copy">
+              <span className="tool-button__title">{action.title}</span>
+              <span className="tool-button__description">{action.description}</span>
+            </span>
           </Link>
         ))}
       </nav>
