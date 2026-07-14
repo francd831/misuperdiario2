@@ -4,10 +4,10 @@ import { PageHeader } from "../../shared/ui/PageHeader";
 
 export default function SettingsPage() {
   return (
-    <section className="page-stack">
+    <section className="page-stack settings-page">
       <PageHeader
         eyebrow="Mochila"
-        title="Tu diario esta protegido"
+        title="Mochila segura"
         description="Aqui veras el estado de tu espacio. Los limites importantes los cuida un adulto."
         backTo="/home"
       />

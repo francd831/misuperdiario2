@@ -151,11 +151,11 @@ export default function DailyPhotoPage() {
   }
 
   return (
-    <section className="page-stack">
+    <section className="page-stack daily-photo-page">
       <PageHeader
         eyebrow="Foto diaria"
-        title="Una foto para recordar el dia"
-        description="Una foto activa al dia por perfil, con reemplazo segun configuracion admin."
+        title="Fotomaton diario"
+        description="Haz la foto de hoy, juega con stickers y sumala a tu album."
         backTo="/home"
         action={
           <Link className="icon-action" to="/daily-photo/timelapse" aria-label="Abrir timelapse">
@@ -167,7 +167,7 @@ export default function DailyPhotoPage() {
       {hasToday && !capturedBlob && (
         <section className="status-panel">
           <h2>Ya tienes foto de hoy</h2>
-          <p>{policy?.allowDailyPhotoReplacement ? "Puedes reemplazarla si quieres." : "Admin bloqueo el reemplazo diario."}</p>
+          <p>{policy?.allowDailyPhotoReplacement ? "Puedes repetirla si quieres otra toma." : "La foto de hoy ya esta guardada."}</p>
         </section>
       )}
 
@@ -207,7 +207,7 @@ export default function DailyPhotoPage() {
       {capturedBlob && (
         <>
           <label className="form-panel">
-            Caption
+            Frase de la foto
             <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Opcional" />
           </label>
           <StickerTray stickers={activePack?.stickers ?? []} onSelect={addSticker} />

@@ -61,7 +61,7 @@ export default function StorePage() {
   }
 
   return (
-    <section className="page-stack">
+    <section className="page-stack store-page">
       <PageHeader
         eyebrow="Tienda"
         title="Cofre de packs"
@@ -76,7 +76,7 @@ export default function StorePage() {
             <Star size={24} fill="currentColor" /> {wallet.balance}
           </strong>
         </div>
-        <p>Guarda recuerdos y desbloquea logros para conseguir mas.</p>
+        <p>Guarda recuerdos para ganar mas y abrir nuevos mundos.</p>
       </section>
 
       {message && <p className={messageTone === "success" ? "form-success" : "form-error"}>{message}</p>}

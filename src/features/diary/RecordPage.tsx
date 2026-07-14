@@ -190,18 +190,18 @@ export default function RecordPage() {
     const dailyMax = entryType === "video" ? policy?.maxVideosPerDay : policy?.maxAudiosPerDay;
 
     return (
-      <section className="page-stack">
+      <section className={`page-stack record-page record-page--${entryType}`}>
         <PageHeader
           eyebrow="Crear recuerdo"
           title={labels[entryType]}
-          description="La grabacion respeta los limites diarios y de duracion configurados por administracion."
+          description="Entra al estudio, graba tu momento y guardalo en el diario."
           backTo="/home"
         />
 
         <section className="status-panel">
-          <h2>Limites configurados</h2>
+          <h2>Reto de hoy</h2>
           <p>
-            Duracion maxima: {maxSeconds ?? "-"} segundos. Usados hoy: {dailyCount}/{dailyMax ?? "-"}.
+            Puedes grabar hasta {maxSeconds ?? "-"} segundos. Hoy llevas {dailyCount}/{dailyMax ?? "-"}.
           </p>
         </section>
 
@@ -270,11 +270,11 @@ export default function RecordPage() {
   }
 
   return (
-    <section className="page-stack">
+    <section className="page-stack record-page record-page--text">
       <PageHeader
         eyebrow="Crear recuerdo"
         title={labels.text}
-        description="Guarda una entrada escrita en el perfil activo. Las capsulas quedaran bloqueadas hasta su fecha."
+        description="Abre tu cuaderno, escribe lo que paso hoy y guardalo como recuerdo."
         backTo="/home"
       />
 

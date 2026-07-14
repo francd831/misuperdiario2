@@ -206,6 +206,8 @@ p {
 .primary-action,
 .secondary-action,
 .icon-action {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   min-height: 46px;
   align-items: center;
@@ -219,21 +221,37 @@ p {
     background 150ms ease;
 }
 
+.primary-action::after,
+.secondary-action::after,
+.icon-action::after {
+  position: absolute;
+  inset: 2px 8px auto;
+  height: 40%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent);
+  content: "";
+  pointer-events: none;
+}
+
 .primary-action {
-  border: 0;
+  border: 2px solid rgba(255, 255, 255, 0.78);
   background: linear-gradient(135deg, #5737d6, #9d4dff);
   color: #fff;
   padding: 0 20px;
-  box-shadow: 0 16px 34px rgba(87, 55, 214, 0.24);
+  box-shadow:
+    inset 0 -5px 0 rgba(33, 25, 43, 0.16),
+    0 16px 34px rgba(87, 55, 214, 0.24);
 }
 
 .secondary-action,
 .icon-action {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.82);
   color: var(--ink);
   padding: 0 16px;
-  box-shadow: var(--shadow-soft);
+  box-shadow:
+    inset 0 -4px 0 rgba(48, 35, 61, 0.06),
+    var(--shadow-soft);
 }
 
 .primary-action:hover,
@@ -743,20 +761,22 @@ p {
 .recorder-panel,
 .pack-card,
 .sticker-tray {
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 26px;
   background: var(--paper);
-  box-shadow: var(--shadow-soft);
+  box-shadow:
+    inset 0 -7px 0 rgba(48, 35, 61, 0.05),
+    var(--shadow-soft);
 }
 
 .feature-card {
   position: relative;
   display: grid;
-  min-height: 152px;
+  min-height: 170px;
   align-content: space-between;
   gap: 22px;
   overflow: hidden;
-  padding: 18px;
+  padding: 20px;
   transition:
     transform 150ms ease,
     box-shadow 150ms ease;
@@ -772,6 +792,20 @@ p {
   background: rgba(255, 255, 255, 0.32);
   content: "";
   transform: rotate(18deg);
+}
+
+.feature-card::before,
+.status-panel::before,
+.form-panel::before,
+.recorder-panel::before,
+.pack-card::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 16% 0, rgba(255, 255, 255, 0.62), transparent 28%),
+    radial-gradient(circle at 92% 10%, rgba(255, 255, 255, 0.42), transparent 20%);
+  content: "";
+  pointer-events: none;
 }
 
 .feature-card__top {
@@ -848,17 +882,83 @@ p {
 .empty-state,
 .media-placeholder,
 .form-panel {
+  position: relative;
+  overflow: hidden;
   padding: 20px;
 }
 
 .status-panel {
+  display: grid;
+  gap: 10px;
   backdrop-filter: blur(14px);
+}
+
+.status-panel h2,
+.status-panel p,
+.status-panel button,
+.status-panel .inline-actions,
+.form-panel > *,
+.recorder-panel > *,
+.pack-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .diary-page .page-header {
   background:
     radial-gradient(circle at 92% 10%, rgba(255, 216, 94, 0.44), transparent 24%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(234, 246, 255, 0.8));
+}
+
+.record-page--video .page-header,
+.record-page--audio .page-header,
+.record-page--text .page-header,
+.daily-photo-page .page-header,
+.timelapse-page .page-header,
+.store-page .page-header,
+.profiles-page .page-header,
+.settings-page .page-header {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+}
+
+.record-page--video .page-header {
+  background:
+    radial-gradient(circle at 86% 16%, rgba(255, 216, 94, 0.48), transparent 24%),
+    linear-gradient(135deg, #efeaff, #ffd0df);
+}
+
+.record-page--audio .page-header {
+  background:
+    radial-gradient(circle at 86% 16%, rgba(255, 255, 255, 0.58), transparent 24%),
+    linear-gradient(135deg, #fff4bf, #ffd0ae);
+}
+
+.record-page--text .page-header,
+.settings-page .page-header {
+  background:
+    radial-gradient(circle at 86% 16%, rgba(255, 255, 255, 0.58), transparent 24%),
+    linear-gradient(135deg, #e3fbef, #e1f4ff);
+}
+
+.daily-photo-page .page-header,
+.timelapse-page .page-header {
+  background:
+    radial-gradient(circle at 86% 16%, rgba(255, 216, 94, 0.4), transparent 24%),
+    linear-gradient(135deg, #e1f4ff, #efeaff);
+}
+
+.store-page .page-header {
+  background:
+    radial-gradient(circle at 86% 16%, rgba(255, 255, 255, 0.62), transparent 24%),
+    linear-gradient(135deg, #ffe16c, #ff8fb5);
+}
+
+.profiles-page .page-header {
+  background:
+    radial-gradient(circle at 86% 16%, rgba(255, 216, 94, 0.42), transparent 24%),
+    linear-gradient(135deg, #fff, #efeaff);
 }
 
 .diary-toolbar {
@@ -1104,9 +1204,14 @@ p {
 }
 
 .recorder-panel {
+  position: relative;
   display: grid;
-  gap: 14px;
-  padding: 16px;
+  gap: 16px;
+  overflow: hidden;
+  padding: 14px;
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 216, 94, 0.34), transparent 26%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(239, 234, 255, 0.74));
 }
 
 .recorder-panel video,
@@ -1114,8 +1219,12 @@ p {
 .audio-placeholder,
 .camera-preview {
   width: 100%;
-  border-radius: 20px;
+  border: 4px solid rgba(255, 255, 255, 0.72);
+  border-radius: 24px;
   background: #21192b;
+  box-shadow:
+    inset 0 -10px 0 rgba(255, 255, 255, 0.08),
+    0 18px 34px rgba(48, 35, 61, 0.18);
 }
 
 .recorder-panel video,
@@ -1131,8 +1240,13 @@ p {
 .audio-placeholder {
   display: grid;
   place-items: center;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.22), transparent 24%),
+    linear-gradient(145deg, #7c3f20, #ff7a59);
   color: #fff;
-  font-weight: 900;
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  font-weight: 950;
+  text-shadow: 0 2px 10px rgba(33, 25, 43, 0.26);
 }
 
 .recorder-panel audio {
@@ -1140,11 +1254,17 @@ p {
 }
 
 .recorder-panel__timer {
-  margin-bottom: 0;
-  color: var(--ink);
-  font-size: 1.7rem;
+  width: fit-content;
+  margin: 0 auto;
+  border: 3px solid rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  background: rgba(33, 25, 43, 0.88);
+  color: #fff;
+  padding: 8px 18px;
+  font-size: clamp(1.45rem, 6vw, 2.1rem);
   font-weight: 950;
   text-align: center;
+  box-shadow: 0 14px 26px rgba(48, 35, 61, 0.16);
 }
 
 .recorder-panel__actions {
@@ -1155,24 +1275,25 @@ p {
 }
 
 .recorder-panel__actions button {
-  border: 0;
   cursor: pointer;
 }
 
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
+  gap: 12px;
 }
 
 .photo-tile {
   position: relative;
   overflow: hidden;
-  border: 3px solid rgba(255, 255, 255, 0.72);
-  border-radius: 18px;
+  border: 4px solid rgba(255, 255, 255, 0.78);
+  border-radius: 24px;
   background: #eadfd2;
   aspect-ratio: 1;
-  box-shadow: var(--shadow-soft);
+  box-shadow:
+    inset 0 -8px 0 rgba(48, 35, 61, 0.08),
+    var(--shadow-soft);
 }
 
 .photo-tile img {
@@ -1199,11 +1320,13 @@ p {
 .timelapse-frame {
   position: relative;
   overflow: hidden;
-  border: 4px solid rgba(255, 255, 255, 0.72);
-  border-radius: 26px;
+  border: 8px solid rgba(255, 255, 255, 0.78);
+  border-radius: 34px;
   background: #21192b;
   aspect-ratio: 1;
-  box-shadow: var(--shadow);
+  box-shadow:
+    inset 0 -12px 0 rgba(255, 255, 255, 0.08),
+    var(--shadow);
 }
 
 .timelapse-frame img {
@@ -1226,6 +1349,15 @@ p {
   gap: 12px;
 }
 
+.timelapse-controls span {
+  border-radius: 999px;
+  background: rgba(115, 87, 255, 0.12);
+  color: #5737d6;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
 .pack-grid {
   display: grid;
   gap: 14px;
@@ -1237,8 +1369,8 @@ p {
   justify-content: space-between;
   gap: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 28px;
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  border-radius: 30px;
   background:
     radial-gradient(circle at 92% 0, rgba(255, 255, 255, 0.48), transparent 28%),
     linear-gradient(135deg, #ffe16c, #ff8fb5);
@@ -1271,7 +1403,19 @@ p {
 }
 
 .pack-card {
+  position: relative;
   overflow: hidden;
+  background:
+    radial-gradient(circle at 80% 0, rgba(255, 255, 255, 0.62), transparent 24%),
+    rgba(255, 255, 255, 0.82);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.pack-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
 }
 
 .pack-card--active {
@@ -1280,12 +1424,17 @@ p {
 
 .pack-card__media {
   position: relative;
+  margin: 10px 10px 0;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.74);
+  border-radius: 24px;
+  box-shadow: 0 14px 24px rgba(48, 35, 61, 0.12);
 }
 
 .pack-card__media img,
 .pack-card__preview {
   width: 100%;
-  height: 170px;
+  height: 190px;
   object-fit: cover;
   background: linear-gradient(135deg, #efe7ff, #dff3ff);
 }
@@ -1322,7 +1471,7 @@ p {
 .pack-card__body {
   display: grid;
   gap: 10px;
-  padding: 15px;
+  padding: 16px 18px 18px;
 }
 
 .pack-card__title {
@@ -1343,6 +1492,7 @@ p {
 }
 
 .pack-card__price {
+  flex: 0 0 auto;
   border-radius: 999px;
   background: rgba(255, 200, 87, 0.32);
   color: #6f4713;
@@ -1365,7 +1515,10 @@ p {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 10px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at 12% 0, rgba(255, 216, 94, 0.3), transparent 22%),
+    rgba(255, 255, 255, 0.8);
 }
 
 .sticker-tray button {
@@ -1374,11 +1527,13 @@ p {
   width: 60px;
   height: 60px;
   place-items: center;
-  border: 0;
-  border-radius: 18px;
-  background: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fff, #f5efff);
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(48, 35, 61, 0.08);
+  box-shadow:
+    inset 0 -4px 0 rgba(48, 35, 61, 0.05),
+    0 8px 18px rgba(48, 35, 61, 0.08);
 }
 
 .sticker-tray img {
@@ -1413,7 +1568,10 @@ p {
 
 .form-panel {
   display: grid;
-  gap: 14px;
+  gap: 16px;
+  background:
+    radial-gradient(circle at 90% 0, rgba(255, 216, 94, 0.24), transparent 24%),
+    rgba(255, 255, 255, 0.82);
 }
 
 .profile-login {
@@ -1427,6 +1585,7 @@ p {
 }
 
 .player-card {
+  position: relative;
   display: grid;
   min-height: 158px;
   place-items: center;
@@ -1438,12 +1597,25 @@ p {
     linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 239, 249, 0.78));
   color: var(--ink);
   cursor: pointer;
+  overflow: hidden;
   padding: 16px;
   box-shadow: var(--shadow-soft);
   transition:
     transform 150ms ease,
     box-shadow 150ms ease,
     border-color 150ms ease;
+}
+
+.player-card::after {
+  position: absolute;
+  right: -20px;
+  bottom: -28px;
+  width: 86px;
+  height: 86px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.28);
+  content: "";
+  transform: rotate(18deg);
 }
 
 .player-card:hover,
@@ -1458,6 +1630,8 @@ p {
 }
 
 .player-card__avatar {
+  position: relative;
+  z-index: 1;
   display: grid;
   width: 72px;
   height: 72px;
@@ -1471,11 +1645,15 @@ p {
 }
 
 .player-card__name {
+  position: relative;
+  z-index: 1;
   font-size: 1.05rem;
   font-weight: 950;
 }
 
 .player-card__level {
+  position: relative;
+  z-index: 1;
   border-radius: 999px;
   background: rgba(115, 87, 255, 0.12);
   color: #5737d6;
@@ -1496,13 +1674,16 @@ p {
 .form-panel input,
 .form-panel select,
 .form-panel textarea {
-  min-height: 48px;
-  border: 1px solid rgba(48, 35, 61, 0.16);
-  border-radius: 16px;
-  background: #fff;
+  min-height: 52px;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
   color: var(--ink);
   padding: 0 13px;
   outline: 0;
+  box-shadow:
+    inset 0 -4px 0 rgba(48, 35, 61, 0.04),
+    0 8px 18px rgba(48, 35, 61, 0.06);
 }
 
 .form-panel input:focus,
@@ -1514,7 +1695,7 @@ p {
 
 .form-panel textarea {
   min-height: 160px;
-  padding: 12px;
+  padding: 14px;
   resize: vertical;
 }
 

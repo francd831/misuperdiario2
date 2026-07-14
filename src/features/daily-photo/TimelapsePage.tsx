@@ -67,11 +67,11 @@ export default function TimelapsePage() {
   const current = filteredPhotos[currentIndex];
 
   return (
-    <section className="page-stack">
+    <section className="page-stack timelapse-page">
       <PageHeader
         eyebrow="Timelapse"
-        title="Tu crecimiento en fotos"
-        description="Reproductor por perfil con rango, velocidad y object URLs controladas."
+        title="Pelicula de fotos"
+        description="Mira como cambia tu album dia a dia."
         backTo="/daily-photo"
       />
 

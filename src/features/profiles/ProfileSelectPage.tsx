@@ -27,11 +27,11 @@ export default function ProfileSelectPage() {
   }
 
   return (
-    <section className="page-stack">
+    <section className="page-stack profiles-page">
       <PageHeader
         eyebrow="Perfiles"
-        title="Quien va a usar el diario?"
-        description="Cada perfil tiene sus propios recuerdos, estrellas, packs y limites."
+        title="Elige jugador"
+        description="Cada jugador tiene sus recuerdos, estrellas y packs."
         backTo="/"
       />
 
