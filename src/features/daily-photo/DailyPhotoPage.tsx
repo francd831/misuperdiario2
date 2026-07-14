@@ -5,7 +5,15 @@ import { achievementService } from "../../core/achievements/achievementService";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
-import { addStickerOverlay, clearOverlays, normalizeOverlayProject, setFrameOverlay } from "../../core/overlays/overlayProject";
+import {
+  addStickerOverlay,
+  clearOverlays,
+  normalizeOverlayProject,
+  removeStickerOverlay,
+  setFrameOverlay,
+  updateFrameOverlay,
+  updateStickerOverlay,
+} from "../../core/overlays/overlayProject";
 import type { OverlayProject } from "../../core/overlays/types";
 import { packService } from "../../core/packs/packService";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
@@ -62,6 +70,7 @@ export default function DailyPhotoPage() {
   const [error, setError] = useState("");
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
+  const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
@@ -91,6 +100,7 @@ export default function DailyPhotoPage() {
     setError("");
     setCapturedBlob(null);
     setEditingPhotoId(null);
+    setSelectedOverlayId(null);
     setOverlays(clearOverlays());
 
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -151,6 +161,7 @@ export default function DailyPhotoPage() {
       setCapturedBlob(null);
       setCaption("");
       setOverlays(clearOverlays());
+      setSelectedOverlayId(null);
       await refreshPhotos();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo guardar la foto.");
@@ -159,10 +170,12 @@ export default function DailyPhotoPage() {
 
   function addSticker(sticker: PackAsset) {
     setOverlays((current) => addStickerOverlay(current, { packId: sticker.packId, assetId: sticker.id }));
+    setSelectedOverlayId(null);
   }
 
   function selectFrame(frame: PackAsset) {
     setOverlays((current) => setFrameOverlay(current, { packId: frame.packId, assetId: frame.id }));
+    setSelectedOverlayId("frame");
   }
 
   function editPhoto(photo: DailyPhoto) {
@@ -170,6 +183,7 @@ export default function DailyPhotoPage() {
     setCaption(photo.caption ?? "");
     setOverlays(normalizeOverlayProject(photo.overlayProject));
     setEditingPhotoId(photo.id);
+    setSelectedOverlayId(null);
     stopCamera();
   }
 
@@ -183,6 +197,7 @@ export default function DailyPhotoPage() {
       setCaption("");
       setOverlays(clearOverlays());
       setEditingPhotoId(null);
+      setSelectedOverlayId(null);
       await refreshPhotos();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo actualizar la foto.");
@@ -217,8 +232,30 @@ export default function DailyPhotoPage() {
           ) : (
             <video ref={videoRef} className="camera-preview" muted playsInline />
           )}
-          <StickerCanvas overlays={overlays} packs={packs} />
-          <FrameCanvas overlays={overlays} packs={packs} />
+          <StickerCanvas
+            overlays={overlays}
+            packs={packs}
+            editable
+            selectedId={typeof selectedOverlayId === "string" && selectedOverlayId !== "frame" ? selectedOverlayId : undefined}
+            onSelect={setSelectedOverlayId}
+            onUpdate={(overlayId, patch) => setOverlays((current) => updateStickerOverlay(current, overlayId, patch))}
+            onRemove={(overlayId) => {
+              setOverlays((current) => removeStickerOverlay(current, overlayId));
+              setSelectedOverlayId(null);
+            }}
+          />
+          <FrameCanvas
+            overlays={overlays}
+            packs={packs}
+            editable
+            selected={selectedOverlayId === "frame"}
+            onSelect={() => setSelectedOverlayId("frame")}
+            onUpdate={(patch) => setOverlays((current) => updateFrameOverlay(current, patch))}
+            onRemove={() => {
+              setOverlays((current) => setFrameOverlay(current));
+              setSelectedOverlayId(null);
+            }}
+          />
         </div>
 
         <div className="recorder-panel__actions">
@@ -254,7 +291,10 @@ export default function DailyPhotoPage() {
           <FrameTray
             frames={activePack?.frames ?? []}
             onSelect={selectFrame}
-            onClear={() => setOverlays((current) => setFrameOverlay(current))}
+            onClear={() => {
+              setOverlays((current) => setFrameOverlay(current));
+              setSelectedOverlayId(null);
+            }}
           />
         </>
       )}

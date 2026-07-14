@@ -10,6 +10,18 @@ export interface StickerOverlay {
   zIndex: number;
 }
 
+export interface FrameOverlay {
+  id: string;
+  kind: "frame";
+  packId: string;
+  assetId: string;
+  x: number;
+  y: number;
+  scale: number;
+  rotation: number;
+  zIndex: number;
+}
+
 export interface PackVisualAssetRef {
   packId: string;
   assetId: string;
@@ -17,7 +29,7 @@ export interface PackVisualAssetRef {
 
 export interface StructuredOverlayProject {
   stickers: StickerOverlay[];
-  frame?: PackVisualAssetRef;
+  frame?: PackVisualAssetRef | FrameOverlay;
   background?: PackVisualAssetRef;
 }
 

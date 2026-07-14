@@ -5,7 +5,14 @@ import { achievementService } from "../../core/achievements/achievementService";
 import { entryRepository } from "../../core/diary/entryRepository";
 import type { EntryType } from "../../core/diary/types";
 import { getMediaConstraints, getSupportedRecordingMimeType } from "../../core/media/recording";
-import { addStickerOverlay, clearOverlays, setFrameOverlay } from "../../core/overlays/overlayProject";
+import {
+  addStickerOverlay,
+  clearOverlays,
+  removeStickerOverlay,
+  setFrameOverlay,
+  updateFrameOverlay,
+  updateStickerOverlay,
+} from "../../core/overlays/overlayProject";
 import type { OverlayProject } from "../../core/overlays/types";
 import { packService } from "../../core/packs/packService";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
@@ -46,6 +53,7 @@ export default function RecordPage() {
   const [dailyCount, setDailyCount] = useState(0);
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
+  const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -164,6 +172,7 @@ export default function RecordPage() {
       recorderRef.current = recorder;
       setElapsed(0);
       setMediaBlob(null);
+      setSelectedOverlayId(null);
       recorder.start(1000);
       setRecording(true);
     } catch {
@@ -199,10 +208,12 @@ export default function RecordPage() {
 
   function addSticker(sticker: PackAsset) {
     setOverlays((current) => addStickerOverlay(current, { packId: sticker.packId, assetId: sticker.id }));
+    setSelectedOverlayId(null);
   }
 
   function selectFrame(frame: PackAsset) {
     setOverlays((current) => setFrameOverlay(current, { packId: frame.packId, assetId: frame.id }));
+    setSelectedOverlayId("frame");
   }
 
   if (entryType !== "text") {
@@ -229,8 +240,30 @@ export default function RecordPage() {
           {entryType === "video" ? (
             <div className="sticker-stage">
               <video ref={videoPreviewRef} src={previewUrl} controls={Boolean(previewUrl)} muted={recording} playsInline />
-              <StickerCanvas overlays={overlays} packs={packs} />
-              <FrameCanvas overlays={overlays} packs={packs} />
+              <StickerCanvas
+                overlays={overlays}
+                packs={packs}
+                editable
+                selectedId={typeof selectedOverlayId === "string" && selectedOverlayId !== "frame" ? selectedOverlayId : undefined}
+                onSelect={setSelectedOverlayId}
+                onUpdate={(overlayId, patch) => setOverlays((current) => updateStickerOverlay(current, overlayId, patch))}
+                onRemove={(overlayId) => {
+                  setOverlays((current) => removeStickerOverlay(current, overlayId));
+                  setSelectedOverlayId(null);
+                }}
+              />
+              <FrameCanvas
+                overlays={overlays}
+                packs={packs}
+                editable
+                selected={selectedOverlayId === "frame"}
+                onSelect={() => setSelectedOverlayId("frame")}
+                onUpdate={(patch) => setOverlays((current) => updateFrameOverlay(current, patch))}
+                onRemove={() => {
+                  setOverlays((current) => setFrameOverlay(current));
+                  setSelectedOverlayId(null);
+                }}
+              />
             </div>
           ) : previewUrl ? (
             <audio src={previewUrl} controls />
@@ -267,7 +300,10 @@ export default function RecordPage() {
             <FrameTray
               frames={activePack?.frames ?? []}
               onSelect={selectFrame}
-              onClear={() => setOverlays((current) => setFrameOverlay(current))}
+              onClear={() => {
+                setOverlays((current) => setFrameOverlay(current));
+                setSelectedOverlayId(null);
+              }}
             />
           </>
         )}

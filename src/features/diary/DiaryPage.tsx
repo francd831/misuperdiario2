@@ -4,8 +4,15 @@ import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepositor
 import type { DailyPhoto } from "../../core/daily-photo/types";
 import { entryRepository } from "../../core/diary/entryRepository";
 import type { DiaryEntry } from "../../core/diary/types";
-import { addStickerOverlay, normalizeOverlayProject, setFrameOverlay } from "../../core/overlays/overlayProject";
-import type { OverlayProject } from "../../core/overlays/types";
+import {
+  addStickerOverlay,
+  normalizeOverlayProject,
+  removeStickerOverlay,
+  setFrameOverlay,
+  updateFrameOverlay,
+  updateStickerOverlay,
+} from "../../core/overlays/overlayProject";
+import type { FrameOverlay, OverlayProject, StickerOverlay } from "../../core/overlays/types";
 import { packService } from "../../core/packs/packService";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
@@ -94,6 +101,7 @@ export default function DiaryPage() {
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
   const [draftOverlays, setDraftOverlays] = useState<OverlayProject>({ stickers: [] });
+  const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
 
   const refreshItems = useCallback(async () => {
@@ -145,19 +153,23 @@ export default function DiaryPage() {
     if (entry.kind !== "entry" || entry.type !== "video") return;
     setEditingEntryId(entry.id);
     setDraftOverlays(normalizeOverlayProject(entry.overlayProject));
+    setSelectedOverlayId(null);
   }
 
   function addSticker(sticker: PackAsset) {
     setDraftOverlays((current) => addStickerOverlay(current, { packId: sticker.packId, assetId: sticker.id }));
+    setSelectedOverlayId(null);
   }
 
   function selectFrame(frame: PackAsset) {
     setDraftOverlays((current) => setFrameOverlay(current, { packId: frame.packId, assetId: frame.id }));
+    setSelectedOverlayId("frame");
   }
 
   async function saveDecorations(entryId: string) {
     await entryRepository.updateOverlayProject(entryId, draftOverlays);
     setEditingEntryId(null);
+    setSelectedOverlayId(null);
     await refreshItems();
   }
 
@@ -203,11 +215,29 @@ export default function DiaryPage() {
               activePack={activePack}
               editingEntryId={editingEntryId}
               draftOverlays={draftOverlays}
+              selectedOverlayId={selectedOverlayId}
               onStartEdit={startEdit}
-              onCancelEdit={() => setEditingEntryId(null)}
+              onCancelEdit={() => {
+                setEditingEntryId(null);
+                setSelectedOverlayId(null);
+              }}
               onAddSticker={addSticker}
               onSelectFrame={selectFrame}
-              onClearFrame={() => setDraftOverlays((current) => setFrameOverlay(current))}
+              onClearFrame={() => {
+                setDraftOverlays((current) => setFrameOverlay(current));
+                setSelectedOverlayId(null);
+              }}
+              onSelectOverlay={setSelectedOverlayId}
+              onUpdateSticker={(overlayId, patch) => setDraftOverlays((current) => updateStickerOverlay(current, overlayId, patch))}
+              onRemoveSticker={(overlayId) => {
+                setDraftOverlays((current) => removeStickerOverlay(current, overlayId));
+                setSelectedOverlayId(null);
+              }}
+              onUpdateFrame={(patch) => setDraftOverlays((current) => updateFrameOverlay(current, patch))}
+              onRemoveFrame={() => {
+                setDraftOverlays((current) => setFrameOverlay(current));
+                setSelectedOverlayId(null);
+              }}
               onSaveDecorations={saveDecorations}
             />
           ))}
@@ -222,11 +252,17 @@ interface DecorationEditProps {
   activePack?: PackWithAssets;
   editingEntryId: string | null;
   draftOverlays: OverlayProject;
+  selectedOverlayId: string | "frame" | null;
   onStartEdit: (entry: TimelineItem) => void;
   onCancelEdit: () => void;
   onAddSticker: (sticker: PackAsset) => void;
   onSelectFrame: (frame: PackAsset) => void;
   onClearFrame: () => void;
+  onSelectOverlay: (overlayId: string | "frame") => void;
+  onUpdateSticker: (overlayId: string, patch: Partial<StickerOverlay>) => void;
+  onRemoveSticker: (overlayId: string) => void;
+  onUpdateFrame: (patch: Partial<FrameOverlay>) => void;
+  onRemoveFrame: () => void;
   onSaveDecorations: (entryId: string) => Promise<void>;
 }
 
@@ -258,11 +294,17 @@ function EntryCard({
   activePack,
   editingEntryId,
   draftOverlays,
+  selectedOverlayId,
   onStartEdit,
   onCancelEdit,
   onAddSticker,
   onSelectFrame,
   onClearFrame,
+  onSelectOverlay,
+  onUpdateSticker,
+  onRemoveSticker,
+  onUpdateFrame,
+  onRemoveFrame,
   onSaveDecorations,
 }: { entry: TimelineItem } & DecorationEditProps) {
   const mediaUrl = useObjectUrl(entry.kind === "entry" ? entry.mediaBlob : undefined);
@@ -289,8 +331,24 @@ function EntryCard({
         {entry.type === "video" && mediaUrl && (
           <div className="sticker-stage">
             <video src={mediaUrl} controls playsInline />
-            <StickerCanvas overlays={overlays ?? []} packs={packs} />
-            <FrameCanvas overlays={overlays} packs={packs} />
+            <StickerCanvas
+              overlays={overlays ?? []}
+              packs={packs}
+              editable={editingEntryId === entry.id}
+              selectedId={typeof selectedOverlayId === "string" && selectedOverlayId !== "frame" ? selectedOverlayId : undefined}
+              onSelect={onSelectOverlay}
+              onUpdate={onUpdateSticker}
+              onRemove={onRemoveSticker}
+            />
+            <FrameCanvas
+              overlays={overlays}
+              packs={packs}
+              editable={editingEntryId === entry.id}
+              selected={selectedOverlayId === "frame"}
+              onSelect={() => onSelectOverlay("frame")}
+              onUpdate={onUpdateFrame}
+              onRemove={onRemoveFrame}
+            />
           </div>
         )}
         {canDecorate && editingEntryId !== entry.id && (

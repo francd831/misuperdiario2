@@ -1,13 +1,23 @@
 import { normalizeOverlayProject } from "../../core/overlays/overlayProject";
-import type { OverlayProject } from "../../core/overlays/types";
+import type { FrameOverlay, OverlayProject } from "../../core/overlays/types";
 import type { PackWithAssets } from "../../core/packs/types";
+import { OverlayControls } from "./OverlayControls";
 
 interface FrameCanvasProps {
   overlays?: OverlayProject;
   packs: PackWithAssets[];
+  editable?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+  onUpdate?: (patch: Partial<FrameOverlay>) => void;
+  onRemove?: () => void;
 }
 
-export function FrameCanvas({ overlays, packs }: FrameCanvasProps) {
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+export function FrameCanvas({ overlays, packs, editable = false, selected = false, onSelect, onUpdate, onRemove }: FrameCanvasProps) {
   const frame = normalizeOverlayProject(overlays).frame;
   if (!frame) return null;
 
@@ -15,19 +25,59 @@ export function FrameCanvas({ overlays, packs }: FrameCanvasProps) {
   if (!asset) return null;
 
   return (
-    <img
-      aria-hidden="true"
-      alt=""
-      src={asset.url}
+    <span
+      aria-hidden={!editable}
       style={{
         position: "absolute",
-        inset: 0,
-        zIndex: 20,
+        left: `${frame.x}%`,
+        top: `${frame.y}%`,
+        transform: `translate(-50%, -50%) scale(${frame.scale}) rotate(${frame.rotation}deg)`,
+        zIndex: frame.zIndex,
         width: "100%",
         height: "100%",
-        objectFit: "cover",
-        pointerEvents: "none",
+        pointerEvents: editable && selected ? "auto" : "none",
+        outline: selected ? "3px solid rgba(255,255,255,0.95)" : undefined,
+        borderRadius: selected ? 14 : undefined,
       }}
-    />
+    >
+      <button
+        type="button"
+        aria-label={`Editar marco ${asset.name}`}
+        onClick={onSelect}
+        style={{
+          all: "unset",
+          cursor: editable && selected ? "pointer" : "default",
+          display: "block",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <img
+          alt=""
+          src={asset.url}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            display: "block",
+            pointerEvents: "none",
+          }}
+        />
+      </button>
+      {editable && selected && (
+        <OverlayControls
+          label={`Controles de ${asset.name}`}
+          onMove={(deltaX, deltaY) =>
+            onUpdate?.({
+              x: clamp(frame.x + deltaX, 0, 100),
+              y: clamp(frame.y + deltaY, 0, 100),
+            })
+          }
+          onRotate={(delta) => onUpdate?.({ rotation: frame.rotation + delta })}
+          onScale={(delta) => onUpdate?.({ scale: clamp(Number((frame.scale + delta).toFixed(2)), 0.5, 2) })}
+          onRemove={() => onRemove?.()}
+        />
+      )}
+    </span>
   );
 }
