@@ -1,18 +1,44 @@
-import { Camera, Mic, PenLine, Star, Trophy, Video } from "lucide-react";
+import { Camera, ChevronRight, LogOut, Mic, PenLine, ShoppingBag, Sparkles, Star, Trophy, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import type { ProfileAchievement } from "../../core/achievements/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
-import { FeatureCard } from "../../shared/ui/FeatureCard";
-import { PageHeader } from "../../shared/ui/PageHeader";
 
 const actions = [
-  { to: "/record/video", title: "Video", description: "Guarda una mini pelicula de hoy.", icon: <Video size={28} />, tone: "berry" as const, badge: "accion" },
-  { to: "/record/audio", title: "Voz", description: "Cuenta algo con tus propias palabras.", icon: <Mic size={28} />, tone: "sun" as const, badge: "sonido" },
-  { to: "/record/text", title: "Escribir", description: "Una idea, un secreto o una capsula.", icon: <PenLine size={28} />, tone: "mint" as const, badge: "diario" },
-  { to: "/daily-photo", title: "Foto diaria", description: "Una imagen para ver como cambia el tiempo.", icon: <Camera size={28} />, tone: "sky" as const, badge: "hoy" },
+  {
+    to: "/record/video",
+    title: "Camara cine",
+    description: "Graba una mini pelicula",
+    icon: <Video size={34} />,
+    className: "tool-button--berry",
+    reward: "+15",
+  },
+  {
+    to: "/record/audio",
+    title: "Orbe de voz",
+    description: "Cuenta algo de hoy",
+    icon: <Mic size={34} />,
+    className: "tool-button--sun",
+    reward: "+10",
+  },
+  {
+    to: "/record/text",
+    title: "Cuaderno magico",
+    description: "Escribe un recuerdo",
+    icon: <PenLine size={34} />,
+    className: "tool-button--mint",
+    reward: "+10",
+  },
+  {
+    to: "/daily-photo",
+    title: "Foto diaria",
+    description: "Captura el dia",
+    icon: <Camera size={34} />,
+    className: "tool-button--sky",
+    reward: "+10",
+  },
 ];
 
 export default function HomePage() {
@@ -42,43 +68,72 @@ export default function HomePage() {
     };
   }, [activeProfile]);
 
-  return (
-    <section className="page-stack">
-      <PageHeader
-        eyebrow="Tu espacio"
-        title={`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}
-        description="Elige una forma de guardar el recuerdo de hoy."
-        action={
-          <button className="secondary-action" type="button" onClick={() => void logout()}>
-            Salir
-          </button>
-        }
-      />
+  const playerInitial = activeProfile?.name.slice(0, 1).toUpperCase() ?? "?";
 
-      <div className="action-grid">
+  return (
+    <section className="game-home">
+      <header className="player-hud">
+        <div className="player-hud__profile">
+          <span className="player-avatar" style={{ background: activeProfile?.avatarColor }}>
+            {playerInitial}
+          </span>
+          <div>
+            <p className="eyebrow">Base secreta</p>
+            <h1>{`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}</h1>
+          </div>
+        </div>
+
+        <div className="player-hud__actions">
+          <Link className="coin-badge" to="/store" aria-label={`${balance} estrellas disponibles`}>
+            <Star size={22} fill="currentColor" />
+            <strong>{balance}</strong>
+          </Link>
+          <button className="round-action" type="button" aria-label="Salir" onClick={() => void logout()}>
+            <LogOut size={20} />
+          </button>
+        </div>
+      </header>
+
+      <section className="daily-quest">
+        <div className="daily-quest__copy">
+          <span className="quest-kicker"><Sparkles size={16} /> Mision de hoy</span>
+          <h2>Guarda un recuerdo y gana estrellas</h2>
+          <p>Elige una herramienta, crea algo tuyo y desbloquea progreso para tu diario.</p>
+        </div>
+        <Link className="quest-reward" to="/daily-photo">
+          <span>Recompensa</span>
+          <strong><Star size={18} fill="currentColor" /> +10</strong>
+        </Link>
+      </section>
+
+      <nav className="tool-grid" aria-label="Herramientas para crear recuerdos">
         {actions.map((action) => (
-          <Link key={action.to} to={action.to} className="card-link">
-            <FeatureCard {...action} />
+          <Link key={action.to} to={action.to} className={`tool-button ${action.className}`}>
+            <span className="tool-button__reward">
+              <Star size={13} fill="currentColor" /> {action.reward}
+            </span>
+            <span className="tool-button__icon">{action.icon}</span>
+            <span className="tool-button__title">{action.title}</span>
+            <span className="tool-button__description">{action.description}</span>
           </Link>
         ))}
-      </div>
+      </nav>
 
-      <div className="grid-two">
-        <FeatureCard
-          title={`${balance} estrellas`}
-          description="Usalas para comprar packs en la tienda."
-          icon={<Star size={24} />}
-          tone="sun"
-          badge="monedero"
-        />
-        <FeatureCard
-          title={`${achievements.length} logros`}
-          description="Los logros dan estrellas una sola vez."
-          icon={<Trophy size={24} />}
-          tone="mint"
-          badge="progreso"
-        />
-      </div>
+      <section className="progress-strip" aria-label="Progreso">
+        <Link className="progress-token progress-token--shop" to="/store">
+          <ShoppingBag size={22} />
+          <span>Tienda</span>
+          <ChevronRight size={18} />
+        </Link>
+        <div className="progress-token">
+          <Trophy size={22} />
+          <span>{achievements.length} logros</span>
+        </div>
+        <div className="progress-token">
+          <Star size={22} fill="currentColor" />
+          <span>{balance} estrellas</span>
+        </div>
+      </section>
     </section>
   );
 }

@@ -297,6 +297,347 @@ p {
   color: var(--ink);
 }
 
+.game-home {
+  display: grid;
+  gap: 18px;
+}
+
+.player-hud {
+  position: sticky;
+  top: 12px;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 16% 0, rgba(255, 255, 255, 0.78), transparent 34%),
+    rgba(255, 255, 255, 0.74);
+  padding: 12px;
+  box-shadow: 0 18px 46px rgba(48, 35, 61, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.player-hud__profile,
+.player-hud__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-hud .eyebrow {
+  margin-bottom: 5px;
+  padding: 5px 9px;
+  font-size: 0.66rem;
+}
+
+.player-hud h1 {
+  margin-bottom: 0;
+  font-size: clamp(1.55rem, 7vw, 3rem);
+}
+
+.player-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  width: 68px;
+  height: 68px;
+  place-items: center;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  color: var(--ink);
+  font-size: 1.9rem;
+  font-weight: 950;
+  box-shadow: 0 12px 24px rgba(48, 35, 61, 0.13);
+}
+
+.coin-badge {
+  position: relative;
+  display: inline-flex;
+  min-width: 86px;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 20%, #fff9cf, transparent 30%),
+    linear-gradient(135deg, #ffe16c, #ffad33);
+  color: #624012;
+  padding: 0 14px;
+  box-shadow:
+    inset 0 -5px 0 rgba(136, 83, 15, 0.13),
+    0 14px 28px rgba(171, 103, 16, 0.22);
+}
+
+.coin-badge::after {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: #ff5f8f;
+  content: "";
+  box-shadow: 0 5px 12px rgba(255, 95, 143, 0.32);
+}
+
+.coin-badge strong {
+  font-size: 1.22rem;
+  font-weight: 950;
+}
+
+.round-action {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  border: 1px solid rgba(48, 35, 61, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+}
+
+.daily-quest {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(255, 255, 255, 0.5), transparent 22%),
+    linear-gradient(135deg, #6e56ff, #ff6fa3 62%, #ffc857);
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.daily-quest::after {
+  position: absolute;
+  right: -28px;
+  bottom: -40px;
+  width: 138px;
+  height: 138px;
+  border: 22px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  content: "";
+}
+
+.daily-quest h2,
+.daily-quest p,
+.quest-kicker {
+  position: relative;
+  z-index: 1;
+}
+
+.daily-quest h2 {
+  max-width: 580px;
+  margin-bottom: 8px;
+  color: #fff;
+  font-size: clamp(1.8rem, 8vw, 3.4rem);
+  line-height: 0.98;
+}
+
+.daily-quest p {
+  max-width: 560px;
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-weight: 800;
+}
+
+.quest-kicker {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.quest-reward {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  width: fit-content;
+  gap: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 12px 14px;
+  color: #6f4713;
+  box-shadow: 0 12px 24px rgba(48, 35, 61, 0.12);
+}
+
+.quest-reward span {
+  color: rgba(48, 35, 61, 0.62);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.quest-reward strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.25rem;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tool-button {
+  position: relative;
+  display: grid;
+  min-height: 188px;
+  align-content: end;
+  gap: 6px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  border-radius: 32px;
+  color: #fff;
+  padding: 16px;
+  box-shadow:
+    inset 0 -8px 0 rgba(33, 25, 43, 0.12),
+    var(--shadow);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.tool-button:hover {
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+.tool-button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.tool-button::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 24% 20%, rgba(255, 255, 255, 0.5), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.22), transparent 18%);
+  content: "";
+}
+
+.tool-button::after {
+  position: absolute;
+  right: -32px;
+  top: -24px;
+  width: 118px;
+  height: 118px;
+  border-radius: 36px;
+  background: rgba(255, 255, 255, 0.18);
+  content: "";
+  transform: rotate(18deg);
+}
+
+.tool-button--berry {
+  background: linear-gradient(145deg, #ff5f8f, #a855f7);
+}
+
+.tool-button--sun {
+  background: linear-gradient(145deg, #ffbf42, #ff7b54);
+}
+
+.tool-button--mint {
+  background: linear-gradient(145deg, #44d6a2, #25a8df);
+}
+
+.tool-button--sky {
+  background: linear-gradient(145deg, #63b8ff, #7367ff);
+}
+
+.tool-button__icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.7);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 24px rgba(33, 25, 43, 0.14);
+}
+
+.tool-button__reward {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  background: #ffe16c;
+  color: #6f4713;
+  padding: 6px 9px;
+  font-size: 0.74rem;
+  font-weight: 950;
+  box-shadow: 0 8px 18px rgba(48, 35, 61, 0.14);
+}
+
+.tool-button__title,
+.tool-button__description {
+  position: relative;
+  z-index: 1;
+}
+
+.tool-button__title {
+  font-size: clamp(1.3rem, 5vw, 1.8rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.tool-button__description {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.progress-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.progress-token {
+  display: inline-flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink);
+  padding: 0 12px;
+  font-size: 0.86rem;
+  font-weight: 950;
+  box-shadow: var(--shadow-soft);
+}
+
+.progress-token--shop {
+  background: linear-gradient(135deg, rgba(255, 244, 191, 0.92), rgba(255, 255, 255, 0.8));
+}
+
 .page-stack {
   display: grid;
   gap: 20px;
@@ -1122,6 +1463,11 @@ p {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .daily-quest {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
   .pack-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1134,6 +1480,32 @@ p {
 }
 
 @media (max-width: 560px) {
+  .player-hud {
+    align-items: flex-start;
+  }
+
+  .player-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 21px;
+    font-size: 1.55rem;
+  }
+
+  .player-hud__actions {
+    gap: 8px;
+  }
+
+  .coin-badge {
+    min-width: 74px;
+    min-height: 46px;
+    padding: 0 11px;
+  }
+
+  .round-action {
+    width: 46px;
+    height: 46px;
+  }
+
   .page-header {
     display: grid;
   }
@@ -1145,12 +1517,25 @@ p {
   .game-hud {
     display: grid;
   }
+
+  .progress-strip {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 420px) {
   .action-grid,
-  .photo-grid {
+  .photo-grid,
+  .tool-grid {
     grid-template-columns: 1fr;
+  }
+
+  .daily-quest {
+    padding: 18px;
+  }
+
+  .tool-button {
+    min-height: 164px;
   }
 
   .feature-card {
