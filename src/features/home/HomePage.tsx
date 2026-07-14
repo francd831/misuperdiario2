@@ -1,8 +1,10 @@
-import { Camera, ChevronRight, Clapperboard, LogOut, Mic, PenLine, ShoppingBag, Sparkles, Star, Trophy, Video } from "lucide-react";
+import { LogOut, Sparkles, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { achievementService } from "../../core/achievements/achievementService";
-import type { ProfileAchievement } from "../../core/achievements/types";
+import actionPhoto from "../../assets/home/action-photo.webp";
+import actionVideo from "../../assets/home/action-video.webp";
+import actionVoice from "../../assets/home/action-voice.webp";
+import actionWrite from "../../assets/home/action-write.webp";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
 
@@ -11,37 +13,32 @@ const actions = [
     to: "/record/video",
     title: "Video",
     description: "Graba una mini pelicula",
-    icon: <Video size={38} />,
-    prop: <Clapperboard size={30} />,
+    image: actionVideo,
     className: "tool-button--berry",
-    sceneClass: "tool-scene--video",
     reward: "+15",
   },
   {
     to: "/record/audio",
     title: "Voz",
     description: "Cuenta algo de hoy",
-    icon: <Mic size={38} />,
+    image: actionVoice,
     className: "tool-button--sun",
-    sceneClass: "tool-scene--voice",
     reward: "+10",
   },
   {
     to: "/record/text",
     title: "Escribir",
     description: "Escribe un recuerdo",
-    icon: <PenLine size={38} />,
+    image: actionWrite,
     className: "tool-button--mint",
-    sceneClass: "tool-scene--write",
     reward: "+10",
   },
   {
     to: "/daily-photo",
     title: "Foto",
     description: "Captura el dia",
-    icon: <Camera size={38} />,
+    image: actionPhoto,
     className: "tool-button--sky",
-    sceneClass: "tool-scene--photo",
     reward: "+10",
   },
 ];
@@ -49,23 +46,17 @@ const actions = [
 export default function HomePage() {
   const { activeProfile, logout } = useProfiles();
   const [balance, setBalance] = useState(0);
-  const [achievements, setAchievements] = useState<ProfileAchievement[]>([]);
 
   useEffect(() => {
     if (!activeProfile) return;
     let alive = true;
 
-    void Promise.all([
-      walletService.getBalance(activeProfile.id),
-      achievementService.listUnlocked(activeProfile.id),
-    ]).then(([nextBalance, nextAchievements]) => {
+    void walletService.getBalance(activeProfile.id).then((nextBalance) => {
       if (!alive) return;
       setBalance(nextBalance);
-      setAchievements(nextAchievements);
     }).catch(() => {
       if (!alive) return;
       setBalance(0);
-      setAchievements([]);
     });
 
     return () => {
@@ -100,13 +91,11 @@ export default function HomePage() {
       </header>
 
       <section className="daily-quest">
-        <div className="daily-quest__copy">
+        <p className="daily-quest__copy">
           <span className="quest-kicker"><Sparkles size={16} /> Mision de hoy</span>
-          <h2>Guarda un recuerdo y gana estrellas</h2>
-          <p>Elige una herramienta, crea algo tuyo y desbloquea progreso para tu diario.</p>
-        </div>
+          <strong>Guarda un recuerdo</strong>
+        </p>
         <Link className="quest-reward" to="/daily-photo">
-          <span>Recompensa</span>
           <strong><Star size={18} fill="currentColor" /> +10</strong>
         </Link>
       </section>
@@ -117,37 +106,17 @@ export default function HomePage() {
             <span className="tool-button__reward">
               <Star size={13} fill="currentColor" /> {action.reward}
             </span>
-            <span className={`tool-scene ${action.sceneClass}`} aria-hidden="true">
-              <span className="tool-scene__spotlight" />
-              <span className="tool-scene__avatar">{playerInitial}</span>
-              <span className="tool-scene__main">{action.icon}</span>
-              {action.prop && <span className="tool-scene__prop">{action.prop}</span>}
-              <span className="tool-scene__line tool-scene__line--one" />
-              <span className="tool-scene__line tool-scene__line--two" />
-            </span>
-            <span className="tool-button__copy">
-              <span className="tool-button__title">{action.title}</span>
-              <span className="tool-button__description">{action.description}</span>
+            <span className="tool-scene" aria-hidden="true">
+              <img className="tool-scene__image" src={action.image} alt="" />
+              <span className="tool-button__copy">
+                <span className="tool-button__title">{action.title}</span>
+                <span className="tool-button__description">{action.description}</span>
+              </span>
             </span>
           </Link>
         ))}
       </nav>
 
-      <section className="progress-strip" aria-label="Progreso">
-        <Link className="progress-token progress-token--shop" to="/store">
-          <ShoppingBag size={22} />
-          <span>Tienda</span>
-          <ChevronRight size={18} />
-        </Link>
-        <div className="progress-token">
-          <Trophy size={22} />
-          <span>{achievements.length} logros</span>
-        </div>
-        <div className="progress-token">
-          <Star size={22} fill="currentColor" />
-          <span>{balance} estrellas</span>
-        </div>
-      </section>
     </section>
   );
 }
