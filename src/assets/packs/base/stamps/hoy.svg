@@ -5,5 +5,5 @@
       <stop offset="100%" stop-color="hsl(295 72% 48%)"/>
     </linearGradient>
   </defs>
-  <g opacity=".92"><path d="M256 54l38 42 55-13 16 55 55 16-13 55 42 38-42 38 13 55-55 16-16 55-55-13-38 42-38-42-55 13-16-55-55-16 13-55-42-38 42-38-13-55 55-16 16-55 55 13 38-42z" fill="url(#grad)" stroke="#fff" stroke-width="16" stroke-linejoin="round"/><circle cx="256" cy="256" r="112" fill="none" stroke="#fff" stroke-width="12" opacity=".8"/><text x="256" y="276" text-anchor="middle" font-family="Arial, sans-serif" font-size="54" font-weight="900" fill="#fff">HOY</text></g>
+  <g opacity=".92"><path d="M256 54l38 42 55-13 16 55 55 16-13 55 42 38-42 38 13 55-55 16-16 55-55-13-38 42-38-42-55 13-16-55-55-16 13-55-42-38 42-38-13-55 55-16 16-55 55 13 38-42z" fill="url(#grad)" stroke="#fff" stroke-width="16" stroke-linejoin="round"/><g transform="translate(168 104) scale(.34)" opacity=".98"><g opacity=".94"><path d="M256 72l28 112 106-42-62 101 102 54-119 10 18 117-73-94-73 94 18-117-119-10 102-54-62-101 106 42 28-112z" fill="url(#grad)" opacity=".88" stroke="#fff" stroke-width="12" stroke-linejoin="round"/></g></g><text x="256" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="900" fill="#fff">HOY</text></g>
 </svg>

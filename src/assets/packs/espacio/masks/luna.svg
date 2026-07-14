@@ -5,5 +5,5 @@
       <stop offset="100%" stop-color="hsl(62 72% 48%)"/>
     </linearGradient>
   </defs>
-  <path d="M152 256c28 42 180 42 208 0" fill="none" stroke="url(#grad)" stroke-width="28" stroke-linecap="round"/><circle cx="186" cy="206" r="20" fill="url(#grad)"/><circle cx="326" cy="206" r="20" fill="url(#grad)"/>
+  <g opacity=".94"><path d="M318 92c-62 22-106 82-106 152s44 130 106 152c-20 8-42 12-66 12-92 0-166-74-166-166S160 76 252 76c24 0 46 4 66 16z" fill="url(#grad)" stroke="#fff" stroke-width="16" stroke-linejoin="round"/><circle cx="314" cy="210" r="18" fill="#fff" opacity=".75"/><circle cx="278" cy="292" r="14" fill="#fff" opacity=".65"/></g>
 </svg>
