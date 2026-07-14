@@ -72,6 +72,7 @@ export default function TimelapsePage() {
         eyebrow="Timelapse"
         title="Tu crecimiento en fotos"
         description="Reproductor por perfil con rango, velocidad y object URLs controladas."
+        backTo="/daily-photo"
       />
 
       <CurrentPhoto photo={current} />

@@ -195,6 +195,7 @@ export default function RecordPage() {
           eyebrow="Crear recuerdo"
           title={labels[entryType]}
           description="La grabacion respeta los limites diarios y de duracion configurados por administracion."
+          backTo="/home"
         />
 
         <section className="status-panel">
@@ -274,6 +275,7 @@ export default function RecordPage() {
         eyebrow="Crear recuerdo"
         title={labels.text}
         description="Guarda una entrada escrita en el perfil activo. Las capsulas quedaran bloqueadas hasta su fecha."
+        backTo="/home"
       />
 
       <form className="form-panel" onSubmit={handleTextSubmit}>

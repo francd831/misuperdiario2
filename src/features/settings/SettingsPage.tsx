@@ -1,4 +1,4 @@
-import { Gauge, HardDrive, Timer } from "lucide-react";
+import { Gauge, HardDrive, ShieldCheck, Timer } from "lucide-react";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
 
@@ -6,15 +6,17 @@ export default function SettingsPage() {
   return (
     <section className="page-stack">
       <PageHeader
-        eyebrow="Ajustes"
-        title="Preferencias del perfil"
-        description="La zona infantil sera sencilla; los limites avanzados viven en administracion."
+        eyebrow="Mochila"
+        title="Tu diario esta protegido"
+        description="Aqui veras el estado de tu espacio. Los limites importantes los cuida un adulto."
+        backTo="/home"
       />
 
       <div className="grid-two">
-        <FeatureCard title="Tiempo" description="Limites de audio y video." icon={<Timer size={24} />} tone="mint" />
-        <FeatureCard title="Calidad" description="Foto y video en baja, media o alta." icon={<Gauge size={24} />} tone="sky" />
-        <FeatureCard title="Espacio" description="Avisos antes de llenar el dispositivo." icon={<HardDrive size={24} />} tone="sun" />
+        <FeatureCard title="Tiempo" description="Videos y audios tienen limites para cuidar el espacio." icon={<Timer size={24} />} tone="mint" badge="regla" />
+        <FeatureCard title="Calidad" description="Fotos y videos se guardan con una calidad equilibrada." icon={<Gauge size={24} />} tone="sky" badge="media" />
+        <FeatureCard title="Espacio" description="La app avisa antes de llenar el dispositivo." icon={<HardDrive size={24} />} tone="sun" badge="local" />
+        <FeatureCard title="Privacidad" description="Tus recuerdos viven en este dispositivo." icon={<ShieldCheck size={24} />} tone="berry" badge="seguro" />
       </div>
     </section>
   );

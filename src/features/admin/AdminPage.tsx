@@ -110,6 +110,7 @@ export default function AdminPage() {
           eyebrow="Primer arranque"
           title="Crea el perfil administrador"
           description="Este PIN protege la zona adulta de Mi Super Diario."
+          backTo="/"
         />
 
         <form className="form-panel" onSubmit={handleCreateAdmin}>
@@ -144,6 +145,7 @@ export default function AdminPage() {
         eyebrow="Administracion"
         title="Control adulto"
         description="Perfiles, PIN admin, backups, limites y almacenamiento."
+        backTo="/profiles"
       />
 
       <form className="form-panel" onSubmit={handleCreateChild}>

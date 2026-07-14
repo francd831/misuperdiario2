@@ -156,6 +156,7 @@ export default function DailyPhotoPage() {
         eyebrow="Foto diaria"
         title="Una foto para recordar el dia"
         description="Una foto activa al dia por perfil, con reemplazo segun configuracion admin."
+        backTo="/home"
         action={
           <Link className="icon-action" to="/daily-photo/timelapse" aria-label="Abrir timelapse">
             <Play size={18} />

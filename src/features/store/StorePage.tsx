@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Lock, ShoppingBag, Star } from "lucide-react";
+import { Check, Lock, ShoppingBag, Sparkles, Star } from "lucide-react";
 import { packService } from "../../core/packs/packService";
 import type { PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
@@ -64,9 +64,20 @@ export default function StorePage() {
     <section className="page-stack">
       <PageHeader
         eyebrow="Tienda"
-        title="Packs por estrellas"
-        description={`Saldo actual: ${wallet.balance} estrellas.`}
+        title="Cofre de packs"
+        description="Desbloquea nuevos mundos visuales con las estrellas que ganas en tu diario."
+        backTo="/home"
       />
+
+      <section className="game-hud" aria-label="Saldo de estrellas">
+        <div>
+          <span className="game-hud__label">Tus estrellas</span>
+          <strong>
+            <Star size={24} fill="currentColor" /> {wallet.balance}
+          </strong>
+        </div>
+        <p>Guarda recuerdos y desbloquea logros para conseguir mas.</p>
+      </section>
 
       {message && <p className={messageTone === "success" ? "form-success" : "form-error"}>{message}</p>}
 
@@ -76,15 +87,28 @@ export default function StorePage() {
           const active = activePackId === manifest.id;
           return (
             <article key={manifest.id} className={`pack-card ${active ? "pack-card--active" : ""}`}>
-              {previewUrl ? <img src={previewUrl} alt="" /> : <div className="pack-card__preview"><ShoppingBag size={28} /></div>}
+              <div className="pack-card__media">
+                {previewUrl ? (
+                  <img src={previewUrl} alt="" />
+                ) : (
+                  <div className="pack-card__preview">
+                    <ShoppingBag size={28} />
+                  </div>
+                )}
+                <span className={`pack-card__status ${active ? "pack-card__status--active" : unlocked ? "pack-card__status--unlocked" : ""}`}>
+                  {active ? <><Check size={14} /> En uso</> : unlocked ? "Listo" : <><Lock size={14} /> Cerrado</>}
+                </span>
+              </div>
               <div className="pack-card__body">
                 <div className="pack-card__title">
                   <h2>{manifest.name}</h2>
-                  {active ? <span><Check size={14} /> Activo</span> : unlocked ? <span>Desbloqueado</span> : <span><Lock size={14} /> Bloqueado</span>}
+                  <span className="pack-card__price">
+                    <Star size={15} fill="currentColor" /> {manifest.priceStars ?? 0}
+                  </span>
                 </div>
                 <p>{manifest.description}</p>
                 <p className="pack-card__meta">
-                  {stickers.length} stickers · {frames.length} marcos · <Star size={14} /> {manifest.priceStars ?? 0}
+                  <Sparkles size={14} /> {stickers.length} stickers / {frames.length} marcos
                 </p>
                 <div className="pack-card__actions">
                   {!unlocked ? (

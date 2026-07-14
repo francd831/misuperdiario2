@@ -36,6 +36,7 @@ export default function DiaryPage() {
         eyebrow="Diario"
         title="Tus recuerdos"
         description="Entradas guardadas en local para el perfil activo."
+        backTo="/home"
       />
 
       <label className="toolbar-placeholder toolbar-placeholder--input">

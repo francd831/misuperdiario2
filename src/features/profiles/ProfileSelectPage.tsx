@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
-import { ShieldCheck, UserRoundPlus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight, ShieldCheck, UserRoundPlus } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
@@ -32,6 +32,7 @@ export default function ProfileSelectPage() {
         eyebrow="Perfiles"
         title="Quien va a usar el diario?"
         description="Cada perfil tiene sus propios recuerdos, estrellas, packs y limites."
+        backTo="/"
       />
 
       {children.length === 0 ? (
@@ -41,17 +42,26 @@ export default function ProfileSelectPage() {
           <p>Entra en administracion para crear el primer perfil.</p>
         </section>
       ) : (
-        <form className="form-panel" onSubmit={handleSubmit}>
-          <label>
-            Perfil
-            <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
-              {children.map((profile) => (
-                <option key={profile.id} value={profile.id}>
-                  {profile.name}
-                </option>
-              ))}
-            </select>
-          </label>
+        <form className="form-panel profile-login" onSubmit={handleSubmit}>
+          <div className="profile-player-grid" role="list" aria-label="Perfiles infantiles">
+            {children.map((profile, index) => {
+              const selected = selectedId === profile.id;
+              return (
+                <button
+                  key={profile.id}
+                  type="button"
+                  className={`player-card ${selected ? "player-card--selected" : ""}`}
+                  onClick={() => setSelectedId(profile.id)}
+                >
+                  <span className="player-card__avatar" style={{ background: profile.avatarColor }}>
+                    {profile.name.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span className="player-card__name">{profile.name}</span>
+                  <span className="player-card__level">Nivel {index + 1}</span>
+                </button>
+              );
+            })}
+          </div>
 
           <label>
             PIN
@@ -68,17 +78,20 @@ export default function ProfileSelectPage() {
           {error && <p className="form-error">{error}</p>}
 
           <button className="primary-action" type="submit" disabled={!selectedId}>
-            Entrar
+            Entrar <ArrowRight aria-hidden="true" size={18} />
           </button>
         </form>
       )}
 
-      <FeatureCard
-        title="Acceso adulto"
-        description="La administracion permite crear perfiles, configurar limites y hacer backups."
-        icon={<ShieldCheck size={24} />}
-        tone="sun"
-      />
+      <Link className="card-link" to="/admin">
+        <FeatureCard
+          title="Acceso adulto"
+          description="La administracion permite crear perfiles, configurar limites y hacer backups."
+          icon={<ShieldCheck size={24} />}
+          tone="sun"
+          badge="admin"
+        />
+      </Link>
     </section>
   );
 }
