@@ -5,11 +5,19 @@ import { achievementService } from "../../core/achievements/achievementService";
 import { entryRepository } from "../../core/diary/entryRepository";
 import type { EntryType } from "../../core/diary/types";
 import { getMediaConstraints, getSupportedRecordingMimeType } from "../../core/media/recording";
+import { addStickerOverlay, clearOverlays, setFrameOverlay } from "../../core/overlays/overlayProject";
+import type { OverlayProject } from "../../core/overlays/types";
+import { packService } from "../../core/packs/packService";
+import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { PageHeader } from "../../shared/ui/PageHeader";
+import { FrameCanvas } from "../stickers/FrameCanvas";
+import { FrameTray } from "../stickers/FrameTray";
+import { StickerCanvas } from "../stickers/StickerCanvas";
+import { StickerTray } from "../stickers/StickerTray";
 
 const labels: Record<string, string> = {
   video: "Nueva entrada de video",
@@ -36,11 +44,14 @@ export default function RecordPage() {
   const [elapsed, setElapsed] = useState(0);
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [dailyCount, setDailyCount] = useState(0);
+  const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
+  const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const previewUrl = useObjectUrl(mediaBlob);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
+  const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
 
   useEffect(() => {
     void storagePolicyRepository.get().then(setPolicy);
@@ -177,12 +188,21 @@ export default function RecordPage() {
       note,
       durationSeconds: elapsed,
       mediaBlob,
+      overlayProject: entryType === "video" ? overlays : undefined,
       isLocked,
       unlockAt: isLocked ? new Date(unlockAt).toISOString() : undefined,
     });
     await achievementService.syncProfile(activeProfile.id);
 
     navigate("/diary");
+  }
+
+  function addSticker(sticker: PackAsset) {
+    setOverlays((current) => addStickerOverlay(current, { packId: sticker.packId, assetId: sticker.id }));
+  }
+
+  function selectFrame(frame: PackAsset) {
+    setOverlays((current) => setFrameOverlay(current, { packId: frame.packId, assetId: frame.id }));
   }
 
   if (entryType !== "text") {
@@ -207,7 +227,11 @@ export default function RecordPage() {
 
         <section className="recorder-panel">
           {entryType === "video" ? (
-            <video ref={videoPreviewRef} src={previewUrl} controls={Boolean(previewUrl)} muted={recording} playsInline />
+            <div className="sticker-stage">
+              <video ref={videoPreviewRef} src={previewUrl} controls={Boolean(previewUrl)} muted={recording} playsInline />
+              <StickerCanvas overlays={overlays} packs={packs} />
+              <FrameCanvas overlays={overlays} packs={packs} />
+            </div>
           ) : previewUrl ? (
             <audio src={previewUrl} controls />
           ) : (
@@ -236,6 +260,17 @@ export default function RecordPage() {
             )}
           </div>
         </section>
+
+        {entryType === "video" && (
+          <>
+            <StickerTray stickers={activePack?.stickers ?? []} onSelect={addSticker} />
+            <FrameTray
+              frames={activePack?.frames ?? []}
+              onSelect={selectFrame}
+              onClear={() => setOverlays((current) => setFrameOverlay(current))}
+            />
+          </>
+        )}
 
         {mediaBlob && (
           <form className="form-panel" onSubmit={(event) => { event.preventDefault(); void saveMediaEntry(); }}>

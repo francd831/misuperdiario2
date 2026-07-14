@@ -33,6 +33,7 @@ export interface CreateMediaEntryInput {
   note?: string;
   durationSeconds: number;
   mediaBlob: Blob;
+  overlayProject?: OverlayProject;
   isLocked?: boolean;
   unlockAt?: string;
 }

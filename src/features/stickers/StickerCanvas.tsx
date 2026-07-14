@@ -1,4 +1,5 @@
 import type { OverlayProject } from "../../core/overlays/types";
+import { normalizeOverlayProject } from "../../core/overlays/overlayProject";
 import type { PackWithAssets } from "../../core/packs/types";
 
 interface StickerCanvasProps {
@@ -7,7 +8,8 @@ interface StickerCanvasProps {
 }
 
 export function StickerCanvas({ overlays, packs }: StickerCanvasProps) {
-  if (overlays.length === 0) return null;
+  const stickers = normalizeOverlayProject(overlays).stickers;
+  if (stickers.length === 0) return null;
 
   function resolveSticker(packId: string, assetId: string) {
     return packs.find((pack) => pack.manifest.id === packId)?.stickers.find((sticker) => sticker.id === assetId);
@@ -15,7 +17,7 @@ export function StickerCanvas({ overlays, packs }: StickerCanvasProps) {
 
   return (
     <div className="sticker-canvas" aria-hidden="true">
-      {overlays.map((overlay) => {
+      {stickers.map((overlay) => {
         const sticker = resolveSticker(overlay.packId, overlay.assetId);
         if (!sticker) return null;
         return (

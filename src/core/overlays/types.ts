@@ -10,4 +10,15 @@ export interface StickerOverlay {
   zIndex: number;
 }
 
-export type OverlayProject = StickerOverlay[];
+export interface PackVisualAssetRef {
+  packId: string;
+  assetId: string;
+}
+
+export interface StructuredOverlayProject {
+  stickers: StickerOverlay[];
+  frame?: PackVisualAssetRef;
+  background?: PackVisualAssetRef;
+}
+
+export type OverlayProject = StickerOverlay[] | StructuredOverlayProject;

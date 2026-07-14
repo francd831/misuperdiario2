@@ -1,5 +1,6 @@
 import { dbDelete, dbGet, dbListByIndex, dbSet } from "../storage/db";
 import type { DailyPhoto, SaveDailyPhotoInput } from "./types";
+import type { OverlayProject } from "../overlays/types";
 
 export function today() {
   return new Date().toISOString().slice(0, 10);
@@ -63,5 +64,17 @@ export const dailyPhotoRepository = {
 
   async remove(id: string) {
     await dbDelete("dailyPhotos", id);
+  },
+
+  async updateOverlayProject(id: string, overlayProject: OverlayProject) {
+    const photo = await this.get(id);
+    if (!photo) throw new Error("Foto no encontrada.");
+    const updated: DailyPhoto = {
+      ...photo,
+      overlayProject,
+      updatedAt: now(),
+    };
+    await dbSet("dailyPhotos", updated);
+    return updated;
   },
 };

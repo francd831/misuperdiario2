@@ -1,5 +1,6 @@
 import { dbGet, dbListByIndex, dbSet } from "../storage/db";
 import type { CreateMediaEntryInput, CreateTextEntryInput, DiaryEntry, EntryType } from "./types";
+import type { OverlayProject } from "../overlays/types";
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -63,6 +64,7 @@ export const entryRepository = {
       note: input.note?.trim() || undefined,
       durationSeconds: input.durationSeconds,
       mediaBlob: input.mediaBlob,
+      overlayProject: input.overlayProject,
       isLocked: Boolean(input.isLocked),
       unlockAt: input.unlockAt || undefined,
       createdAt,
@@ -71,5 +73,17 @@ export const entryRepository = {
 
     await dbSet("entries", entry);
     return entry;
+  },
+
+  async updateOverlayProject(id: string, overlayProject: OverlayProject) {
+    const entry = await this.get(id);
+    if (!entry) throw new Error("Entrada no encontrada.");
+    const updated: DiaryEntry = {
+      ...entry,
+      overlayProject,
+      updatedAt: now(),
+    };
+    await dbSet("entries", updated);
+    return updated;
   },
 };

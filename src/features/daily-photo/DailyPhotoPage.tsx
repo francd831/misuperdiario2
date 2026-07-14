@@ -5,6 +5,7 @@ import { achievementService } from "../../core/achievements/achievementService";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
+import { addStickerOverlay, clearOverlays, normalizeOverlayProject, setFrameOverlay } from "../../core/overlays/overlayProject";
 import type { OverlayProject } from "../../core/overlays/types";
 import { packService } from "../../core/packs/packService";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
@@ -13,17 +14,38 @@ import { storagePolicyRepository } from "../../core/settings/storagePolicyReposi
 import type { StoragePolicy } from "../../core/profiles/types";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { PageHeader } from "../../shared/ui/PageHeader";
+import { FrameCanvas } from "../stickers/FrameCanvas";
+import { FrameTray } from "../stickers/FrameTray";
 import { StickerCanvas } from "../stickers/StickerCanvas";
 import { StickerTray } from "../stickers/StickerTray";
 
-function PhotoThumb({ photo }: { photo: DailyPhoto }) {
+function PhotoThumb({ photo, onEdit }: { photo: DailyPhoto; onEdit: (photo: DailyPhoto) => void }) {
   const url = useObjectUrl(photo.thumbnailBlob ?? photo.blob);
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
 
   return (
     <article className="photo-tile">
       {url && <img src={url} alt={photo.caption || `Foto del ${photo.date}`} />}
+      <FrameCanvas overlays={photo.overlayProject} packs={packs} />
       <StickerCanvas overlays={photo.overlayProject ?? []} packs={packs} />
+      <button
+        type="button"
+        onClick={() => onEdit(photo)}
+        style={{
+          position: "absolute",
+          top: 8,
+          right: 8,
+          zIndex: 30,
+          border: 0,
+          borderRadius: 999,
+          background: "rgba(255,255,255,0.9)",
+          color: "#30233d",
+          padding: "6px 9px",
+          fontWeight: 800,
+        }}
+      >
+        Editar
+      </button>
       <span>{new Date(photo.date).toLocaleDateString("es", { day: "numeric", month: "short" })}</span>
     </article>
   );
@@ -39,7 +61,8 @@ export default function DailyPhotoPage() {
   const [caption, setCaption] = useState("");
   const [error, setError] = useState("");
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
-  const [overlays, setOverlays] = useState<OverlayProject>([]);
+  const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
+  const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
   const hasToday = useMemo(() => photos.some((photo) => photo.date === new Date().toISOString().slice(0, 10)), [photos]);
@@ -67,7 +90,8 @@ export default function DailyPhotoPage() {
   async function startCamera() {
     setError("");
     setCapturedBlob(null);
-    setOverlays([]);
+    setEditingPhotoId(null);
+    setOverlays(clearOverlays());
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("Este navegador no permite usar la camara desde la web.");
@@ -126,7 +150,7 @@ export default function DailyPhotoPage() {
       await achievementService.syncProfile(activeProfile.id);
       setCapturedBlob(null);
       setCaption("");
-      setOverlays([]);
+      setOverlays(clearOverlays());
       await refreshPhotos();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo guardar la foto.");
@@ -134,20 +158,35 @@ export default function DailyPhotoPage() {
   }
 
   function addSticker(sticker: PackAsset) {
-    setOverlays((current) => [
-      ...current,
-      {
-        id: crypto.randomUUID(),
-        kind: "sticker",
-        packId: sticker.packId,
-        assetId: sticker.id,
-        x: 50,
-        y: 50,
-        scale: 1,
-        rotation: 0,
-        zIndex: current.length + 1,
-      },
-    ]);
+    setOverlays((current) => addStickerOverlay(current, { packId: sticker.packId, assetId: sticker.id }));
+  }
+
+  function selectFrame(frame: PackAsset) {
+    setOverlays((current) => setFrameOverlay(current, { packId: frame.packId, assetId: frame.id }));
+  }
+
+  function editPhoto(photo: DailyPhoto) {
+    setCapturedBlob(photo.blob);
+    setCaption(photo.caption ?? "");
+    setOverlays(normalizeOverlayProject(photo.overlayProject));
+    setEditingPhotoId(photo.id);
+    stopCamera();
+  }
+
+  async function savePhotoDecorations() {
+    setError("");
+    if (!editingPhotoId) return;
+
+    try {
+      await dailyPhotoRepository.updateOverlayProject(editingPhotoId, overlays);
+      setCapturedBlob(null);
+      setCaption("");
+      setOverlays(clearOverlays());
+      setEditingPhotoId(null);
+      await refreshPhotos();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo actualizar la foto.");
+    }
   }
 
   return (
@@ -179,6 +218,7 @@ export default function DailyPhotoPage() {
             <video ref={videoRef} className="camera-preview" muted playsInline />
           )}
           <StickerCanvas overlays={overlays} packs={packs} />
+          <FrameCanvas overlays={overlays} packs={packs} />
         </div>
 
         <div className="recorder-panel__actions">
@@ -196,21 +236,26 @@ export default function DailyPhotoPage() {
               <button className="secondary-action" type="button" onClick={() => { setCapturedBlob(null); void startCamera(); }}>
                 <RotateCcw size={18} /> Repetir
               </button>
-              <button className="primary-action" type="button" onClick={() => void savePhoto()}>
-                <Save size={18} /> Guardar
+              <button className="primary-action" type="button" onClick={() => void (editingPhotoId ? savePhotoDecorations() : savePhoto())}>
+                <Save size={18} /> {editingPhotoId ? "Guardar cambios" : "Guardar"}
               </button>
             </>
           )}
         </div>
       </section>
 
-      {capturedBlob && (
+      {(capturedBlob || !editingPhotoId) && (
         <>
           <label className="form-panel">
             Frase de la foto
             <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Opcional" />
           </label>
           <StickerTray stickers={activePack?.stickers ?? []} onSelect={addSticker} />
+          <FrameTray
+            frames={activePack?.frames ?? []}
+            onSelect={selectFrame}
+            onClear={() => setOverlays((current) => setFrameOverlay(current))}
+          />
         </>
       )}
 
@@ -225,7 +270,7 @@ export default function DailyPhotoPage() {
       ) : (
         <div className="photo-grid">
           {photos.map((photo) => (
-            <PhotoThumb key={photo.id} photo={photo} />
+            <PhotoThumb key={photo.id} photo={photo} onEdit={editPhoto} />
           ))}
         </div>
       )}
