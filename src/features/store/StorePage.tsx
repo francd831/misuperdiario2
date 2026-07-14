@@ -17,7 +17,6 @@ export default function StorePage() {
   const [messageTone, setMessageTone] = useState<"success" | "error">("success");
 
   const activePackId = activeProfile?.activePackId ?? "base";
-  const openPack = packs.find((pack) => pack.manifest.id === openPackId);
 
   async function refreshEntitlements() {
     if (!activeProfile) return;
@@ -87,6 +86,7 @@ export default function StorePage() {
         {sortedPacks.map(({ manifest, previewUrl, stickers, frames, filters, speechBubbles, stamps, masks, effects }) => {
           const unlocked = unlockedIds.has(manifest.id);
           const active = activePackId === manifest.id;
+          const open = openPackId === manifest.id;
           return (
             <article key={manifest.id} className={`pack-card ${active ? "pack-card--active" : ""}`}>
               <div className="pack-card__media">
@@ -113,8 +113,8 @@ export default function StorePage() {
                   <Sparkles size={14} /> {stickers.length} stickers / {frames.length} marcos / {filters.length + speechBubbles.length + stamps.length + masks.length + effects.length} extras
                 </p>
                 <div className="pack-card__actions">
-                  <button className="secondary-action" type="button" onClick={() => setOpenPackId(manifest.id)}>
-                    <Eye size={16} /> Ver incluye
+                  <button className="secondary-action" type="button" onClick={() => setOpenPackId(open ? null : manifest.id)}>
+                    <Eye size={16} /> Ver
                   </button>
                   {!unlocked ? (
                     <button className="primary-action" type="button" onClick={() => void buyPack(manifest.id)}>
@@ -126,28 +126,26 @@ export default function StorePage() {
                     </button>
                   )}
                 </div>
+                {open && (
+                  <section className="status-panel" aria-label={`Contenido del pack ${manifest.name}`}>
+                    <h3>Incluye</h3>
+                    <PackAssetGroup title="Stickers" assets={stickers} />
+                    <PackAssetGroup title="Marcos" assets={frames} />
+                    <PackAssetGroup title="Filtros" assets={filters} />
+                    <PackAssetGroup title="Bocadillos" assets={speechBubbles} />
+                    <PackAssetGroup title="Sellos" assets={stamps} />
+                    <PackAssetGroup title="Mascaras" assets={masks} />
+                    <PackAssetGroup title="Efectos animados" assets={effects} />
+                    <button className="secondary-action" type="button" onClick={() => setOpenPackId(null)}>
+                      Cerrar
+                    </button>
+                  </section>
+                )}
               </div>
             </article>
           );
         })}
       </div>
-
-      {openPack && (
-        <section className="status-panel" aria-label={`Contenido del pack ${openPack.manifest.name}`}>
-          <h2>{openPack.manifest.name}</h2>
-          <p>{openPack.manifest.description}</p>
-          <PackAssetGroup title="Stickers" assets={openPack.stickers} />
-          <PackAssetGroup title="Marcos" assets={openPack.frames} />
-          <PackAssetGroup title="Filtros" assets={openPack.filters} />
-          <PackAssetGroup title="Bocadillos" assets={openPack.speechBubbles} />
-          <PackAssetGroup title="Sellos" assets={openPack.stamps} />
-          <PackAssetGroup title="Mascaras" assets={openPack.masks} />
-          <PackAssetGroup title="Efectos animados" assets={openPack.effects} />
-          <button className="secondary-action" type="button" onClick={() => setOpenPackId(null)}>
-            Cerrar
-          </button>
-        </section>
-      )}
 
       <section className="status-panel">
         <h2>Ultimos movimientos</h2>

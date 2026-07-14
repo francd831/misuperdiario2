@@ -5,6 +5,5 @@
       <stop offset="100%" stop-color="hsl(295 72% 48%)"/>
     </linearGradient>
   </defs>
-  <path d="M76 210c52-70 116-104 180-104s128 34 180 104c-22 72-64 108-126 108-30 0-48-14-54-34-6 20-24 34-54 34-62 0-104-36-126-108z" fill="url(#grad)" stroke="#fff" stroke-width="16"/><circle cx="190" cy="224" r="34" fill="#fff"/><circle cx="322" cy="224" r="34" fill="#fff"/>
-  <text x="256" y="284" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="800" fill="#fff">Mascara</text>
+  <g opacity=".96"><rect x="92" y="188" width="126" height="82" rx="30" fill="none" stroke="url(#grad)" stroke-width="24"/><rect x="294" y="188" width="126" height="82" rx="30" fill="none" stroke="url(#grad)" stroke-width="24"/><path d="M218 224h76M64 208l34 18M448 208l-34 18" stroke="url(#grad)" stroke-width="22" stroke-linecap="round"/></g>
 </svg>
