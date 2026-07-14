@@ -1,10 +1,11 @@
 import { hashPin, isValidPin, verifyPin } from "../auth/pinService";
 import { walletService } from "../wallet/walletService";
 import { profileRepository } from "./profileRepository";
-import type { Profile, ProfileRole } from "./types";
+import type { Profile, ProfileAvatarPreset, ProfileRole } from "./types";
 
 const ACTIVE_PROFILE_KEY = "msd_active_profile_id";
 const avatarColors = ["#ffe4ee", "#e8f8ef", "#e5f3ff", "#fff1c7", "#ede7ff"];
+const avatarPresets: ProfileAvatarPreset[] = ["star", "heart", "rocket", "smile", "palette", "crown", "sparkles", "trophy"];
 
 function now() {
   return new Date().toISOString();
@@ -18,6 +19,7 @@ function createProfileModel(name: string, role: ProfileRole, pinHash?: string): 
     role,
     name: name.trim(),
     avatarColor: avatarColors[Math.floor(Math.random() * avatarColors.length)],
+    avatarPreset: avatarPresets[Math.floor(Math.random() * avatarPresets.length)],
     pinHash,
     activePackId: "base",
     createdAt,
@@ -64,6 +66,33 @@ export const profileService = {
     if (!profile) return false;
     if (!profile.pinHash) return true;
     return verifyPin(pin, profile.pinHash);
+  },
+
+  async updateProfile(
+    profileId: string,
+    input: {
+      name: string;
+      pin?: string;
+      avatarPreset?: ProfileAvatarPreset;
+      avatarPhotoDataUrl?: string;
+    },
+  ) {
+    const profile = await profileRepository.get(profileId);
+    if (!profile) throw new Error("Perfil no encontrado.");
+
+    const name = input.name.trim();
+    if (name.length < 2) throw new Error("El nombre debe tener al menos 2 letras.");
+
+    const cleanPin = input.pin?.trim();
+    if (cleanPin && !isValidPin(cleanPin)) throw new Error("El PIN debe tener 4 digitos.");
+
+    await profileRepository.save({
+      ...profile,
+      name,
+      pinHash: cleanPin ? await hashPin(cleanPin) : profile.pinHash,
+      avatarPreset: input.avatarPhotoDataUrl ? undefined : input.avatarPreset ?? profile.avatarPreset ?? "star",
+      avatarPhotoDataUrl: input.avatarPhotoDataUrl,
+    });
   },
 
   login(profileId: string) {

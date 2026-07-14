@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { profileService } from "./profileService";
-import type { Profile } from "./types";
+import type { Profile, ProfileAvatarPreset } from "./types";
 
 type ProfileStatus = "loading" | "needs-admin" | "select-profile" | "active";
 
@@ -11,6 +11,10 @@ interface ProfileContextValue {
   refresh: () => Promise<void>;
   createAdmin: (name: string, pin: string) => Promise<void>;
   createChild: (name: string, pin?: string) => Promise<void>;
+  updateProfile: (
+    profileId: string,
+    input: { name: string; pin?: string; avatarPreset?: ProfileAvatarPreset; avatarPhotoDataUrl?: string },
+  ) => Promise<void>;
   login: (profileId: string, pin: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -52,6 +56,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       },
       async createChild(name, pin) {
         await profileService.createChild(name, pin);
+        await refresh();
+      },
+      async updateProfile(profileId, input) {
+        await profileService.updateProfile(profileId, input);
         await refresh();
       },
       async login(profileId, pin) {

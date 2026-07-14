@@ -7,6 +7,7 @@ import actionVoice from "../../assets/home/action-voice.webp";
 import actionWrite from "../../assets/home/action-write.webp";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
+import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
 
 const actions = [
   {
@@ -64,15 +65,11 @@ export default function HomePage() {
     };
   }, [activeProfile]);
 
-  const playerInitial = activeProfile?.name.slice(0, 1).toUpperCase() ?? "?";
-
   return (
     <section className="game-home">
       <header className="player-hud">
         <div className="player-hud__profile">
-          <span className="player-avatar" style={{ background: activeProfile?.avatarColor }}>
-            {playerInitial}
-          </span>
+          {activeProfile ? <ProfileAvatar profile={activeProfile} className="player-avatar" /> : <span className="player-avatar">?</span>}
           <div>
             <p className="eyebrow">Base secreta</p>
             <h1>{`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}</h1>

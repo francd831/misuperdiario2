@@ -1,10 +1,14 @@
 export type ProfileRole = "admin" | "child";
 
+export type ProfileAvatarPreset = "star" | "heart" | "rocket" | "smile" | "palette" | "crown" | "sparkles" | "trophy";
+
 export interface Profile {
   id: string;
   role: ProfileRole;
   name: string;
   avatarColor: string;
+  avatarPreset?: ProfileAvatarPreset;
+  avatarPhotoDataUrl?: string;
   pinHash?: string;
   activePackId: string;
   createdAt: string;

@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
+import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
 
 export default function ProfileSelectPage() {
   const navigate = useNavigate();
@@ -53,9 +54,7 @@ export default function ProfileSelectPage() {
                   className={`player-card ${selected ? "player-card--selected" : ""}`}
                   onClick={() => setSelectedId(profile.id)}
                 >
-                  <span className="player-card__avatar" style={{ background: profile.avatarColor }}>
-                    {profile.name.slice(0, 1).toUpperCase()}
-                  </span>
+                  <ProfileAvatar profile={profile} className="player-card__avatar" />
                   <span className="player-card__name">{profile.name}</span>
                   <span className="player-card__level">Nivel {index + 1}</span>
                 </button>
