@@ -18,6 +18,11 @@ export interface PackManifest {
   theme: PackTheme;
   stickers?: string[] | { autoLoad?: boolean; folder?: string };
   frames?: string[] | { autoLoad?: boolean; folder?: string };
+  filters?: string[] | { autoLoad?: boolean; folder?: string };
+  speechBubbles?: string[] | { autoLoad?: boolean; folder?: string };
+  stamps?: string[] | { autoLoad?: boolean; folder?: string };
+  masks?: string[] | { autoLoad?: boolean; folder?: string };
+  effects?: string[] | { autoLoad?: boolean; folder?: string };
   preview?: string;
 }
 
@@ -33,6 +38,11 @@ export interface PackWithAssets {
   previewUrl?: string;
   stickers: PackAsset[];
   frames: PackAsset[];
+  filters: PackAsset[];
+  speechBubbles: PackAsset[];
+  stamps: PackAsset[];
+  masks: PackAsset[];
+  effects: PackAsset[];
 }
 
 export interface PackEntitlement {

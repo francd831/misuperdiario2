@@ -1,5 +1,17 @@
 import type { PackAsset, PackManifest, PackWithAssets } from "./types";
 
+type PackAssetKind = "stickers" | "frames" | "filters" | "speechBubbles" | "stamps" | "masks" | "effects";
+
+const defaultFolders: Record<PackAssetKind, string> = {
+  stickers: "stickers",
+  frames: "frames",
+  filters: "filters",
+  speechBubbles: "speech-bubbles",
+  stamps: "stamps",
+  masks: "masks",
+  effects: "effects",
+};
+
 const manifestModules = import.meta.glob<{ default: PackManifest }>("/src/assets/packs/**/manifest.json", {
   eager: true,
 });
@@ -41,7 +53,7 @@ function getPackAssetUrl(packId: string, assetPath: string) {
   return assetModules[`/src/assets/packs/${packId}/${assetPath.replace(/^\/+/, "")}`];
 }
 
-function resolveAssets(pack: PackManifest, kind: "stickers" | "frames") {
+function resolveAssets(pack: PackManifest, kind: PackAssetKind) {
   const value = pack[kind];
   if (Array.isArray(value)) {
     return value
@@ -55,7 +67,7 @@ function resolveAssets(pack: PackManifest, kind: "stickers" | "frames") {
   }
 
   if (value?.autoLoad || !value) {
-    return assetsFromFolder(pack.id, normalizeFolder(value?.folder, kind));
+    return assetsFromFolder(pack.id, normalizeFolder(value?.folder, defaultFolders[kind]));
   }
 
   return [];
@@ -88,6 +100,11 @@ export const packLoader = {
       previewUrl: getPackAssetUrl(manifest.id, manifest.preview ?? "preview.png"),
       stickers: resolveAssets(manifest, "stickers"),
       frames: resolveAssets(manifest, "frames"),
+      filters: resolveAssets(manifest, "filters"),
+      speechBubbles: resolveAssets(manifest, "speechBubbles"),
+      stamps: resolveAssets(manifest, "stamps"),
+      masks: resolveAssets(manifest, "masks"),
+      effects: resolveAssets(manifest, "effects"),
     }));
   },
 

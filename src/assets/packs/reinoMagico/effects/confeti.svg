@@ -1,0 +1,10 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Efecto 1">
+  <defs>
+    <linearGradient id="grad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="hsl(89 92% 70%)"/>
+      <stop offset="100%" stop-color="hsl(89 72% 48%)"/>
+    </linearGradient>
+  </defs>
+  <g transform-origin="256 256"><animateTransform attributeName="transform" attributeType="XML" type="rotate" from="-4 256 256" to="4 256 256" dur="1.4s" repeatCount="indefinite" additive="sum" /><circle cx="256" cy="256" r="84" fill="url(#grad)" opacity=".66"/><path d="M256 72l28 112 106-42-62 101 102 54-119 10 18 117-73-94-73 94 18-117-119-10 102-54-62-101 106 42 28-112z" fill="url(#grad)" stroke="#fff" stroke-width="14" stroke-linejoin="round"/></g>
+  <text x="256" y="284" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="800" fill="#fff">Efecto 1</text>
+</svg>
