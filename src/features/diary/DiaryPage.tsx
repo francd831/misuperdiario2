@@ -6,8 +6,10 @@ import { entryRepository } from "../../core/diary/entryRepository";
 import type { DiaryEntry } from "../../core/diary/types";
 import {
   addStickerOverlay,
+  addVisualOverlay,
   normalizeOverlayProject,
   removeStickerOverlay,
+  setFilterOverlay,
   setFrameOverlay,
   updateFrameOverlay,
   updateStickerOverlay,
@@ -18,6 +20,8 @@ import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { PageHeader } from "../../shared/ui/PageHeader";
+import { AssetTray } from "../stickers/AssetTray";
+import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { FrameTray } from "../stickers/FrameTray";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -166,6 +170,16 @@ export default function DiaryPage() {
     setSelectedOverlayId("frame");
   }
 
+  function selectFilter(filter: PackAsset) {
+    setDraftOverlays((current) => setFilterOverlay(current, { packId: filter.packId, assetId: filter.id, assetKind: "filters" }));
+    setSelectedOverlayId(null);
+  }
+
+  function addPackAsset(asset: PackAsset, assetKind: "speechBubbles" | "stamps" | "masks" | "effects") {
+    setDraftOverlays((current) => addVisualOverlay(current, { packId: asset.packId, assetId: asset.id, assetKind }));
+    setSelectedOverlayId(null);
+  }
+
   async function saveDecorations(entryId: string) {
     await entryRepository.updateOverlayProject(entryId, draftOverlays);
     setEditingEntryId(null);
@@ -223,8 +237,14 @@ export default function DiaryPage() {
               }}
               onAddSticker={addSticker}
               onSelectFrame={selectFrame}
+              onSelectFilter={selectFilter}
+              onAddPackAsset={addPackAsset}
               onClearFrame={() => {
                 setDraftOverlays((current) => setFrameOverlay(current));
+                setSelectedOverlayId(null);
+              }}
+              onClearFilter={() => {
+                setDraftOverlays((current) => setFilterOverlay(current));
                 setSelectedOverlayId(null);
               }}
               onSelectOverlay={setSelectedOverlayId}
@@ -257,7 +277,10 @@ interface DecorationEditProps {
   onCancelEdit: () => void;
   onAddSticker: (sticker: PackAsset) => void;
   onSelectFrame: (frame: PackAsset) => void;
+  onSelectFilter: (filter: PackAsset) => void;
+  onAddPackAsset: (asset: PackAsset, assetKind: "speechBubbles" | "stamps" | "masks" | "effects") => void;
   onClearFrame: () => void;
+  onClearFilter: () => void;
   onSelectOverlay: (overlayId: string | "frame") => void;
   onUpdateSticker: (overlayId: string, patch: Partial<StickerOverlay>) => void;
   onRemoveSticker: (overlayId: string) => void;
@@ -299,7 +322,10 @@ function EntryCard({
   onCancelEdit,
   onAddSticker,
   onSelectFrame,
+  onSelectFilter,
+  onAddPackAsset,
   onClearFrame,
+  onClearFilter,
   onSelectOverlay,
   onUpdateSticker,
   onRemoveSticker,
@@ -323,6 +349,7 @@ function EntryCard({
         {entry.type === "photo" && photoUrl && (
           <div className="sticker-stage">
             <img className="entry-card__photo" src={photoUrl} alt="" />
+            <FilterCanvas overlays={entry.overlayProject} packs={packs} />
             <StickerCanvas overlays={entry.overlayProject ?? []} packs={packs} />
             <FrameCanvas overlays={entry.overlayProject} packs={packs} />
           </div>
@@ -331,6 +358,7 @@ function EntryCard({
         {entry.type === "video" && mediaUrl && (
           <div className="sticker-stage">
             <video src={mediaUrl} controls playsInline />
+            <FilterCanvas overlays={overlays} packs={packs} />
             <StickerCanvas
               overlays={overlays ?? []}
               packs={packs}
@@ -360,6 +388,43 @@ function EntryCard({
           <div className="form-panel">
             <StickerTray stickers={activePack?.stickers ?? []} onSelect={onAddSticker} />
             <FrameTray frames={activePack?.frames ?? []} onSelect={onSelectFrame} onClear={onClearFrame} />
+            <AssetTray
+              label="Filtros del pack activo"
+              emptyTitle="Sin filtros"
+              emptyDescription="El pack activo no tiene filtros disponibles."
+              assets={activePack?.filters ?? []}
+              onSelect={onSelectFilter}
+              onClear={onClearFilter}
+              clearLabel="Sin filtro"
+            />
+            <AssetTray
+              label="Bocadillos del pack activo"
+              emptyTitle="Sin bocadillos"
+              emptyDescription="El pack activo no tiene bocadillos disponibles."
+              assets={activePack?.speechBubbles ?? []}
+              onSelect={(asset) => onAddPackAsset(asset, "speechBubbles")}
+            />
+            <AssetTray
+              label="Sellos del pack activo"
+              emptyTitle="Sin sellos"
+              emptyDescription="El pack activo no tiene sellos disponibles."
+              assets={activePack?.stamps ?? []}
+              onSelect={(asset) => onAddPackAsset(asset, "stamps")}
+            />
+            <AssetTray
+              label="Mascaras del pack activo"
+              emptyTitle="Sin mascaras"
+              emptyDescription="El pack activo no tiene mascaras disponibles."
+              assets={activePack?.masks ?? []}
+              onSelect={(asset) => onAddPackAsset(asset, "masks")}
+            />
+            <AssetTray
+              label="Efectos del pack activo"
+              emptyTitle="Sin efectos"
+              emptyDescription="El pack activo no tiene efectos disponibles."
+              assets={activePack?.effects ?? []}
+              onSelect={(asset) => onAddPackAsset(asset, "effects")}
+            />
             <div className="inline-actions">
               <button className="primary-action" type="button" onClick={() => void onSaveDecorations(entry.id)}>
                 Guardar decoracion

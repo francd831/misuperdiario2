@@ -1,6 +1,6 @@
 import type { OverlayProject, StickerOverlay } from "../../core/overlays/types";
 import { normalizeOverlayProject } from "../../core/overlays/overlayProject";
-import type { PackWithAssets } from "../../core/packs/types";
+import type { PackAsset, PackAssetKind, PackWithAssets } from "../../core/packs/types";
 import { OverlayControls } from "./OverlayControls";
 
 interface StickerCanvasProps {
@@ -21,15 +21,17 @@ export function StickerCanvas({ overlays, packs, editable = false, selectedId, o
   const stickers = normalizeOverlayProject(overlays).stickers;
   if (stickers.length === 0) return null;
 
-  function resolveSticker(packId: string, assetId: string) {
-    return packs.find((pack) => pack.manifest.id === packId)?.stickers.find((sticker) => sticker.id === assetId);
+  function resolveAsset(packId: string, assetId: string, assetKind: PackAssetKind = "stickers"): PackAsset | undefined {
+    const pack = packs.find((item) => item.manifest.id === packId);
+    if (!pack) return undefined;
+    return pack[assetKind].find((asset) => asset.id === assetId) ?? pack.stickers.find((asset) => asset.id === assetId);
   }
 
   return (
     <div className="sticker-canvas" aria-hidden={!editable} style={{ pointerEvents: editable ? "auto" : undefined }}>
       {stickers.map((overlay) => {
-        const sticker = resolveSticker(overlay.packId, overlay.assetId);
-        if (!sticker) return null;
+        const asset = resolveAsset(overlay.packId, overlay.assetId, overlay.assetKind);
+        if (!asset) return null;
         const selected = editable && selectedId === overlay.id;
         const transform = `translate(-50%, -50%) scale(${overlay.scale}) rotate(${overlay.rotation}deg)`;
 
@@ -53,7 +55,7 @@ export function StickerCanvas({ overlays, packs, editable = false, selectedId, o
           >
             <button
               type="button"
-              aria-label={`Editar sticker ${sticker.name}`}
+              aria-label={`Editar elemento ${asset.name}`}
               onClick={() => onSelect?.(overlay.id)}
               style={{
                 all: "unset",
@@ -61,11 +63,11 @@ export function StickerCanvas({ overlays, packs, editable = false, selectedId, o
                 display: "block",
               }}
             >
-              <img src={sticker.url} alt="" style={{ display: "block", position: "static" }} />
+              <img src={asset.url} alt="" style={{ display: "block", position: "static" }} />
             </button>
             {selected && (
               <OverlayControls
-                label={`Controles de ${sticker.name}`}
+                label={`Controles de ${asset.name}`}
                 onMove={(deltaX, deltaY) =>
                   updateSticker({
                     x: clamp(overlay.x + deltaX, 0, 100),

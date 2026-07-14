@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Lock, ShoppingBag, Sparkles, Star } from "lucide-react";
+import { Check, Eye, Lock, ShoppingBag, Sparkles, Star } from "lucide-react";
 import { packService } from "../../core/packs/packService";
 import type { PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
@@ -12,10 +12,12 @@ export default function StorePage() {
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set(["base"]));
   const [wallet, setWallet] = useState<WalletSummary>({ balance: 0, transactions: [] });
+  const [openPackId, setOpenPackId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [messageTone, setMessageTone] = useState<"success" | "error">("success");
 
   const activePackId = activeProfile?.activePackId ?? "base";
+  const openPack = packs.find((pack) => pack.manifest.id === openPackId);
 
   async function refreshEntitlements() {
     if (!activeProfile) return;
@@ -82,7 +84,7 @@ export default function StorePage() {
       {message && <p className={messageTone === "success" ? "form-success" : "form-error"}>{message}</p>}
 
       <div className="pack-grid">
-        {sortedPacks.map(({ manifest, previewUrl, stickers, frames }) => {
+        {sortedPacks.map(({ manifest, previewUrl, stickers, frames, filters, speechBubbles, stamps, masks, effects }) => {
           const unlocked = unlockedIds.has(manifest.id);
           const active = activePackId === manifest.id;
           return (
@@ -108,9 +110,12 @@ export default function StorePage() {
                 </div>
                 <p>{manifest.description}</p>
                 <p className="pack-card__meta">
-                  <Sparkles size={14} /> {stickers.length} stickers / {frames.length} marcos
+                  <Sparkles size={14} /> {stickers.length} stickers / {frames.length} marcos / {filters.length + speechBubbles.length + stamps.length + masks.length + effects.length} extras
                 </p>
                 <div className="pack-card__actions">
+                  <button className="secondary-action" type="button" onClick={() => setOpenPackId(manifest.id)}>
+                    <Eye size={16} /> Ver incluye
+                  </button>
                   {!unlocked ? (
                     <button className="primary-action" type="button" onClick={() => void buyPack(manifest.id)}>
                       Comprar
@@ -127,6 +132,23 @@ export default function StorePage() {
         })}
       </div>
 
+      {openPack && (
+        <section className="status-panel" aria-label={`Contenido del pack ${openPack.manifest.name}`}>
+          <h2>{openPack.manifest.name}</h2>
+          <p>{openPack.manifest.description}</p>
+          <PackAssetGroup title="Stickers" assets={openPack.stickers} />
+          <PackAssetGroup title="Marcos" assets={openPack.frames} />
+          <PackAssetGroup title="Filtros" assets={openPack.filters} />
+          <PackAssetGroup title="Bocadillos" assets={openPack.speechBubbles} />
+          <PackAssetGroup title="Sellos" assets={openPack.stamps} />
+          <PackAssetGroup title="Mascaras" assets={openPack.masks} />
+          <PackAssetGroup title="Efectos animados" assets={openPack.effects} />
+          <button className="secondary-action" type="button" onClick={() => setOpenPackId(null)}>
+            Cerrar
+          </button>
+        </section>
+      )}
+
       <section className="status-panel">
         <h2>Ultimos movimientos</h2>
         {wallet.transactions.length === 0 ? (
@@ -142,5 +164,22 @@ export default function StorePage() {
         )}
       </section>
     </section>
+  );
+}
+
+function PackAssetGroup({ title, assets }: { title: string; assets: PackWithAssets["stickers"] }) {
+  return (
+    <div>
+      <p className="pack-card__meta">
+        <Sparkles size={14} /> {title}: {assets.length}
+      </p>
+      <div className="sticker-tray" aria-label={title}>
+        {assets.map((asset) => (
+          <button key={`${asset.packId}:${asset.id}`} type="button" aria-label={asset.name}>
+            <img src={asset.url} alt={asset.name} />
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }

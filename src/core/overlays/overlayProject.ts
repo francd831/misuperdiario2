@@ -1,3 +1,4 @@
+import type { PackAssetKind } from "../packs/types";
 import type { FrameOverlay, OverlayProject, PackVisualAssetRef, StickerOverlay, StructuredOverlayProject } from "./types";
 
 function normalizeFrame(frame?: PackVisualAssetRef | FrameOverlay): FrameOverlay | undefined {
@@ -22,11 +23,19 @@ export function normalizeOverlayProject(project?: OverlayProject): StructuredOve
   return {
     stickers: project.stickers ?? [],
     frame: normalizeFrame(project.frame),
+    filter: project.filter,
     background: project.background,
   };
 }
 
 export function addStickerOverlay(project: OverlayProject | undefined, sticker: Pick<StickerOverlay, "packId" | "assetId">) {
+  return addVisualOverlay(project, { ...sticker, assetKind: "stickers" });
+}
+
+export function addVisualOverlay(
+  project: OverlayProject | undefined,
+  asset: Pick<StickerOverlay, "packId" | "assetId"> & { assetKind: PackAssetKind },
+) {
   const normalized = normalizeOverlayProject(project);
   return {
     ...normalized,
@@ -35,8 +44,9 @@ export function addStickerOverlay(project: OverlayProject | undefined, sticker: 
       {
         id: crypto.randomUUID(),
         kind: "sticker" as const,
-        packId: sticker.packId,
-        assetId: sticker.assetId,
+        assetKind: asset.assetKind,
+        packId: asset.packId,
+        assetId: asset.assetId,
         x: 50,
         y: 50,
         scale: 1,
@@ -76,6 +86,13 @@ export function updateFrameOverlay(project: OverlayProject | undefined, patch: P
   return {
     ...normalized,
     frame: { ...normalizeFrame(normalized.frame)!, ...patch },
+  };
+}
+
+export function setFilterOverlay(project: OverlayProject | undefined, filter?: PackVisualAssetRef) {
+  return {
+    ...normalizeOverlayProject(project),
+    filter,
   };
 }
 

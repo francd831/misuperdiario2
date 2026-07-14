@@ -1,4 +1,5 @@
 import type { PackAsset } from "../../core/packs/types";
+import { AssetTray } from "./AssetTray";
 
 interface FrameTrayProps {
   frames: PackAsset[];
@@ -7,27 +8,15 @@ interface FrameTrayProps {
 }
 
 export function FrameTray({ frames, onSelect, onClear }: FrameTrayProps) {
-  if (frames.length === 0) {
-    return (
-      <section className="status-panel">
-        <h2>Sin marcos</h2>
-        <p>El pack activo no tiene marcos disponibles.</p>
-      </section>
-    );
-  }
-
   return (
-    <section className="sticker-tray" aria-label="Marcos del pack activo">
-      {onClear && (
-        <button type="button" onClick={onClear}>
-          Sin marco
-        </button>
-      )}
-      {frames.map((frame) => (
-        <button key={`${frame.packId}:${frame.id}`} type="button" onClick={() => onSelect(frame)}>
-          <img src={frame.url} alt={frame.name} />
-        </button>
-      ))}
-    </section>
+    <AssetTray
+      label="Marcos del pack activo"
+      emptyTitle="Sin marcos"
+      emptyDescription="El pack activo no tiene marcos disponibles."
+      assets={frames}
+      onSelect={onSelect}
+      onClear={onClear}
+      clearLabel="Sin marco"
+    />
   );
 }

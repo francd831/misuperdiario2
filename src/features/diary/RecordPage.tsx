@@ -7,8 +7,10 @@ import type { EntryType } from "../../core/diary/types";
 import { getMediaConstraints, getSupportedRecordingMimeType } from "../../core/media/recording";
 import {
   addStickerOverlay,
+  addVisualOverlay,
   clearOverlays,
   removeStickerOverlay,
+  setFilterOverlay,
   setFrameOverlay,
   updateFrameOverlay,
   updateStickerOverlay,
@@ -21,6 +23,8 @@ import type { StoragePolicy } from "../../core/profiles/types";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { PageHeader } from "../../shared/ui/PageHeader";
+import { AssetTray } from "../stickers/AssetTray";
+import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { FrameTray } from "../stickers/FrameTray";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -216,6 +220,16 @@ export default function RecordPage() {
     setSelectedOverlayId("frame");
   }
 
+  function selectFilter(filter: PackAsset) {
+    setOverlays((current) => setFilterOverlay(current, { packId: filter.packId, assetId: filter.id, assetKind: "filters" }));
+    setSelectedOverlayId(null);
+  }
+
+  function addPackAsset(asset: PackAsset, assetKind: "speechBubbles" | "stamps" | "masks" | "effects") {
+    setOverlays((current) => addVisualOverlay(current, { packId: asset.packId, assetId: asset.id, assetKind }));
+    setSelectedOverlayId(null);
+  }
+
   if (entryType !== "text") {
     const maxSeconds = entryType === "video" ? policy?.maxVideoSeconds : policy?.maxAudioSeconds;
     const dailyMax = entryType === "video" ? policy?.maxVideosPerDay : policy?.maxAudiosPerDay;
@@ -240,6 +254,7 @@ export default function RecordPage() {
           {entryType === "video" ? (
             <div className="sticker-stage">
               <video ref={videoPreviewRef} src={previewUrl} controls={Boolean(previewUrl)} muted={recording} playsInline />
+              <FilterCanvas overlays={overlays} packs={packs} />
               <StickerCanvas
                 overlays={overlays}
                 packs={packs}
@@ -304,6 +319,43 @@ export default function RecordPage() {
                 setOverlays((current) => setFrameOverlay(current));
                 setSelectedOverlayId(null);
               }}
+            />
+            <AssetTray
+              label="Filtros del pack activo"
+              emptyTitle="Sin filtros"
+              emptyDescription="El pack activo no tiene filtros disponibles."
+              assets={activePack?.filters ?? []}
+              onSelect={selectFilter}
+              onClear={() => setOverlays((current) => setFilterOverlay(current))}
+              clearLabel="Sin filtro"
+            />
+            <AssetTray
+              label="Bocadillos del pack activo"
+              emptyTitle="Sin bocadillos"
+              emptyDescription="El pack activo no tiene bocadillos disponibles."
+              assets={activePack?.speechBubbles ?? []}
+              onSelect={(asset) => addPackAsset(asset, "speechBubbles")}
+            />
+            <AssetTray
+              label="Sellos del pack activo"
+              emptyTitle="Sin sellos"
+              emptyDescription="El pack activo no tiene sellos disponibles."
+              assets={activePack?.stamps ?? []}
+              onSelect={(asset) => addPackAsset(asset, "stamps")}
+            />
+            <AssetTray
+              label="Mascaras del pack activo"
+              emptyTitle="Sin mascaras"
+              emptyDescription="El pack activo no tiene mascaras disponibles."
+              assets={activePack?.masks ?? []}
+              onSelect={(asset) => addPackAsset(asset, "masks")}
+            />
+            <AssetTray
+              label="Efectos del pack activo"
+              emptyTitle="Sin efectos"
+              emptyDescription="El pack activo no tiene efectos disponibles."
+              assets={activePack?.effects ?? []}
+              onSelect={(asset) => addPackAsset(asset, "effects")}
             />
           </>
         )}

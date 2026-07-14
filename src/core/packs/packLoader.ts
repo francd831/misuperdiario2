@@ -1,6 +1,4 @@
-import type { PackAsset, PackManifest, PackWithAssets } from "./types";
-
-type PackAssetKind = "stickers" | "frames" | "filters" | "speechBubbles" | "stamps" | "masks" | "effects";
+import type { PackAsset, PackAssetKind, PackManifest, PackWithAssets } from "./types";
 
 const defaultFolders: Record<PackAssetKind, string> = {
   stickers: "stickers",

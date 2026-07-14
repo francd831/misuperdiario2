@@ -1,3 +1,5 @@
+export type PackAssetKind = "stickers" | "frames" | "filters" | "speechBubbles" | "stamps" | "masks" | "effects";
+
 export interface PackTheme {
   primary: string;
   secondary: string;

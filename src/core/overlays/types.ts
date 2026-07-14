@@ -1,6 +1,9 @@
+import type { PackAssetKind } from "../packs/types";
+
 export interface StickerOverlay {
   id: string;
   kind: "sticker";
+  assetKind?: PackAssetKind;
   packId: string;
   assetId: string;
   x: number;
@@ -25,11 +28,13 @@ export interface FrameOverlay {
 export interface PackVisualAssetRef {
   packId: string;
   assetId: string;
+  assetKind?: PackAssetKind;
 }
 
 export interface StructuredOverlayProject {
   stickers: StickerOverlay[];
   frame?: PackVisualAssetRef | FrameOverlay;
+  filter?: PackVisualAssetRef;
   background?: PackVisualAssetRef;
 }
 
