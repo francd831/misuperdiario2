@@ -25,6 +25,7 @@ const buttonStyle = {
 export function OverlayControls({ label, onMove, onRotate, onScale, onRemove }: OverlayControlsProps) {
   return (
     <div
+      data-overlay-controls
       aria-label={label}
       style={{
         position: "absolute",

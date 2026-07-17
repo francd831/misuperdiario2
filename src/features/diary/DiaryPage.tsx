@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Camera, FileText, Lock, Mic, Search, Sparkles, Video } from "lucide-react";
+import { BookOpen, Camera, FileText, Lock, Mic, Search, Sparkles, Trash2, Video } from "lucide-react";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -187,12 +187,20 @@ export default function DiaryPage() {
     await refreshItems();
   }
 
+  async function deleteItem(item: TimelineItem) {
+    const label = item.type === "photo" ? "esta foto" : item.type === "video" ? "este vídeo" : "este recuerdo";
+    if (!window.confirm(`¿Quieres borrar ${label}? No se podrá recuperar.`)) return;
+    if (item.kind === "photo") await dailyPhotoRepository.remove(item.id);
+    else await entryRepository.remove(item.id);
+    if (editingEntryId === item.id) setEditingEntryId(null);
+    await refreshItems();
+  }
+
   return (
     <section className="page-stack diary-page">
       <PageHeader
-        eyebrow="Diario"
-        title="Album de recuerdos"
-        description="Todo lo que has guardado, ordenado por dias como una aventura."
+        title="Diario"
+        icon={<BookOpen size={22} />}
         backTo="/home"
       />
 
@@ -219,7 +227,7 @@ export default function DiaryPage() {
           <p>{query ? "Prueba con otra palabra." : "Empieza creando un video, una voz, una foto o un texto desde el inicio."}</p>
         </section>
       ) : (
-        <div className="diary-timeline" aria-label="Linea temporal de recuerdos">
+        <div className="diary-timeline" aria-label="Línea temporal de recuerdos">
           {groupedEntries.map((group) => (
             <TimelineDay
               key={group.date}
@@ -259,6 +267,7 @@ export default function DiaryPage() {
                 setSelectedOverlayId(null);
               }}
               onSaveDecorations={saveDecorations}
+              onDelete={(item) => void deleteItem(item)}
             />
           ))}
         </div>
@@ -287,6 +296,7 @@ interface DecorationEditProps {
   onUpdateFrame: (patch: Partial<FrameOverlay>) => void;
   onRemoveFrame: () => void;
   onSaveDecorations: (entryId: string) => Promise<void>;
+  onDelete: (entry: TimelineItem) => void;
 }
 
 function TimelineDay({ date, entries, ...editProps }: { date: string; entries: TimelineItem[] } & DecorationEditProps) {
@@ -332,6 +342,7 @@ function EntryCard({
   onUpdateFrame,
   onRemoveFrame,
   onSaveDecorations,
+  onDelete,
 }: { entry: TimelineItem } & DecorationEditProps) {
   const mediaUrl = useObjectUrl(entry.kind === "entry" ? entry.mediaBlob : undefined);
   const photoUrl = useObjectUrl(entry.kind === "photo" ? entry.photoBlob : undefined);
@@ -412,7 +423,7 @@ function EntryCard({
               onSelect={(asset) => onAddPackAsset(asset, "stamps")}
             />
             <AssetTray
-              label="Mascaras del pack activo"
+              label="Máscaras del pack activo"
               emptyTitle="Sin mascaras"
               emptyDescription="El pack activo no tiene mascaras disponibles."
               assets={activePack?.masks ?? []}
@@ -439,6 +450,9 @@ function EntryCard({
       <div className="entry-card__meta">
         <span className="entry-card__badge">{entry.type === "photo" ? "Foto" : getTypeLabel(entry.type)}</span>
         {entry.isLocked && <span className="entry-card__badge">Capsula</span>}
+        <button className="danger-icon-action" type="button" onClick={() => onDelete(entry)} aria-label={`Borrar ${entry.type === "photo" ? "foto" : "recuerdo"}`}>
+          <Trash2 size={17} />
+        </button>
       </div>
     </article>
   );

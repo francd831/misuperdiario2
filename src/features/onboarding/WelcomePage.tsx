@@ -1,40 +1,39 @@
-import { ArrowRight, Camera, Mic, PenLine, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
+import actionPhoto from "../../assets/home/action-photo.webp";
+import actionWrite from "../../assets/home/action-write.webp";
 
 export default function WelcomePage() {
   return (
     <section className="welcome-screen">
       <div className="welcome-hero">
         <div className="welcome-copy">
-          <p className="eyebrow">Beta privada</p>
+          <p className="welcome-kicker">Tus recuerdos, solo tuyos</p>
           <h1>Mi Super Diario</h1>
           <p>
-            Un lugar privado para guardar recuerdos con voz, fotos, videos,
-            stickers y pequenas recompensas.
+            Guarda lo que viviste con palabras, voz, fotos y vídeo.
           </p>
         </div>
 
-        <div className="memory-orbit" aria-hidden="true">
-          <span><PenLine size={28} /></span>
-          <span><Camera size={30} /></span>
-          <span><Mic size={28} /></span>
-          <span><Star size={30} /></span>
+        <div className="welcome-memory-preview" aria-label="Ejemplos de recuerdos que puedes crear">
+          <figure className="welcome-memory-card welcome-memory-card--photo">
+            <img src={actionPhoto} alt="Crear un recuerdo con una foto" />
+          </figure>
+          <figure className="welcome-memory-card welcome-memory-card--write">
+            <img src={actionWrite} alt="Escribir un recuerdo personal" />
+          </figure>
         </div>
       </div>
 
       <div className="welcome-actions">
         <Link className="primary-action" to="/profiles">
-          Empezar <ArrowRight aria-hidden="true" size={20} />
-        </Link>
-        <Link className="secondary-action" to="/admin">
-          <ShieldCheck aria-hidden="true" size={18} /> Administracion
+          Entrar en mi diario <ArrowRight aria-hidden="true" size={20} />
         </Link>
       </div>
 
-      <div className="welcome-note">
-        <Sparkles aria-hidden="true" size={18} />
-        <span>Diario local, privado y pensado para beta familiar.</span>
-      </div>
+      <Link className="welcome-admin-link" to="/admin">
+        <ShieldCheck aria-hidden="true" size={17} /> Administración familiar
+      </Link>
     </section>
   );
 }

@@ -107,9 +107,8 @@ export default function AdminPage() {
     return (
       <section className="page-stack page-stack--admin">
         <PageHeader
-          eyebrow="Primer arranque"
-          title="Crea el perfil administrador"
-          description="Este PIN protege la zona adulta de Mi Super Diario."
+          title="Configurar familia"
+          icon={<ShieldCheck size={22} />}
           backTo="/"
         />
 
@@ -123,7 +122,7 @@ export default function AdminPage() {
             <input
               inputMode="numeric"
               maxLength={4}
-              placeholder="4 digitos"
+              placeholder="4 dígitos"
               type="password"
               value={adminPin}
               onChange={(event) => setAdminPin(event.target.value.replace(/\D/g, "").slice(0, 4))}
@@ -142,9 +141,8 @@ export default function AdminPage() {
   return (
     <section className="page-stack page-stack--admin">
       <PageHeader
-        eyebrow="Administracion"
-        title="Control adulto"
-        description="Perfiles, PIN admin, backups, limites y almacenamiento."
+        title="Control familiar"
+        icon={<ShieldCheck size={22} />}
         backTo="/profiles"
       />
 
@@ -207,8 +205,8 @@ export default function AdminPage() {
       <div className="grid-two">
         <FeatureCard title="Perfiles" description="Crear, editar y restablecer PIN." icon={<UsersRound size={24} />} tone="mint" />
         <FeatureCard title="Seguridad" description="PIN hasheado y bloqueo por intentos." icon={<ShieldCheck size={24} />} tone="sky" />
-        <FeatureCard title="Almacenamiento" description="Cuotas, calidad y limites diarios." icon={<HardDrive size={24} />} tone="sun" />
-        <FeatureCard title="Backups" description="Exportar e importar todo el diario." icon={<DatabaseBackup size={24} />} tone="berry" />
+        <FeatureCard title="Almacenamiento" description="Cuotas, calidad y límites diarios." icon={<HardDrive size={24} />} tone="sun" />
+        <FeatureCard title="Copias de seguridad" description="Exporta e importa todo el diario." icon={<DatabaseBackup size={24} />} tone="berry" />
       </div>
     </section>
   );

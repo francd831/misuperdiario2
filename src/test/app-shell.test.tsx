@@ -38,13 +38,13 @@ describe("App shell", () => {
     renderAt("/");
 
     expect(await screen.findByRole("heading", { name: "Mi Super Diario" })).toBeInTheDocument();
-    expect(screen.getByText(/Beta privada/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tus recuerdos, solo tuyos/i)).toBeInTheDocument();
   });
 
   it("renders a lazy child route with navigation", async () => {
     renderAt("/home");
 
     expect(await screen.findByRole("heading", { name: "Hola, Luna" })).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Navegacion principal" })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Navegación principal" })).toBeInTheDocument();
   });
 });

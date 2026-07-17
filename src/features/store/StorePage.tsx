@@ -64,9 +64,8 @@ export default function StorePage() {
   return (
     <section className="page-stack store-page">
       <PageHeader
-        eyebrow="Tienda"
-        title="Cofre de packs"
-        description="Desbloquea nuevos mundos visuales con las estrellas que ganas en tu diario."
+        title="Tienda"
+        icon={<ShoppingBag size={22} />}
         backTo="/home"
       />
 
@@ -79,6 +78,10 @@ export default function StorePage() {
         </div>
         <p>Guarda recuerdos para ganar mas y abrir nuevos mundos.</p>
       </section>
+
+      {import.meta.env.DEV && (
+        <p className="form-success">Modo de pruebas: todos los packs están disponibles.</p>
+      )}
 
       {message && <p className={messageTone === "success" ? "form-success" : "form-error"}>{message}</p>}
 
@@ -134,7 +137,7 @@ export default function StorePage() {
                     <PackAssetGroup title="Filtros" assets={filters} />
                     <PackAssetGroup title="Bocadillos" assets={speechBubbles} />
                     <PackAssetGroup title="Sellos" assets={stamps} />
-                    <PackAssetGroup title="Mascaras" assets={masks} />
+                    <PackAssetGroup title="Máscaras" assets={masks} />
                     <PackAssetGroup title="Efectos animados" assets={effects} />
                     <button className="secondary-action" type="button" onClick={() => setOpenPackId(null)}>
                       Cerrar

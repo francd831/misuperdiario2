@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Play, RotateCcw, Save } from "lucide-react";
+import { Camera, Play, RotateCcw, Save, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
@@ -24,14 +24,12 @@ import { storagePolicyRepository } from "../../core/settings/storagePolicyReposi
 import type { StoragePolicy } from "../../core/profiles/types";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { PageHeader } from "../../shared/ui/PageHeader";
-import { AssetTray } from "../stickers/AssetTray";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
-import { FrameTray } from "../stickers/FrameTray";
 import { StickerCanvas } from "../stickers/StickerCanvas";
-import { StickerTray } from "../stickers/StickerTray";
+import { VisualToolCarousel } from "../stickers/VisualToolCarousel";
 
-function PhotoThumb({ photo, onEdit }: { photo: DailyPhoto; onEdit: (photo: DailyPhoto) => void }) {
+function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (photo: DailyPhoto) => void; onDelete: (photo: DailyPhoto) => void }) {
   const url = useObjectUrl(photo.thumbnailBlob ?? photo.blob);
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
 
@@ -41,24 +39,12 @@ function PhotoThumb({ photo, onEdit }: { photo: DailyPhoto; onEdit: (photo: Dail
       <FilterCanvas overlays={photo.overlayProject} packs={packs} />
       <FrameCanvas overlays={photo.overlayProject} packs={packs} />
       <StickerCanvas overlays={photo.overlayProject ?? []} packs={packs} />
-      <button
-        type="button"
-        onClick={() => onEdit(photo)}
-        style={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          zIndex: 30,
-          border: 0,
-          borderRadius: 999,
-          background: "rgba(255,255,255,0.9)",
-          color: "#30233d",
-          padding: "6px 9px",
-          fontWeight: 800,
-        }}
-      >
-        Editar
-      </button>
+      <div className="memory-card-actions">
+        <button type="button" onClick={() => onEdit(photo)}>Editar</button>
+        <button className="danger-icon-action" type="button" onClick={() => onDelete(photo)} aria-label="Borrar foto">
+          <Trash2 size={16} />
+        </button>
+      </div>
       <span>{new Date(photo.date).toLocaleDateString("es", { day: "numeric", month: "short" })}</span>
     </article>
   );
@@ -77,6 +63,7 @@ export default function DailyPhotoPage() {
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
+  const [cameraAspectRatio, setCameraAspectRatio] = useState("1 / 1");
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
   const hasToday = useMemo(() => photos.some((photo) => photo.date === new Date().toISOString().slice(0, 10)), [photos]);
@@ -109,7 +96,7 @@ export default function DailyPhotoPage() {
     setOverlays(clearOverlays());
 
     if (!navigator.mediaDevices?.getUserMedia) {
-      setError("Este navegador no permite usar la camara desde la web.");
+      setError("Este navegador no permite usar la cámara desde la web.");
       return;
     }
 
@@ -124,9 +111,10 @@ export default function DailyPhotoPage() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
+        setCameraAspectRatio(`${videoRef.current.videoWidth} / ${videoRef.current.videoHeight}`);
       }
     } catch {
-      setError("No se pudo acceder a la camara.");
+      setError("No se pudo acceder a la cámara.");
     }
   }
 
@@ -134,14 +122,11 @@ export default function DailyPhotoPage() {
     const video = videoRef.current;
     if (!video || video.videoWidth === 0 || video.videoHeight === 0) return;
     const canvas = document.createElement("canvas");
-    const size = Math.min(video.videoWidth, video.videoHeight);
-    canvas.width = size;
-    canvas.height = size;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
     const context = canvas.getContext("2d");
     if (!context) return;
-    const sx = (video.videoWidth - size) / 2;
-    const sy = (video.videoHeight - size) / 2;
-    context.drawImage(video, sx, sy, size, size, 0, 0, size, size);
+    context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
     setCapturedBlob(await blobFromCanvas(canvas));
     stopCamera();
   }
@@ -174,8 +159,11 @@ export default function DailyPhotoPage() {
   }
 
   function addSticker(sticker: PackAsset) {
-    setOverlays((current) => addStickerOverlay(current, { packId: sticker.packId, assetId: sticker.id }));
-    setSelectedOverlayId(null);
+    setOverlays((current) => {
+      const next = addStickerOverlay(current, { packId: sticker.packId, assetId: sticker.id });
+      setSelectedOverlayId(next.stickers.at(-1)?.id ?? null);
+      return next;
+    });
   }
 
   function selectFrame(frame: PackAsset) {
@@ -189,8 +177,11 @@ export default function DailyPhotoPage() {
   }
 
   function addPackAsset(asset: PackAsset, assetKind: "speechBubbles" | "stamps" | "masks" | "effects") {
-    setOverlays((current) => addVisualOverlay(current, { packId: asset.packId, assetId: asset.id, assetKind }));
-    setSelectedOverlayId(null);
+    setOverlays((current) => {
+      const next = addVisualOverlay(current, { packId: asset.packId, assetId: asset.id, assetKind });
+      setSelectedOverlayId(next.stickers.at(-1)?.id ?? null);
+      return next;
+    });
   }
 
   function editPhoto(photo: DailyPhoto) {
@@ -219,12 +210,22 @@ export default function DailyPhotoPage() {
     }
   }
 
+  async function deletePhoto(photo: DailyPhoto) {
+    if (!window.confirm("¿Quieres borrar esta foto? No se podrá recuperar.")) return;
+    await dailyPhotoRepository.remove(photo.id);
+    if (editingPhotoId === photo.id) {
+      setCapturedBlob(null);
+      setEditingPhotoId(null);
+      setOverlays(clearOverlays());
+    }
+    await refreshPhotos();
+  }
+
   return (
     <section className="page-stack daily-photo-page">
       <PageHeader
-        eyebrow="Foto diaria"
-        title="Fotomaton diario"
-        description="Haz la foto de hoy, juega con stickers y sumala a tu album."
+        title="Foto diaria"
+        icon={<Camera size={22} />}
         backTo="/home"
         action={
           <Link className="icon-action" to="/daily-photo/timelapse" aria-label="Abrir timelapse">
@@ -240,10 +241,20 @@ export default function DailyPhotoPage() {
         </section>
       )}
 
-      <section className="recorder-panel">
-        <div className="sticker-stage">
+      <section className="photo-booth">
+        <div className="photo-booth__topline">
+          <span>La foto de hoy</span>
+          <span>{new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date())}</span>
+        </div>
+        <div className="photo-booth__frame">
+          <div className="sticker-stage" style={{ aspectRatio: cameraAspectRatio }}>
           {capturedUrl ? (
-            <img className="camera-preview" src={capturedUrl} alt="Foto capturada" />
+            <img
+              className="camera-preview"
+              src={capturedUrl}
+              alt="Foto capturada"
+              onLoad={(event) => setCameraAspectRatio(`${event.currentTarget.naturalWidth} / ${event.currentTarget.naturalHeight}`)}
+            />
           ) : (
             <video ref={videoRef} className="camera-preview" muted playsInline />
           )}
@@ -272,16 +283,17 @@ export default function DailyPhotoPage() {
               setSelectedOverlayId(null);
             }}
           />
+          </div>
         </div>
 
-        <div className="recorder-panel__actions">
+        <div className="photo-booth__controls">
           {!capturedBlob ? (
             <>
               <button className="secondary-action" type="button" onClick={() => void startCamera()}>
-                <Camera size={18} /> Abrir camara
+                <Camera size={18} /> Abrir cámara
               </button>
-              <button className="primary-action" type="button" onClick={() => void capturePhoto()}>
-                <Camera size={18} /> Capturar
+              <button className="photo-shutter" type="button" onClick={() => void capturePhoto()} aria-label="Capturar foto">
+                <span><Camera size={22} /></span>
               </button>
             </>
           ) : (
@@ -299,55 +311,18 @@ export default function DailyPhotoPage() {
 
       {(capturedBlob || !editingPhotoId) && (
         <>
-          <label className="form-panel">
-            Frase de la foto
-            <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Opcional" />
+          <label className="photo-caption">
+            <span>Pie de foto</span>
+            <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="¿Qué quieres recordar?" />
           </label>
-          <StickerTray stickers={activePack?.stickers ?? []} onSelect={addSticker} />
-          <FrameTray
-            frames={activePack?.frames ?? []}
-            onSelect={selectFrame}
-            onClear={() => {
-              setOverlays((current) => setFrameOverlay(current));
-              setSelectedOverlayId(null);
-            }}
-          />
-          <AssetTray
-            label="Filtros del pack activo"
-            emptyTitle="Sin filtros"
-            emptyDescription="El pack activo no tiene filtros disponibles."
-            assets={activePack?.filters ?? []}
-            onSelect={selectFilter}
-            onClear={() => setOverlays((current) => setFilterOverlay(current))}
-            clearLabel="Sin filtro"
-          />
-          <AssetTray
-            label="Bocadillos del pack activo"
-            emptyTitle="Sin bocadillos"
-            emptyDescription="El pack activo no tiene bocadillos disponibles."
-            assets={activePack?.speechBubbles ?? []}
-            onSelect={(asset) => addPackAsset(asset, "speechBubbles")}
-          />
-          <AssetTray
-            label="Sellos del pack activo"
-            emptyTitle="Sin sellos"
-            emptyDescription="El pack activo no tiene sellos disponibles."
-            assets={activePack?.stamps ?? []}
-            onSelect={(asset) => addPackAsset(asset, "stamps")}
-          />
-          <AssetTray
-            label="Mascaras del pack activo"
-            emptyTitle="Sin mascaras"
-            emptyDescription="El pack activo no tiene mascaras disponibles."
-            assets={activePack?.masks ?? []}
-            onSelect={(asset) => addPackAsset(asset, "masks")}
-          />
-          <AssetTray
-            label="Efectos del pack activo"
-            emptyTitle="Sin efectos"
-            emptyDescription="El pack activo no tiene efectos disponibles."
-            assets={activePack?.effects ?? []}
-            onSelect={(asset) => addPackAsset(asset, "effects")}
+          <VisualToolCarousel
+            pack={activePack}
+            onSticker={addSticker}
+            onFrame={selectFrame}
+            onFilter={selectFilter}
+            onVisual={addPackAsset}
+            onClearFrame={() => { setOverlays((current) => setFrameOverlay(current)); setSelectedOverlayId(null); }}
+            onClearFilter={() => setOverlays((current) => setFilterOverlay(current))}
           />
         </>
       )}
@@ -363,7 +338,7 @@ export default function DailyPhotoPage() {
       ) : (
         <div className="photo-grid">
           {photos.map((photo) => (
-            <PhotoThumb key={photo.id} photo={photo} onEdit={editPhoto} />
+            <PhotoThumb key={photo.id} photo={photo} onEdit={editPhoto} onDelete={(item) => void deletePhoto(item)} />
           ))}
         </div>
       )}
