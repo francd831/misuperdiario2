@@ -11,7 +11,7 @@ const items = [
 
 export function BottomNavigation() {
   return (
-    <nav className="bottom-nav" aria-label="Navegacion principal">
+    <nav className="bottom-nav" aria-label="Navegación principal">
       {items.map(({ to, label, icon: Icon }) => (
         <NavLink key={to} to={to} className="bottom-nav__item">
           <Icon aria-hidden="true" size={20} strokeWidth={2.4} />

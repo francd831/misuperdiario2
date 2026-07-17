@@ -1,4 +1,4 @@
-import { dbGet, dbListByIndex, dbSet } from "../storage/db";
+import { dbDelete, dbGet, dbListByIndex, dbSet } from "../storage/db";
 import type { CreateMediaEntryInput, CreateTextEntryInput, DiaryEntry, EntryType } from "./types";
 import type { OverlayProject } from "../overlays/types";
 
@@ -32,6 +32,10 @@ export const entryRepository = {
   async countTodayByType(profileId: string, type: EntryType) {
     const entries = await dbListByIndex("entries", "by-profile-date", [profileId, today()]);
     return entries.filter((entry) => entry.type === type).length;
+  },
+
+  async remove(id: string) {
+    await dbDelete("entries", id);
   },
 
   async createTextEntry(input: CreateTextEntryInput) {

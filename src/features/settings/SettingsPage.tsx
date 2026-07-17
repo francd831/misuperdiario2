@@ -1,10 +1,11 @@
-import { Camera, Gauge, HardDrive, Save, ShieldCheck, Timer } from "lucide-react";
+import { Camera, Gauge, HardDrive, Save, ShieldCheck, SlidersHorizontal, Timer } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { ProfileAvatarPreset } from "../../core/profiles/types";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
 import { PageHeader } from "../../shared/ui/PageHeader";
 import { ProfileAvatar, profileAvatarPresets } from "../../shared/ui/ProfileAvatar";
+import { MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "../../app/mascot/FloatingMascot";
 
 async function stopStream(stream?: MediaStream | null) {
   stream?.getTracks().forEach((track) => track.stop());
@@ -21,6 +22,7 @@ export default function SettingsPage() {
   const [cameraActive, setCameraActive] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [mascotVisible, setMascotVisible] = useState(() => localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
 
   useEffect(() => {
     if (!activeProfile) return;
@@ -46,7 +48,7 @@ export default function SettingsPage() {
       }
       setCameraActive(true);
     } catch {
-      setError("No se pudo abrir la camara.");
+      setError("No se pudo abrir la cámara.");
     }
   }
 
@@ -108,9 +110,8 @@ export default function SettingsPage() {
   return (
     <section className="page-stack settings-page">
       <PageHeader
-        eyebrow="Mochila"
-        title="Mochila segura"
-        description="Aqui veras el estado de tu espacio. Los limites importantes los cuida un adulto."
+        title="Ajustes"
+        icon={<SlidersHorizontal size={22} />}
         backTo="/home"
       />
 
@@ -128,7 +129,7 @@ export default function SettingsPage() {
               <input
                 inputMode="numeric"
                 maxLength={4}
-                placeholder="4 digitos"
+                placeholder="4 dígitos"
                 type="password"
                 value={pin}
                 onChange={(event) => setPin(event.target.value.replace(/\D/g, "").slice(0, 4))}
@@ -156,7 +157,7 @@ export default function SettingsPage() {
             )}
             <div className="actions-row">
               <button className="secondary-action" type="button" onClick={() => void startCamera()}>
-                <Camera size={18} /> Abrir camara
+                <Camera size={18} /> Abrir cámara
               </button>
               <button className="secondary-action" type="button" disabled={!cameraActive} onClick={() => void captureAvatarPhoto()}>
                 Sacar foto
@@ -173,9 +174,29 @@ export default function SettingsPage() {
         </form>
       )}
 
+      <section className="form-panel mascot-setting">
+        <div>
+          <h2>Mascota del pack</h2>
+          <p>Se mueve por la aplicación y puedes apartarla con el dedo.</p>
+        </div>
+        <label className="mascot-switch">
+          <span>{mascotVisible ? "Visible" : "Oculta"}</span>
+          <input
+            type="checkbox"
+            checked={mascotVisible}
+            onChange={(event) => {
+              const next = event.target.checked;
+              setMascotVisible(next);
+              localStorage.setItem(MASCOT_VISIBILITY_KEY, String(next));
+              window.dispatchEvent(new Event(MASCOT_VISIBILITY_EVENT));
+            }}
+          />
+        </label>
+      </section>
+
       <div className="grid-two">
-        <FeatureCard title="Tiempo" description="Videos y audios tienen limites para cuidar el espacio." icon={<Timer size={24} />} tone="mint" badge="regla" />
-        <FeatureCard title="Calidad" description="Fotos y videos se guardan con una calidad equilibrada." icon={<Gauge size={24} />} tone="sky" badge="media" />
+        <FeatureCard title="Tiempo" description="Vídeos y audios tienen límites para cuidar el espacio." icon={<Timer size={24} />} tone="mint" badge="regla" />
+        <FeatureCard title="Calidad" description="Fotos y vídeos se guardan con una calidad equilibrada." icon={<Gauge size={24} />} tone="sky" badge="media" />
         <FeatureCard title="Espacio" description="La app avisa antes de llenar el dispositivo." icon={<HardDrive size={24} />} tone="sun" badge="local" />
         <FeatureCard title="Privacidad" description="Tus recuerdos viven en este dispositivo." icon={<ShieldCheck size={24} />} tone="berry" badge="seguro" />
       </div>

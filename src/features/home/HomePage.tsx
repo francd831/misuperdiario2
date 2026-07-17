@@ -13,7 +13,7 @@ const actions = [
   {
     to: "/record/video",
     title: "Video",
-    description: "Graba una mini pelicula",
+    description: "Graba una mini película",
     image: actionVideo,
     className: "tool-button--berry",
     reward: "+15",
@@ -37,7 +37,7 @@ const actions = [
   {
     to: "/daily-photo",
     title: "Foto",
-    description: "Captura el dia",
+    description: "Captura el día",
     image: actionPhoto,
     className: "tool-button--sky",
     reward: "+10",
@@ -89,8 +89,8 @@ export default function HomePage() {
 
       <section className="daily-quest">
         <p className="daily-quest__copy">
-          <span className="quest-kicker"><Sparkles size={16} /> Mision de hoy</span>
-          <strong>Guarda un recuerdo</strong>
+          <span className="quest-kicker"><Sparkles size={16} /> Para hoy</span>
+          <strong>¿Qué te gustaría recordar?</strong>
         </p>
         <Link className="quest-reward" to="/daily-photo">
           <strong><Star size={18} fill="currentColor" /> +10</strong>

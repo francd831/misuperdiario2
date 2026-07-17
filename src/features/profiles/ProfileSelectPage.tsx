@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { ArrowRight, ShieldCheck, UserRoundPlus } from "lucide-react";
+import { ArrowRight, ShieldCheck, UserRoundPlus, UsersRound } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { FeatureCard } from "../../shared/ui/FeatureCard";
@@ -30,9 +30,8 @@ export default function ProfileSelectPage() {
   return (
     <section className="page-stack profiles-page">
       <PageHeader
-        eyebrow="Perfiles"
-        title="Elige jugador"
-        description="Cada jugador tiene sus recuerdos, estrellas y packs."
+        title="Perfiles"
+        icon={<UsersRound size={22} />}
         backTo="/"
       />
 
@@ -67,7 +66,7 @@ export default function ProfileSelectPage() {
             <input
               inputMode="numeric"
               maxLength={4}
-              placeholder="4 digitos"
+              placeholder="4 dígitos"
               type="password"
               value={pin}
               onChange={(event) => setPin(event.target.value.replace(/\D/g, "").slice(0, 4))}
@@ -85,7 +84,7 @@ export default function ProfileSelectPage() {
       <Link className="card-link" to="/admin">
         <FeatureCard
           title="Acceso adulto"
-          description="La administracion permite crear perfiles, configurar limites y hacer backups."
+          description="La administración permite crear perfiles, configurar límites y hacer copias de seguridad."
           icon={<ShieldCheck size={24} />}
           tone="sun"
           badge="admin"

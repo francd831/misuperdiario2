@@ -4,6 +4,7 @@ import { packLoader } from "../../core/packs/packLoader";
 import type { PackManifest } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { BottomNavigation } from "../navigation/BottomNavigation";
+import { FloatingMascot } from "../mascot/FloatingMascot";
 
 const routesWithoutNav = new Set(["/", "/profiles", "/admin"]);
 const fallbackPackId = "base";
@@ -55,6 +56,7 @@ export function AppLayout() {
       <main className="app-main">
         <Outlet />
       </main>
+      {showNav && activeProfile && <FloatingMascot packId={activePackId} profileId={activeProfile.id} />}
       {showNav && <BottomNavigation />}
     </div>
   );

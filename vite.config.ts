@@ -40,6 +40,14 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/~oauth/],
         runtimeCaching: [
           {
+            urlPattern: /\/assets\/.*-sprites-.*\.webp$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "floating-mascots",
+              expiration: { maxEntries: 24, maxAgeSeconds: 60 * 60 * 24 * 90 },
+            },
+          },
+          {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
             options: {

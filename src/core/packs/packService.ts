@@ -3,12 +3,19 @@ import { walletService } from "../wallet/walletService";
 import { entitlementRepository } from "./entitlementRepository";
 import { packLoader } from "./packLoader";
 
+// During local development every world is available for visual and mascot testing.
+// Production builds continue using the real entitlement and purchase flow.
+const previewAllPacks = import.meta.env.DEV || import.meta.env.VITE_PREVIEW_ALL_PACKS === "true";
+
 export const packService = {
   listPacks() {
     return packLoader.listPacksWithAssets();
   },
 
   async listUnlockedPackIds(profileId: string) {
+    if (previewAllPacks) {
+      return new Set(packLoader.listManifests().map((pack) => pack.id));
+    }
     const entitlements = await entitlementRepository.listByProfile(profileId);
     const freeIds = packLoader.listManifests().filter((pack) => pack.free).map((pack) => pack.id);
     return new Set([...freeIds, ...entitlements.map((item) => item.packId)]);
@@ -16,6 +23,7 @@ export const packService = {
 
   async isUnlocked(profileId: string, packId: string) {
     const pack = packLoader.getPack(packId);
+    if (previewAllPacks) return Boolean(pack);
     if (pack?.free) return true;
     return Boolean(await entitlementRepository.get(profileId, packId));
   },

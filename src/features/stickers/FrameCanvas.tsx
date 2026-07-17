@@ -2,6 +2,7 @@ import { normalizeOverlayProject } from "../../core/overlays/overlayProject";
 import type { FrameOverlay, OverlayProject } from "../../core/overlays/types";
 import type { PackWithAssets } from "../../core/packs/types";
 import { OverlayControls } from "./OverlayControls";
+import { useOverlayGestures } from "./useOverlayGestures";
 
 interface FrameCanvasProps {
   overlays?: OverlayProject;
@@ -23,9 +24,14 @@ export function FrameCanvas({ overlays, packs, editable = false, selected = fals
 
   const asset = packs.find((pack) => pack.manifest.id === frame.packId)?.frames.find((item) => item.id === frame.assetId);
   if (!asset) return null;
+  const gestures = useOverlayGestures({
+    x: frame.x, y: frame.y, scale: frame.scale, rotation: frame.rotation,
+    minScale: .5, maxScale: 2, onSelect, onUpdate: (patch) => onUpdate?.(patch),
+  });
 
   return (
     <span
+      {...(editable ? gestures : {})}
       aria-hidden={!editable}
       style={{
         position: "absolute",
@@ -36,6 +42,8 @@ export function FrameCanvas({ overlays, packs, editable = false, selected = fals
         width: "100%",
         height: "100%",
         pointerEvents: editable && selected ? "auto" : "none",
+        touchAction: "none",
+        cursor: editable ? "grab" : "default",
         outline: selected ? "3px solid rgba(255,255,255,0.95)" : undefined,
         borderRadius: selected ? 14 : undefined,
       }}

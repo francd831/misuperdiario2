@@ -16,7 +16,7 @@ function cutoffForRange(range: string) {
 
 function CurrentPhoto({ photo }: { photo?: DailyPhoto }) {
   const url = useObjectUrl(photo?.blob);
-  if (!photo || !url) return <div className="media-placeholder">Sin fotos todavia</div>;
+  if (!photo || !url) return <div className="media-placeholder">Todavía no hay fotos</div>;
 
   return (
     <div className="timelapse-frame">
@@ -69,9 +69,8 @@ export default function TimelapsePage() {
   return (
     <section className="page-stack timelapse-page">
       <PageHeader
-        eyebrow="Timelapse"
-        title="Pelicula de fotos"
-        description="Mira como cambia tu album dia a dia."
+        title="Tu película"
+        icon={<Play size={22} />}
         backTo="/daily-photo"
       />
 
@@ -107,8 +106,8 @@ export default function TimelapsePage() {
             Rango
             <select value={range} onChange={(event) => setRange(event.target.value)}>
               <option value="all">Todo</option>
-              <option value="30">30 dias</option>
-              <option value="90">90 dias</option>
+              <option value="30">30 días</option>
+              <option value="90">90 días</option>
               <option value="365">1 ano</option>
             </select>
           </label>
