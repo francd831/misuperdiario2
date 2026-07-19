@@ -3765,11 +3765,7 @@ p {
   align-items: center;
   justify-content: center;
   container-type: size;
-  background-image:
-    linear-gradient(rgba(10, 35, 53, .42), rgba(10, 35, 53, .5)),
-    var(--adventure-map);
-  background-position: center;
-  background-size: cover;
+  background: #0a2335;
 }
 
 .adventure-map-stage {
@@ -3816,5 +3812,30 @@ p {
   .adventure-map-stage {
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
+  }
+}
+
+/* Desktop PWAs can open in a nearly square window. Keep the game board panoramic
+   instead of stretching it to the available window height. */
+@media (min-width: 701px) and (min-height: 601px) {
+  .app-frame--home .app-main {
+    width: min(1400px, 100%);
+  }
+
+  .app-frame--home .adventure-home {
+    min-height: 0;
+    align-content: center;
+  }
+
+  .app-frame--home .adventure-board--premium {
+    width: 100%;
+    min-height: 0;
+    max-height: calc(100dvh - 150px);
+    aspect-ratio: 1848 / 856;
+  }
+
+  .app-frame--home .adventure-map-stage {
+    width: 100%;
+    height: 100%;
   }
 }
