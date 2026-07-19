@@ -3951,6 +3951,53 @@ p {
   }
 }
 
+/* Installed landscape tablets use dedicated 16:10 artwork and the complete
+   viewport. Keep this after the desktop PWA rules so touch devices do not
+   inherit the laptop letterbox layout. */
+@media (orientation: landscape) and (pointer: coarse) and (min-width: 701px) {
+  .app-frame--home .app-main {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .app-frame--home .bottom-nav {
+    display: none;
+  }
+
+  .app-frame--home .adventure-home,
+  .app-frame--home .adventure-board--premium {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .app-frame--home .adventure-board--premium {
+    border: 0;
+    border-radius: 0;
+    aspect-ratio: auto;
+  }
+
+  .app-frame--home .adventure-map-stage {
+    width: min(100vw, 160dvh);
+    height: min(100dvh, 62.5vw);
+    max-width: none;
+    max-height: none;
+    aspect-ratio: 8 / 5;
+    background-image:
+      linear-gradient(180deg, rgba(8, 25, 43, .1), transparent 20%),
+      var(--adventure-map-tablet);
+  }
+
+  .app-frame--home .adventure-hud {
+    top: max(7px, env(safe-area-inset-top));
+    right: max(9px, env(safe-area-inset-right));
+    left: max(9px, env(safe-area-inset-left));
+  }
+}
+
 /* Base-pack cinema: the illustrated location is the UI surface. */
 .record-page--video { background: transparent; }
 .record-page--video .cinema-studio {

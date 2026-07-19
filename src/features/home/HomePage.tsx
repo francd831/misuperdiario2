@@ -2,7 +2,9 @@ import { BookOpen, Download, LogOut, RotateCcw, Settings, Star } from "lucide-re
 import { useEffect, useState, type CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import adventureMap from "../../assets/home/adventure-map-premium.webp";
+import adventureMapTablet from "../../assets/home/adventure-map-premium-tablet.webp";
 import creativeRoom from "../../assets/home/creative-room-base.webp";
+import creativeRoomTablet from "../../assets/home/creative-room-base-tablet.webp";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
 import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
@@ -21,9 +23,9 @@ const basicWorlds: typeof adventureWorlds = [
   { id: "photo", to: "/daily-photo", title: "Rincón de fotos", action: "Foto", className: "adventure-world--photo" },
 ];
 
-const basicScene = { id: "room", background: creativeRoom, worlds: basicWorlds } as const;
+const basicScene = { id: "room", background: creativeRoom, tabletBackground: creativeRoomTablet, worlds: basicWorlds } as const;
 const homeScenes = {
-  aventuraPirata: { id: "pirate", background: adventureMap, worlds: adventureWorlds },
+  aventuraPirata: { id: "pirate", background: adventureMap, tabletBackground: adventureMapTablet, worlds: adventureWorlds },
 } as const;
 
 type InstallPromptEvent = Event & {
@@ -93,7 +95,14 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className={`adventure-board adventure-board--premium adventure-board--${scene.id}`} aria-label="Mundos de Mi Súper Diario" style={{ "--adventure-map": `url(${scene.background})` } as CSSProperties}>
+      <main
+        className={`adventure-board adventure-board--premium adventure-board--${scene.id}`}
+        aria-label="Mundos de Mi Súper Diario"
+        style={{
+          "--adventure-map": `url(${scene.background})`,
+          "--adventure-map-tablet": `url(${scene.tabletBackground})`,
+        } as CSSProperties}
+      >
         <div className="adventure-map-stage">
           {scene.worlds.map((world, index) => (
             <button
