@@ -45,6 +45,7 @@ describe("App shell", () => {
     renderAt("/home");
 
     expect(await screen.findByRole("heading", { name: "Hola, Luna" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Solete. Puedes moverlo por la pantalla." })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Navegación principal" })).toBeInTheDocument();
   });
 });

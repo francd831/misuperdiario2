@@ -1,4 +1,4 @@
-import { LogOut, RotateCcw, Star } from "lucide-react";
+import { Download, LogOut, RotateCcw, Star } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -6,20 +6,22 @@ import {
   MASCOT_TRAVEL_EVENT,
   type MascotTravelDetail,
 } from "../../app/mascot/FloatingMascot";
-import actionPhoto from "../../assets/home/action-photo.webp";
-import actionVideo from "../../assets/home/action-video.webp";
-import actionVoice from "../../assets/home/action-voice.webp";
-import actionWrite from "../../assets/home/action-write.webp";
+import adventureMap from "../../assets/home/adventure-map-premium.webp";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
 import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
 
 const worlds = [
-  { id: "video", to: "/record/video", title: "Vídeo", image: actionVideo, className: "adventure-world--video", reward: "+15" },
-  { id: "voice", to: "/record/audio", title: "Voz", image: actionVoice, className: "adventure-world--voice", reward: "+10" },
-  { id: "write", to: "/record/text", title: "Escribir", image: actionWrite, className: "adventure-world--write", reward: "+10" },
-  { id: "photo", to: "/daily-photo", title: "Foto", image: actionPhoto, className: "adventure-world--photo", reward: "+10" },
+  { id: "video", to: "/record/video", title: "Vídeo", className: "adventure-world--video", reward: "+15" },
+  { id: "voice", to: "/record/audio", title: "Voz", className: "adventure-world--voice", reward: "+10" },
+  { id: "write", to: "/record/text", title: "Escribir", className: "adventure-world--write", reward: "+10" },
+  { id: "photo", to: "/daily-photo", title: "Foto", className: "adventure-world--photo", reward: "+10" },
 ];
+
+type InstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
 
 export default function HomePage() {
   const { activeProfile, logout } = useProfiles();
@@ -28,6 +30,7 @@ export default function HomePage() {
   const pendingRoute = useRef<string>();
   const [balance, setBalance] = useState(0);
   const [travellingTo, setTravellingTo] = useState<string>();
+  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent>();
 
   useEffect(() => {
     if (!activeProfile) return;
@@ -39,6 +42,15 @@ export default function HomePage() {
     });
     return () => { alive = false; };
   }, [activeProfile]);
+
+  useEffect(() => {
+    const captureInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as InstallPromptEvent);
+    };
+    window.addEventListener("beforeinstallprompt", captureInstallPrompt);
+    return () => window.removeEventListener("beforeinstallprompt", captureInstallPrompt);
+  }, []);
 
   useEffect(() => {
     const handleArrival = (event: Event) => {
@@ -79,6 +91,18 @@ export default function HomePage() {
           <h1>{`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}</h1>
         </div>
         <div className="player-hud__actions">
+          {installPrompt && (
+            <button
+              className="round-action adventure-install"
+              type="button"
+              aria-label="Instalar aplicación"
+              onClick={() => {
+                void installPrompt.prompt().then(() => installPrompt.userChoice).finally(() => setInstallPrompt(undefined));
+              }}
+            >
+              <Download size={18} />
+            </button>
+          )}
           <Link className="coin-badge" to="/store" aria-label={`${balance} estrellas disponibles`}>
             <Star size={19} fill="currentColor" /><strong>{balance}</strong>
           </Link>
@@ -86,9 +110,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="adventure-board" aria-label="Mapa de mundos de Mi Súper Diario">
-        <div className="adventure-board__sky" aria-hidden="true"><i /><i /><i /></div>
-        <div className="adventure-path" aria-hidden="true"><i /><i /><i /></div>
+      <main className="adventure-board adventure-board--premium" aria-label="Mapa de mundos de Mi Súper Diario" style={{ "--adventure-map": `url(${adventureMap})` } as CSSProperties}>
         <p className="adventure-board__prompt">Elige tu próxima aventura</p>
         {worlds.map((world, index) => (
           <button
@@ -99,7 +121,7 @@ export default function HomePage() {
             aria-label={`Ir al mundo ${world.title}`}
             style={{ "--world-order": index } as CSSProperties}
           >
-            <span className="adventure-world__scene"><img src={world.image} alt="" /></span>
+            <span className="adventure-world__pin" aria-hidden="true"><i /></span>
             <span className="adventure-world__name">{world.title}</span>
             <span className="adventure-world__reward"><Star size={11} fill="currentColor" />{world.reward}</span>
           </button>
