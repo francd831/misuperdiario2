@@ -3036,3 +3036,103 @@ p {
     border-radius: 14px;
   }
 }
+
+/* Home is a single-screen mobile launcher: compact HUD plus a 2x2 action grid. */
+@media (max-width: 560px) {
+  .game-home {
+    gap: 10px;
+  }
+
+  .player-hud {
+    top: 8px;
+    min-height: 70px;
+    align-items: center;
+    border-radius: 24px;
+    padding: 8px;
+  }
+
+  .player-hud__profile,
+  .player-hud__actions {
+    gap: 8px;
+  }
+
+  .player-hud h1 {
+    max-width: 34vw;
+    overflow: hidden;
+    font-size: clamp(1.05rem, 5.4vw, 1.4rem);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .player-avatar {
+    width: 50px;
+    height: 50px;
+    border-width: 3px;
+    border-radius: 18px;
+  }
+
+  .coin-badge {
+    min-width: 62px;
+    min-height: 42px;
+    padding: 0 10px;
+  }
+
+  .coin-badge strong {
+    font-size: 1rem;
+  }
+
+  .round-action {
+    width: 42px;
+    height: 42px;
+    border-radius: 15px;
+  }
+
+  .tool-grid {
+    height: clamp(360px, calc(100dvh - 208px), 520px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .tool-button {
+    height: 100%;
+    min-height: 0;
+    border-radius: 22px;
+    padding: 6px;
+  }
+
+  .tool-scene {
+    height: 100%;
+    min-height: 0;
+    border-radius: 17px;
+  }
+
+  .tool-scene__image {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .tool-button__reward {
+    top: 8px;
+    right: 8px;
+    padding: 4px 7px;
+    font-size: 0.66rem;
+  }
+
+  .tool-button__copy {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .tool-button__title {
+    font-size: clamp(1.25rem, 6vw, 1.7rem);
+  }
+
+  .tool-button__description {
+    overflow: hidden;
+    font-size: 0.72rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

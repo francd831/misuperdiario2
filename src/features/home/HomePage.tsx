@@ -1,4 +1,4 @@
-import { LogOut, Sparkles, Star } from "lucide-react";
+import { LogOut, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import actionPhoto from "../../assets/home/action-photo.webp";
@@ -70,10 +70,7 @@ export default function HomePage() {
       <header className="player-hud">
         <div className="player-hud__profile">
           {activeProfile ? <ProfileAvatar profile={activeProfile} className="player-avatar" /> : <span className="player-avatar">?</span>}
-          <div>
-            <p className="eyebrow">Base secreta</p>
-            <h1>{`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}</h1>
-          </div>
+          <h1>{`Hola${activeProfile ? `, ${activeProfile.name}` : ""}`}</h1>
         </div>
 
         <div className="player-hud__actions">
@@ -86,16 +83,6 @@ export default function HomePage() {
           </button>
         </div>
       </header>
-
-      <section className="daily-quest">
-        <p className="daily-quest__copy">
-          <span className="quest-kicker"><Sparkles size={16} /> Para hoy</span>
-          <strong>¿Qué te gustaría recordar?</strong>
-        </p>
-        <Link className="quest-reward" to="/daily-photo">
-          <strong><Star size={18} fill="currentColor" /> +10</strong>
-        </Link>
-      </section>
 
       <nav className="tool-grid" aria-label="Herramientas para crear recuerdos">
         {actions.map((action) => (
