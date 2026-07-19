@@ -120,9 +120,7 @@ export default function HomePage() {
               onClick={(event) => visitWorld(event, world)}
               aria-label={`${world.action}: ${world.title}`}
               style={{ "--world-order": index } as CSSProperties}
-            >
-              <span className="adventure-world__name adventure-world__sign">{world.title}</span>
-            </button>
+            />
           ))}
         </div>
       </main>
