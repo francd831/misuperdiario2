@@ -111,7 +111,6 @@ export default function HomePage() {
       </header>
 
       <main className="adventure-board adventure-board--premium" aria-label="Mapa de mundos de Mi Súper Diario" style={{ "--adventure-map": `url(${adventureMap})` } as CSSProperties}>
-        <p className="adventure-board__prompt">Elige tu próxima aventura</p>
         {worlds.map((world, index) => (
           <button
             key={world.id}
