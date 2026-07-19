@@ -12,10 +12,10 @@ import { walletService } from "../../core/wallet/walletService";
 import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
 
 const worlds = [
-  { id: "video", to: "/record/video", title: "Vídeo", className: "adventure-world--video", reward: "+15" },
-  { id: "voice", to: "/record/audio", title: "Voz", className: "adventure-world--voice", reward: "+10" },
-  { id: "write", to: "/record/text", title: "Escribir", className: "adventure-world--write", reward: "+10" },
-  { id: "photo", to: "/daily-photo", title: "Foto", className: "adventure-world--photo", reward: "+10" },
+  { id: "video", to: "/record/video", title: "Vídeo", className: "adventure-world--video" },
+  { id: "voice", to: "/record/audio", title: "Voz", className: "adventure-world--voice" },
+  { id: "write", to: "/record/text", title: "Escribir", className: "adventure-world--write" },
+  { id: "photo", to: "/daily-photo", title: "Foto", className: "adventure-world--photo" },
 ];
 
 type InstallPromptEvent = Event & {
@@ -122,7 +122,6 @@ export default function HomePage() {
           >
             <span className="adventure-world__pin" aria-hidden="true"><i /></span>
             <span className="adventure-world__name">{world.title}</span>
-            <span className="adventure-world__reward"><Star size={11} fill="currentColor" />{world.reward}</span>
           </button>
         ))}
       </main>
