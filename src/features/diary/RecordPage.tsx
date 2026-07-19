@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { LockKeyhole, Mic, Pause, PenLine, Play, RotateCcw, Save, Square, Trash2, Video, X } from "lucide-react";
+import { ArrowLeft, Clapperboard, Film, LockKeyhole, Mic, Pause, PenLine, Play, RotateCcw, Save, Square, Trash2, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -24,6 +24,7 @@ import { storagePolicyRepository } from "../../core/settings/storagePolicyReposi
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { PageHeader } from "../../shared/ui/PageHeader";
 import recordingMicrophone from "../../assets/recording-microphone.png";
+import cinemaMemoriesBase from "../../assets/recording/cinema-memories-base.webp";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -78,6 +79,7 @@ export default function RecordPage() {
   const [elapsed, setElapsed] = useState(0);
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [saveSheetOpen, setSaveSheetOpen] = useState(false);
+  const [effectsOpen, setEffectsOpen] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
   const [todayVideos, setTodayVideos] = useState<DiaryEntry[]>([]);
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
@@ -308,46 +310,38 @@ export default function RecordPage() {
 
     return (
       <section className={`page-stack record-page record-page--${entryType}`}>
-        <PageHeader
-          title={labels[entryType]}
-          icon={entryType === "video" ? <Video size={22} /> : <Mic size={22} />}
-          backTo="/home"
-        />
+        {entryType !== "video" && (
+          <PageHeader title={labels[entryType]} icon={<Mic size={22} />} backTo="/home" />
+        )}
 
-        <section className={`capture-studio capture-studio--${entryType}`}>
+        <section className={`capture-studio capture-studio--${entryType} ${entryType === "video" ? "cinema-studio" : ""}`} data-pack={activePack?.manifest.id ?? "base"}>
           {entryType === "video" ? (
-            <div className="video-viewfinder">
-              <div className="video-viewfinder__meta">
-                <span className={recording && !paused ? "is-live" : ""}>{recording ? (paused ? "En pausa" : "Grabando") : "Tu cámara"}</span>
-                <span>{dailyCount}/{dailyMax ?? "-"} hoy</span>
-              </div>
-              <div className="sticker-stage">
+            <div className="cinema-stage" style={{ backgroundImage: `url(${cinemaMemoriesBase})` }}>
+              <button className="cinema-stage__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
+              <span className="cinema-stage__ticket">{dailyCount}/{dailyMax ?? "-"} hoy</span>
+              <div className="video-viewfinder cinema-screen">
+                <div className="video-viewfinder__meta">
+                  <span className={recording && !paused ? "is-live" : ""}>{recording ? (paused ? "Rodaje en pausa" : "Rodando") : previewUrl ? "Tu película" : "Pantalla preparada"}</span>
+                  <span>{formatSeconds(elapsed)}</span>
+                </div>
+                <div className="sticker-stage">
                 <video ref={videoPreviewRef} src={previewUrl} controls={Boolean(previewUrl)} muted={recording} playsInline />
-              <FilterCanvas overlays={overlays} packs={packs} />
-              <StickerCanvas
-                overlays={overlays}
-                packs={packs}
-                editable
-                selectedId={typeof selectedOverlayId === "string" && selectedOverlayId !== "frame" ? selectedOverlayId : undefined}
-                onSelect={setSelectedOverlayId}
-                onUpdate={(overlayId, patch) => setOverlays((current) => updateStickerOverlay(current, overlayId, patch))}
-                onRemove={(overlayId) => {
-                  setOverlays((current) => removeStickerOverlay(current, overlayId));
-                  setSelectedOverlayId(null);
-                }}
-              />
-              <FrameCanvas
-                overlays={overlays}
-                packs={packs}
-                editable
-                selected={selectedOverlayId === "frame"}
-                onSelect={() => setSelectedOverlayId("frame")}
-                onUpdate={(patch) => setOverlays((current) => updateFrameOverlay(current, patch))}
-                onRemove={() => {
-                  setOverlays((current) => setFrameOverlay(current));
-                  setSelectedOverlayId(null);
-                }}
-              />
+                  {!recording && !previewUrl && <div className="cinema-screen__empty" aria-hidden="true"><Film size={38} /><span>Prepara tu escena</span></div>}
+                  <FilterCanvas overlays={overlays} packs={packs} />
+                  <StickerCanvas
+                    overlays={overlays} packs={packs} editable
+                    selectedId={typeof selectedOverlayId === "string" && selectedOverlayId !== "frame" ? selectedOverlayId : undefined}
+                    onSelect={setSelectedOverlayId}
+                    onUpdate={(overlayId, patch) => setOverlays((current) => updateStickerOverlay(current, overlayId, patch))}
+                    onRemove={(overlayId) => { setOverlays((current) => removeStickerOverlay(current, overlayId)); setSelectedOverlayId(null); }}
+                  />
+                  <FrameCanvas
+                    overlays={overlays} packs={packs} editable selected={selectedOverlayId === "frame"}
+                    onSelect={() => setSelectedOverlayId("frame")}
+                    onUpdate={(patch) => setOverlays((current) => updateFrameOverlay(current, patch))}
+                    onRemove={() => { setOverlays((current) => setFrameOverlay(current)); setSelectedOverlayId(null); }}
+                  />
+                </div>
               </div>
             </div>
           ) : (
@@ -370,24 +364,33 @@ export default function RecordPage() {
             </div>
           )}
 
+          {entryType === "video" ? (
+            <div className="cinema-console">
+              <button className={`cinema-effects ${effectsOpen ? "is-open" : ""}`} type="button" onClick={() => setEffectsOpen((open) => !open)} aria-expanded={effectsOpen}>
+                <Clapperboard size={19} /> Efectos
+              </button>
+              <p className="cinema-console__timer" aria-live="polite">{formatSeconds(elapsed)} <span>{maxSeconds ? `/ ${formatSeconds(maxSeconds)}` : ""}</span></p>
+              <div className="cinema-console__actions">
+                {!recording && !mediaBlob ? (
+                  <button className="cinema-record" type="button" onClick={() => void startRecording()} aria-label="Empezar a grabar"><span /></button>
+                ) : recording ? (
+                  <>
+                    <button className="cinema-control" type="button" onClick={togglePause} aria-label={paused ? "Continuar" : "Pausa"}>{paused ? <Play size={20} fill="currentColor" /> : <Pause size={20} fill="currentColor" />}</button>
+                    <button className="cinema-control cinema-control--stop" type="button" onClick={stopRecording} aria-label="Detener"><Square size={18} fill="currentColor" /></button>
+                  </>
+                ) : (
+                  <>
+                    <button className="cinema-action" type="button" onClick={() => setMediaBlob(null)}><RotateCcw size={18} /> Repetir</button>
+                    <button className="cinema-action cinema-action--save" type="button" onClick={() => setSaveSheetOpen(true)}><Save size={18} /> Guardar</button>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
           <div className="capture-controls">
             <p className="capture-controls__timer" aria-live="polite">
               {formatSeconds(elapsed)} <span>{maxSeconds ? `/ ${formatSeconds(maxSeconds)}` : ""}</span>
             </p>
-            {entryType === "video" && (!recording && !mediaBlob ? (
-              <button className="primary-action" type="button" onClick={() => void startRecording()}>
-                <Video size={18} /> Grabar
-              </button>
-            ) : recording ? (
-              <>
-                <button className="secondary-action" type="button" onClick={togglePause}>
-                  {paused ? <Play size={18} fill="currentColor" /> : <Pause size={18} fill="currentColor" />} {paused ? "Continuar" : "Pausa"}
-                </button>
-                <button className="capture-stop" type="button" onClick={stopRecording}>
-                  <Square size={17} fill="currentColor" /> Detener
-                </button>
-              </>
-            ) : null)}
             {entryType === "audio" && recording && (
               <button className="secondary-action" type="button" onClick={togglePause}>
                 {paused ? <Play size={18} fill="currentColor" /> : <Pause size={18} fill="currentColor" />} {paused ? "Continuar" : "Pausa"}
@@ -404,18 +407,21 @@ export default function RecordPage() {
               </>
             )}
           </div>
+          )}
         </section>
 
-        {entryType === "video" && (
-          <VisualToolCarousel
-            pack={activePack}
-            onSticker={addSticker}
-            onFrame={selectFrame}
-            onFilter={selectFilter}
-            onVisual={addPackAsset}
-            onClearFrame={() => { setOverlays((current) => setFrameOverlay(current)); setSelectedOverlayId(null); }}
-            onClearFilter={() => setOverlays((current) => setFilterOverlay(current))}
-          />
+        {entryType === "video" && effectsOpen && (
+          <section className="cinema-effects-drawer" aria-label="Mesa de efectos">
+            <VisualToolCarousel
+              pack={activePack}
+              onSticker={addSticker}
+              onFrame={selectFrame}
+              onFilter={selectFilter}
+              onVisual={addPackAsset}
+              onClearFrame={() => { setOverlays((current) => setFrameOverlay(current)); setSelectedOverlayId(null); }}
+              onClearFilter={() => setOverlays((current) => setFilterOverlay(current))}
+            />
+          </section>
         )}
 
         {entryType === "video" && todayVideos.length > 0 && (
