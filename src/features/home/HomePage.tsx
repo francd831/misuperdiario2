@@ -1,4 +1,4 @@
-import { Download, LogOut, RotateCcw, Star } from "lucide-react";
+import { BookOpen, Download, LogOut, RotateCcw, Settings, Star } from "lucide-react";
 import { useEffect, useState, type CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import adventureMap from "../../assets/home/adventure-map-premium.webp";
@@ -84,9 +84,11 @@ export default function HomePage() {
               <Download size={18} />
             </button>
           )}
+          <Link className="round-action" to="/diary" aria-label="Diario"><BookOpen size={19} /></Link>
           <Link className="coin-badge" to="/store" aria-label={`${balance} estrellas disponibles`}>
             <Star size={19} fill="currentColor" /><strong>{balance}</strong>
           </Link>
+          <Link className="round-action" to="/settings" aria-label="Ajustes"><Settings size={18} /></Link>
           <button className="round-action" type="button" aria-label="Salir" onClick={() => void logout()}><LogOut size={18} /></button>
         </div>
       </header>

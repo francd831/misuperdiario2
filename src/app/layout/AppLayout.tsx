@@ -3,10 +3,9 @@ import { Outlet, useLocation } from "react-router-dom";
 import { packLoader } from "../../core/packs/packLoader";
 import type { PackManifest } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
-import { BottomNavigation } from "../navigation/BottomNavigation";
 import { FloatingMascot } from "../mascot/FloatingMascot";
 
-const routesWithoutNav = new Set(["/", "/profiles", "/admin"]);
+const routesWithoutMascot = new Set(["/", "/profiles", "/admin"]);
 const fallbackPackId = "base";
 
 type ThemeVariables = CSSProperties & Record<`--${string}`, string>;
@@ -46,7 +45,7 @@ function themeVariables(pack: PackManifest | undefined): ThemeVariables {
 export function AppLayout() {
   const { activeProfile } = useProfiles();
   const location = useLocation();
-  const showNav = !routesWithoutNav.has(location.pathname);
+  const showMascot = !routesWithoutMascot.has(location.pathname);
   const activePackId = activeProfile?.activePackId ?? fallbackPackId;
   const activePack = packLoader.getPack(activePackId) ?? packLoader.getPack(fallbackPackId);
   const style = useMemo(() => themeVariables(activePack), [activePack]);
@@ -56,8 +55,7 @@ export function AppLayout() {
       <main className="app-main">
         <Outlet />
       </main>
-      {showNav && activeProfile && <FloatingMascot packId={activePackId} profileId={activeProfile.id} />}
-      {showNav && <BottomNavigation />}
+      {showMascot && activeProfile && <FloatingMascot packId={activePackId} profileId={activeProfile.id} />}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Play, RotateCcw, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Camera, Play, RotateCcw, Save, SlidersHorizontal, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
@@ -23,7 +23,7 @@ import { useProfiles } from "../../core/profiles/ProfileContext";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
-import { PageHeader } from "../../shared/ui/PageHeader";
+import photoCornerBase from "../../assets/recording/photo-corner-base.webp";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -63,6 +63,7 @@ export default function DailyPhotoPage() {
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
+  const [effectsOpen, setEffectsOpen] = useState(false);
   const [cameraAspectRatio, setCameraAspectRatio] = useState("1 / 1");
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
@@ -223,30 +224,11 @@ export default function DailyPhotoPage() {
 
   return (
     <section className="page-stack daily-photo-page">
-      <PageHeader
-        title="Foto diaria"
-        icon={<Camera size={22} />}
-        backTo="/home"
-        action={
-          <Link className="icon-action" to="/daily-photo/timelapse" aria-label="Abrir timelapse">
-            <Play size={18} />
-          </Link>
-        }
-      />
-
-      {hasToday && !capturedBlob && (
-        <section className="status-panel">
-          <h2>Ya tienes foto de hoy</h2>
-          <p>{policy?.allowDailyPhotoReplacement ? "Puedes repetirla si quieres otra toma." : "La foto de hoy ya esta guardada."}</p>
-        </section>
-      )}
-
-      <section className="photo-booth">
-        <div className="photo-booth__topline">
-          <span>La foto de hoy</span>
-          <span>{new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date())}</span>
-        </div>
-        <div className="photo-booth__frame">
+      <section className="photo-room" style={{ backgroundImage: `url(${photoCornerBase})` }}>
+        <Link className="world-scene__back" to="/home" aria-label="Volver a la habitación"><ArrowLeft size={22} /></Link>
+        <Link className="photo-room__timelapse" to="/daily-photo/timelapse" aria-label="Abrir timelapse"><Play size={18} /></Link>
+        {hasToday && !capturedBlob && <span className="photo-room__today">Foto de hoy guardada</span>}
+        <div className="photo-room__preview">
           <div className="sticker-stage" style={{ aspectRatio: cameraAspectRatio }}>
           {capturedUrl ? (
             <img
@@ -286,7 +268,8 @@ export default function DailyPhotoPage() {
           </div>
         </div>
 
-        <div className="photo-booth__controls">
+        <div className="photo-room__controls">
+          <button className={`photo-room__effects ${effectsOpen ? "is-open" : ""}`} type="button" onClick={() => setEffectsOpen((open) => !open)} aria-label="Efectos" aria-expanded={effectsOpen}><SlidersHorizontal size={18} /></button>
           {!capturedBlob ? (
             <>
               <button className="secondary-action" type="button" onClick={() => void startCamera()}>
@@ -315,15 +298,17 @@ export default function DailyPhotoPage() {
             <span>Pie de foto</span>
             <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="¿Qué quieres recordar?" />
           </label>
-          <VisualToolCarousel
-            pack={activePack}
-            onSticker={addSticker}
-            onFrame={selectFrame}
-            onFilter={selectFilter}
-            onVisual={addPackAsset}
-            onClearFrame={() => { setOverlays((current) => setFrameOverlay(current)); setSelectedOverlayId(null); }}
-            onClearFilter={() => setOverlays((current) => setFilterOverlay(current))}
-          />
+          {effectsOpen && (
+            <VisualToolCarousel
+              pack={activePack}
+              onSticker={addSticker}
+              onFrame={selectFrame}
+              onFilter={selectFilter}
+              onVisual={addPackAsset}
+              onClearFrame={() => { setOverlays((current) => setFrameOverlay(current)); setSelectedOverlayId(null); }}
+              onClearFilter={() => setOverlays((current) => setFilterOverlay(current))}
+            />
+          )}
         </>
       )}
 

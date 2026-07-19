@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Clapperboard, Film, LockKeyhole, Mic, Pause, PenLine, Play, RotateCcw, Save, Square, Trash2, X } from "lucide-react";
+import { ArrowLeft, Clapperboard, Film, LockKeyhole, Pause, Play, RotateCcw, Save, Square, Trash2, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -22,19 +22,13 @@ import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
-import { PageHeader } from "../../shared/ui/PageHeader";
-import recordingMicrophone from "../../assets/recording-microphone.png";
 import cinemaMemoriesBase from "../../assets/recording/cinema-memories-base.webp";
+import storyDeskBase from "../../assets/recording/story-desk-base.webp";
+import voiceStudioBase from "../../assets/recording/voice-studio-base.webp";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
 import { VisualToolCarousel } from "../stickers/VisualToolCarousel";
-
-const labels: Record<string, string> = {
-  video: "Vídeo",
-  audio: "Voz",
-  text: "Escribir",
-};
 
 function formatSeconds(seconds: number) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -310,10 +304,6 @@ export default function RecordPage() {
 
     return (
       <section className={`page-stack record-page record-page--${entryType}`}>
-        {entryType !== "video" && (
-          <PageHeader title={labels[entryType]} icon={<Mic size={22} />} backTo="/home" />
-        )}
-
         <section className={`capture-studio capture-studio--${entryType} ${entryType === "video" ? "cinema-studio" : ""}`} data-pack={activePack?.manifest.id ?? "base"}>
           {entryType === "video" ? (
             <div className="cinema-stage" style={{ backgroundImage: `url(${cinemaMemoriesBase})` }}>
@@ -345,21 +335,33 @@ export default function RecordPage() {
               </div>
             </div>
           ) : (
-            <div className="voice-studio">
+            <div className="voice-room" style={{ backgroundImage: `url(${voiceStudioBase})` }}>
+              <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
+              <span className="world-scene__counter">{dailyCount}/{dailyMax ?? "-"} hoy</span>
               <button
-                className={`voice-studio__art ${recording && !paused ? "is-recording" : ""}`}
+                className={`voice-room__mic ${recording && !paused ? "is-recording" : ""}`}
                 type="button"
                 onClick={() => recording ? stopRecording() : void startRecording()}
                 aria-label={recording ? "Detener grabación de voz" : "Iniciar grabación de voz"}
                 aria-pressed={recording}
               >
-                <span className="voice-studio__wave" aria-hidden="true"><i /><i /><i /><i /><i /></span>
-                <img src={recordingMicrophone} alt="" />
+                <span className="voice-room__pulse" aria-hidden="true" />
               </button>
-              <div className="voice-studio__content">
-                {(recording || mediaBlob) && <p className="voice-studio__state">{recording ? (paused ? "En pausa" : "Grabando") : "Grabación lista"}</p>}
-                <p className="voice-studio__limit">Máximo {formatSeconds(maxSeconds ?? 0)} · {dailyCount}/{dailyMax ?? "-"} hoy</p>
+              <div className="voice-room__console">
+                <p className="voice-room__timer" aria-live="polite">{formatSeconds(elapsed)} <span>/ {formatSeconds(maxSeconds ?? 0)}</span></p>
+                {recording && (
+                  <button className="voice-room__control" type="button" onClick={togglePause} aria-label={paused ? "Continuar" : "Pausa"}>
+                    {paused ? <Play size={19} fill="currentColor" /> : <Pause size={19} fill="currentColor" />}
+                  </button>
+                )}
                 {previewUrl && <audio src={previewUrl} controls />}
+                {mediaBlob && (
+                  <div className="voice-room__actions">
+                    <button type="button" onClick={() => setMediaBlob(null)}><RotateCcw size={17} /> Repetir</button>
+                    <button type="button" onClick={() => setSaveSheetOpen(true)}><Save size={17} /> Guardar</button>
+                  </div>
+                )}
+                <small>Máximo {formatSeconds(maxSeconds ?? 0)}</small>
               </div>
             </div>
           )}
@@ -386,28 +388,7 @@ export default function RecordPage() {
                 )}
               </div>
             </div>
-          ) : (
-          <div className="capture-controls">
-            <p className="capture-controls__timer" aria-live="polite">
-              {formatSeconds(elapsed)} <span>{maxSeconds ? `/ ${formatSeconds(maxSeconds)}` : ""}</span>
-            </p>
-            {entryType === "audio" && recording && (
-              <button className="secondary-action" type="button" onClick={togglePause}>
-                {paused ? <Play size={18} fill="currentColor" /> : <Pause size={18} fill="currentColor" />} {paused ? "Continuar" : "Pausa"}
-              </button>
-            )}
-            {mediaBlob && (
-              <>
-                <button className="secondary-action" type="button" onClick={() => setMediaBlob(null)}>
-                  <RotateCcw size={18} /> Repetir
-                </button>
-                <button className="primary-action" type="button" onClick={() => setSaveSheetOpen(true)}>
-                  <Save size={18} /> Guardar
-                </button>
-              </>
-            )}
-          </div>
-          )}
+          ) : null}
         </section>
 
         {entryType === "video" && effectsOpen && (
@@ -483,39 +464,33 @@ export default function RecordPage() {
 
   return (
     <section className="page-stack record-page record-page--text">
-      <PageHeader
-        title={labels.text}
-        icon={<PenLine size={22} />}
-        backTo="/home"
-      />
-
-      <form className="diary-editor" onSubmit={handleTextSubmit}>
-        <div className="diary-sheet">
-          <div className="diary-sheet__binding" aria-hidden="true" />
-          <p className="diary-sheet__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</p>
+      <form className="story-room" style={{ backgroundImage: `url(${storyDeskBase})` }} onSubmit={handleTextSubmit}>
+        <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
+        <div className="story-room__page">
+          <p className="story-room__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</p>
           <label className="visually-hidden" htmlFor="diary-title">Título</label>
-          <input id="diary-title" className="diary-sheet__title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Título de hoy" />
+          <input id="diary-title" className="story-room__title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Título de hoy" />
           <label className="visually-hidden" htmlFor="diary-note">Texto</label>
           <textarea
             id="diary-note"
-            className="diary-sheet__note"
+            className="story-room__note"
             value={note}
             onChange={(event) => setNote(event.target.value)}
             placeholder="Querido diario..."
-            rows={12}
+            rows={9}
             required
           />
-          <span className="diary-sheet__page">{note.length} letras</span>
+          <span className="story-room__letters">{note.length} letras</span>
         </div>
 
-        <div className="diary-editor__footer">
-          <label className="inline-check diary-lock">
+        <div className="story-room__tools">
+          <label className="story-room__lock">
             <input type="checkbox" checked={isLocked} onChange={(event) => setIsLocked(event.target.checked)} />
-            Guardar en la cápsula del tiempo
+            <LockKeyhole size={17} /> Cápsula del tiempo
           </label>
 
           {isLocked && (
-            <label className="diary-unlock">
+            <label className="story-room__unlock">
               Abrir el
               <input value={unlockAt} onChange={(event) => setUnlockAt(event.target.value)} type="date" />
             </label>
@@ -523,7 +498,7 @@ export default function RecordPage() {
 
           {error && <p className="form-error">{error}</p>}
 
-          <button className="primary-action" type="submit">
+          <button className="story-room__save" type="submit">
             <Save size={18} /> Guardar página
           </button>
         </div>
