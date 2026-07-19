@@ -52,7 +52,7 @@ export function AppLayout() {
   const style = useMemo(() => themeVariables(activePack), [activePack]);
 
   return (
-    <div className="app-frame" data-pack-theme={activePack?.id ?? fallbackPackId} style={style}>
+    <div className={`app-frame ${location.pathname === "/home" ? "app-frame--home" : ""}`} data-pack-theme={activePack?.id ?? fallbackPackId} style={style}>
       <main className="app-main">
         <Outlet />
       </main>

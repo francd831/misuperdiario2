@@ -3037,6 +3037,302 @@ p {
   }
 }
 
+/* Panoramic adventure map */
+.adventure-home {
+  position: relative;
+  min-height: calc(100dvh - 126px);
+}
+
+.rotate-device {
+  display: none;
+}
+
+.adventure-hud {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 12;
+  min-height: 52px;
+  border: 0;
+  border-bottom: 3px solid rgba(255, 255, 255, .28);
+  border-radius: 29px 29px 14px 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 42%),
+    linear-gradient(90deg, #263954, #18263d 55%, #263954);
+  color: #fff;
+  padding: 5px 8px;
+  box-shadow: 0 6px 0 rgba(16, 28, 48, .26), 0 12px 24px rgba(20, 31, 50, .24);
+  backdrop-filter: none;
+}
+
+.adventure-hud .player-avatar {
+  width: 40px;
+  height: 40px;
+  border-width: 2px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fff, #b9d5ec);
+  box-shadow: inset 0 -4px 0 rgba(34, 52, 78, .2), 0 0 0 2px rgba(107, 172, 225, .72);
+}
+
+.adventure-hud h1 {
+  max-width: 32vw;
+  overflow: hidden;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 2px 2px rgba(0, 0, 0, .35);
+}
+
+.adventure-hud .coin-badge {
+  min-width: 72px;
+  min-height: 34px;
+  border-color: rgba(255, 255, 255, .42);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fff09a, #f5b72f);
+  padding: 0 9px;
+  box-shadow: inset 0 -4px 0 rgba(120, 73, 8, .2), 0 3px 8px rgba(0, 0, 0, .25);
+}
+
+.adventure-hud .coin-badge::after { display: none; }
+.adventure-hud .coin-badge strong { font-size: 1rem; }
+
+.adventure-hud .round-action {
+  width: 36px;
+  height: 36px;
+  border-color: rgba(255, 255, 255, .24);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .16);
+}
+
+.adventure-board {
+  position: relative;
+  min-height: 620px;
+  overflow: hidden;
+  border: 5px solid rgba(255, 255, 255, 0.88);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 10% 16%, rgba(255, 255, 255, 0.8) 0 3%, transparent 3.2%),
+    linear-gradient(180deg, #93dcf4 0 42%, #b8e989 42% 68%, #61b663 68% 100%);
+  box-shadow: inset 0 -16px 0 rgba(39, 91, 57, 0.12), 0 24px 54px rgba(48, 35, 61, 0.2);
+  isolation: isolate;
+}
+
+.adventure-board::before,
+.adventure-board::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.adventure-board::before {
+  right: -4%;
+  bottom: -25%;
+  left: -4%;
+  height: 62%;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(ellipse at 22% 45%, #39884c 0 7%, transparent 7.4%),
+    radial-gradient(ellipse at 74% 32%, #3b914d 0 8%, transparent 8.4%),
+    linear-gradient(165deg, #7bcf70, #3e9655);
+}
+
+.adventure-board::after {
+  top: 24%;
+  right: -8%;
+  width: 48%;
+  height: 35%;
+  border-radius: 60% 0 0 30%;
+  background: linear-gradient(150deg, #95dd82, #53a95c);
+  transform: rotate(-8deg);
+}
+
+.adventure-board__prompt {
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  z-index: 4;
+  margin: 0;
+  color: rgba(39, 45, 61, 0.74);
+  font-size: 0.82rem;
+  font-weight: 950;
+  transform: translateX(-50%);
+}
+
+.adventure-board__sky i {
+  position: absolute;
+  z-index: -1;
+  width: 90px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: 28px -8px 0 rgba(255, 255, 255, 0.56), 52px 2px 0 rgba(255, 255, 255, 0.48);
+}
+
+.adventure-board__sky i:nth-child(1) { top: 17%; left: 8%; }
+.adventure-board__sky i:nth-child(2) { top: 23%; left: 46%; transform: scale(.7); }
+.adventure-board__sky i:nth-child(3) { top: 13%; right: 8%; transform: scale(.85); }
+
+.adventure-path {
+  position: absolute;
+  inset: 26% 8% 10%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.adventure-path::before {
+  position: absolute;
+  inset: 38% 4% auto;
+  height: 24%;
+  border: 18px solid #f6d28b;
+  border-top-color: transparent;
+  border-radius: 50%;
+  content: "";
+  filter: drop-shadow(0 7px 0 rgba(109, 84, 45, 0.12));
+  transform: rotate(-3deg);
+}
+
+.adventure-path i {
+  position: absolute;
+  width: 22%;
+  height: 16px;
+  border-radius: 999px;
+  background: #f6d28b;
+  box-shadow: 0 7px 0 rgba(109, 84, 45, 0.12);
+}
+
+.adventure-path i:nth-child(1) { top: 27%; left: 10%; transform: rotate(17deg); }
+.adventure-path i:nth-child(2) { top: 59%; left: 39%; transform: rotate(-12deg); }
+.adventure-path i:nth-child(3) { top: 37%; right: 9%; transform: rotate(-24deg); }
+
+.adventure-world {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  width: clamp(132px, 19%, 190px);
+  cursor: pointer;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 0;
+  place-items: center;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.adventure-world:hover,
+.adventure-world:focus-visible { transform: translateY(-7px) scale(1.04); }
+.adventure-world:focus-visible { filter: drop-shadow(0 0 0 5px #fff); }
+.adventure-world:active { transform: translateY(1px) scale(.97); }
+.adventure-world.is-destination { animation: world-beacon .75s ease-in-out infinite alternate; }
+
+.adventure-world--video { top: 27%; left: 5%; }
+.adventure-world--voice { bottom: 9%; left: 29%; }
+.adventure-world--write { top: 24%; right: 28%; }
+.adventure-world--photo { right: 5%; bottom: 10%; }
+
+.adventure-world__scene {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border: 5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 26px;
+  aspect-ratio: 1.35;
+  background: #fff;
+  box-shadow: inset 0 -7px 0 rgba(48, 35, 61, 0.1), 0 14px 24px rgba(48, 35, 61, 0.22);
+}
+
+.adventure-world__scene img { width: 100%; height: 100%; object-fit: cover; }
+
+.adventure-world__name {
+  z-index: 2;
+  margin-top: -16px;
+  border: 3px solid #fff;
+  border-radius: 14px;
+  background: var(--theme-primary);
+  color: #fff;
+  padding: 6px 15px 8px;
+  font-size: clamp(1rem, 2.1vw, 1.4rem);
+  font-weight: 950;
+  box-shadow: inset 0 -4px 0 rgba(33, 25, 43, 0.16), 0 7px 15px rgba(48, 35, 61, 0.18);
+}
+
+.adventure-world__reward {
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #ffe16c;
+  color: #624012;
+  padding: 4px 7px;
+  font-size: .68rem;
+  font-weight: 950;
+}
+
+@keyframes world-beacon {
+  to { filter: drop-shadow(0 0 16px rgba(255, 225, 108, .95)); transform: translateY(-6px) scale(1.04); }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .app-frame--home .app-main { width: 100%; padding: 6px 8px; }
+  .app-frame--home .bottom-nav { display: none; }
+  .app-frame--home .adventure-home { min-height: calc(100dvh - 12px); }
+  .app-frame--home .adventure-board { min-height: calc(100dvh - 12px); border-radius: 24px; }
+  .app-frame--home .adventure-hud { top: 0; right: 0; left: 0; }
+  .app-frame--home .adventure-board__prompt { top: 62px; }
+  .app-frame--home .adventure-world { width: clamp(112px, 18vw, 158px); }
+  .app-frame--home .floating-mascot { z-index: 10; }
+}
+
+@media (orientation: portrait) and (max-width: 700px) {
+  .app-frame--home .rotate-device {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 10px;
+    background: linear-gradient(160deg, var(--theme-background), #fff 54%, var(--theme-secondary-soft));
+    color: var(--ink);
+    padding: 28px;
+    text-align: center;
+  }
+
+  .rotate-device__phone {
+    display: grid;
+    width: 66px;
+    height: 104px;
+    margin-bottom: 14px;
+    place-items: center;
+    border: 6px solid var(--theme-primary);
+    border-radius: 18px;
+    color: var(--theme-primary);
+    animation: rotate-phone 1.8s ease-in-out infinite;
+  }
+
+  .rotate-device strong { font-size: 1.7rem; font-weight: 950; }
+  .rotate-device > span:last-child { color: var(--muted); font-weight: 800; }
+}
+
+@keyframes rotate-phone {
+  45%, 100% { transform: rotate(90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adventure-world.is-destination,
+  .rotate-device__phone { animation: none; }
+}
+
 /* Home is a single-screen mobile launcher: compact HUD plus a 2x2 action grid. */
 @media (max-width: 560px) {
   .game-home {
