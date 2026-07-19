@@ -3684,3 +3684,77 @@ p {
 .app-frame--home .adventure-board--premium .adventure-world--voice { top: 51%; bottom: auto; left: 20%; width: 27%; }
 .app-frame--home .adventure-board--premium .adventure-world--write { top: 22%; right: 23%; width: 25%; min-height: 38%; }
 .app-frame--home .adventure-board--premium .adventure-world--photo { right: 1%; bottom: 4%; width: 24%; min-height: 34%; }
+
+/* Environment-specific signs: each label belongs to its landmark. */
+.app-frame--home .adventure-board--premium .adventure-world__sign {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  margin: 0;
+  opacity: 1;
+  pointer-events: none;
+  transform: none;
+  transition: filter 160ms ease, transform 160ms ease;
+  backdrop-filter: none;
+}
+
+.app-frame--home .adventure-board--premium .adventure-world:hover .adventure-world__sign,
+.app-frame--home .adventure-board--premium .adventure-world:focus-visible .adventure-world__sign,
+.app-frame--home .adventure-board--premium .adventure-world.is-destination .adventure-world__sign {
+  opacity: 1;
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.12);
+}
+
+.app-frame--home .adventure-world--video .adventure-world__sign {
+  margin-bottom: 2%;
+  border: 3px solid #6e351f;
+  border-radius: 5px;
+  background:
+    radial-gradient(circle, #ffd56a 0 2px, transparent 2.5px) 2px 2px / 12px 12px,
+    #fff0c7;
+  color: #592418;
+  padding: 7px 15px;
+  font-size: .88rem;
+  letter-spacing: .025em;
+  text-shadow: none;
+  box-shadow: inset 0 0 0 2px #e5a853, 0 5px 9px rgba(45, 24, 15, .28);
+}
+
+.app-frame--home .adventure-world--voice .adventure-world__sign {
+  margin-bottom: 1%;
+  border: 2px solid #cf9d54;
+  border-radius: 4px 9px 5px 8px;
+  background: linear-gradient(100deg, #704527, #9b6636 52%, #6b4025);
+  color: #fff2ce;
+  padding: 6px 14px;
+  font-size: .88rem;
+  text-shadow: 0 2px 1px rgba(39, 20, 11, .7);
+  box-shadow: inset 0 0 0 2px rgba(255, 220, 154, .18), 0 5px 9px rgba(31, 20, 12, .32);
+  transform: rotate(-2deg);
+}
+
+.app-frame--home .adventure-world--write .adventure-world__sign {
+  margin-bottom: 5%;
+  border: 2px solid #f4dc8a;
+  border-radius: 5px;
+  background: linear-gradient(145deg, #d3a947, #f3dc88 48%, #aa7b2e);
+  color: #382716;
+  padding: 6px 13px;
+  font-size: .84rem;
+  text-shadow: 0 1px rgba(255, 247, 199, .7);
+  box-shadow: inset 0 0 0 2px rgba(88, 55, 15, .22), 0 5px 10px rgba(37, 25, 12, .3);
+}
+
+.app-frame--home .adventure-world--photo .adventure-world__sign {
+  margin: 0 0 2% 7%;
+  border: 2px solid #ddc18c;
+  border-radius: 3px;
+  background: linear-gradient(100deg, #49633d, #6e8b54);
+  color: #fff8d8;
+  padding: 6px 14px 6px 18px;
+  font-size: .86rem;
+  text-shadow: 0 2px 1px rgba(20, 38, 18, .6);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .12), 0 5px 10px rgba(18, 35, 18, .32);
+  clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%, 8% 50%);
+}

@@ -120,7 +120,7 @@ export default function HomePage() {
             aria-label={`Ir al mundo ${world.title}`}
             style={{ "--world-order": index } as CSSProperties}
           >
-            <span className="adventure-world__name">{world.title}</span>
+            <span className="adventure-world__name adventure-world__sign">{world.title}</span>
           </button>
         ))}
       </main>
