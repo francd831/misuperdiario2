@@ -3758,3 +3758,63 @@ p {
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .12), 0 5px 10px rgba(18, 35, 18, .32);
   clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%, 8% 50%);
 }
+
+/* Resolution-safe stage: artwork and hotspots always scale together. */
+.app-frame--home .adventure-board--premium {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: size;
+  background-image:
+    linear-gradient(rgba(10, 35, 53, .42), rgba(10, 35, 53, .5)),
+    var(--adventure-map);
+  background-position: center;
+  background-size: cover;
+}
+
+.adventure-map-stage {
+  position: relative;
+  width: min(100cqw, 215.888cqh);
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  aspect-ratio: 1848 / 856;
+  flex: 0 1 auto;
+  background-image: linear-gradient(180deg, rgba(8, 25, 43, .14), transparent 22%), var(--adventure-map);
+  background-position: center;
+  background-size: 100% 100%;
+  box-shadow: 0 0 50px rgba(4, 18, 29, .28);
+}
+
+.app-frame--home .adventure-board--premium .adventure-world__sign {
+  max-width: 92%;
+  white-space: normal;
+  line-height: 1.02;
+  text-align: center;
+}
+
+.app-frame--home .adventure-world--video .adventure-world__sign {
+  min-width: min(172px, 92%);
+  padding: 9px 14px;
+  font-size: clamp(.76rem, 1.65vw, 1.04rem);
+}
+
+.app-frame--home .adventure-world--voice .adventure-world__sign,
+.app-frame--home .adventure-world--write .adventure-world__sign,
+.app-frame--home .adventure-world--photo .adventure-world__sign {
+  min-width: min(154px, 90%);
+  padding-top: 8px;
+  padding-bottom: 9px;
+  font-size: clamp(.72rem, 1.5vw, .98rem);
+}
+
+.app-frame--home .adventure-board--premium .adventure-world--write,
+.app-frame--home .adventure-board--premium .adventure-world--photo { align-items: center; }
+
+@media (max-aspect-ratio: 16 / 10) and (orientation: landscape) {
+  .adventure-map-stage {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
+  }
+}

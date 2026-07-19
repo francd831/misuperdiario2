@@ -12,10 +12,10 @@ import { walletService } from "../../core/wallet/walletService";
 import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
 
 const worlds = [
-  { id: "video", to: "/record/video", title: "Vídeo", className: "adventure-world--video" },
-  { id: "voice", to: "/record/audio", title: "Voz", className: "adventure-world--voice" },
-  { id: "write", to: "/record/text", title: "Escribir", className: "adventure-world--write" },
-  { id: "photo", to: "/daily-photo", title: "Foto", className: "adventure-world--photo" },
+  { id: "video", to: "/record/video", title: "Cine de los recuerdos", action: "Vídeo", className: "adventure-world--video" },
+  { id: "voice", to: "/record/audio", title: "El rincón de las voces", action: "Voz", className: "adventure-world--voice" },
+  { id: "write", to: "/record/text", title: "La casa de las historias", action: "Escribir", className: "adventure-world--write" },
+  { id: "photo", to: "/daily-photo", title: "El mirador del día", action: "Foto", className: "adventure-world--photo" },
 ];
 
 type InstallPromptEvent = Event & {
@@ -111,18 +111,20 @@ export default function HomePage() {
       </header>
 
       <main className="adventure-board adventure-board--premium" aria-label="Mapa de mundos de Mi Súper Diario" style={{ "--adventure-map": `url(${adventureMap})` } as CSSProperties}>
-        {worlds.map((world, index) => (
-          <button
-            key={world.id}
-            type="button"
-            className={`adventure-world ${world.className} ${travellingTo === world.id ? "is-destination" : ""}`}
-            onClick={(event) => visitWorld(event, world)}
-            aria-label={`Ir al mundo ${world.title}`}
-            style={{ "--world-order": index } as CSSProperties}
-          >
-            <span className="adventure-world__name adventure-world__sign">{world.title}</span>
-          </button>
-        ))}
+        <div className="adventure-map-stage">
+          {worlds.map((world, index) => (
+            <button
+              key={world.id}
+              type="button"
+              className={`adventure-world ${world.className} ${travellingTo === world.id ? "is-destination" : ""}`}
+              onClick={(event) => visitWorld(event, world)}
+              aria-label={`${world.action}: ${world.title}`}
+              style={{ "--world-order": index } as CSSProperties}
+            >
+              <span className="adventure-world__name adventure-world__sign">{world.title}</span>
+            </button>
+          ))}
+        </div>
       </main>
     </section>
   );
