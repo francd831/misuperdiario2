@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { packLoader } from "../../core/packs/packLoader";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 
@@ -34,9 +33,6 @@ const spriteLoaders: Record<AnimatedMascotKind, () => Promise<string>> = {
 
 export const MASCOT_VISIBILITY_KEY = "misuperdiario:mascot-visible";
 export const MASCOT_VISIBILITY_EVENT = "misuperdiario:mascot-visibility";
-export const MASCOT_TRAVEL_EVENT = "misuperdiario:mascot-travel";
-export const MASCOT_ARRIVED_EVENT = "misuperdiario:mascot-arrived";
-export type MascotTravelDetail = { id: string; x: number; y: number };
 
 const mascotByPack: Record<string, { asset: string; accessory?: string; label: string }> = {
   base: { asset: "sol", label: "Solete" },
@@ -83,7 +79,6 @@ function readStoredPosition(profileId: string) {
 }
 
 export function FloatingMascot({ packId, profileId }: { packId: string; profileId: string }) {
-  const location = useLocation();
   const rootRef = useRef<HTMLButtonElement>(null);
   const visualRef = useRef<HTMLSpanElement>(null);
   const spriteFrameRef = useRef<HTMLSpanElement>(null);
@@ -91,11 +86,9 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
   const target = useRef({ x: 18, y: 150 });
   const drag = useRef<{ pointerId: number; offsetX: number; offsetY: number; startX: number; startY: number } | null>(null);
   const targetAt = useRef(0);
-  const guidedDestination = useRef<string>();
   const [reacting, setReacting] = useState(false);
   const [visible, setVisible] = useState(() => localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
   const [spriteUrl, setSpriteUrl] = useState<string>();
-  const resting = location.pathname === "/daily-photo" || location.pathname === "/record/video" || location.pathname === "/record/audio";
 
   const mascot = useMemo(() => {
     const pack = packLoader.getPackWithAssets(packId) ?? packLoader.getPackWithAssets("base");
@@ -167,21 +160,10 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
       jumpStarted = time;
     };
 
-    const handleGuidedTravel = (event: Event) => {
-      const detail = (event as CustomEvent<MascotTravelDetail>).detail;
-      const { maxX, maxY } = bounds();
-      guidedDestination.current = detail.id;
-      target.current = {
-        x: Math.max(8, Math.min(maxX, detail.x - 52)),
-        y: Math.max(48, Math.min(maxY, detail.y - 92)),
-      };
-      travelMode = "run";
-    };
-
     const animate = (time: number) => {
       const delta = Math.min(32, time - lastTime);
       lastTime = time;
-      if (!drag.current && allowAutonomousMotion && (!resting || travelMode === "teleport")) {
+      if (!drag.current && allowAutonomousMotion) {
         if (travelMode === "idle" && time >= targetAt.current) chooseTarget(time);
         if (travelMode === "teleport") {
           const elapsed = time - teleportStarted;
@@ -218,14 +200,7 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
           }
           if (remaining <= 1.5) {
             position.current = { ...target.current };
-            if (guidedDestination.current) {
-              const id = guidedDestination.current;
-              guidedDestination.current = undefined;
-              travelMode = "idle";
-              idleStarted = time;
-              targetAt.current = time + 1800;
-              window.dispatchEvent(new CustomEvent(MASCOT_ARRIVED_EVENT, { detail: { id } }));
-            } else if (mascot.animatedKind === "owl" && Math.random() < .3) {
+            if (mascot.animatedKind === "owl" && Math.random() < .3) {
               travelMode = "teleport";
               teleportStarted = time;
               teleported = false;
@@ -279,22 +254,20 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
       if (!animationFrame) animationFrame = requestAnimationFrame(animate);
     };
     targetAt.current = performance.now() + 700;
-    window.addEventListener(MASCOT_TRAVEL_EVENT, handleGuidedTravel);
     document.addEventListener("visibilitychange", handlePageVisibility);
     if (!document.hidden) animationFrame = requestAnimationFrame(animate);
     return () => {
       document.removeEventListener("visibilitychange", handlePageVisibility);
-      window.removeEventListener(MASCOT_TRAVEL_EVENT, handleGuidedTravel);
       cancelAnimationFrame(animationFrame);
     };
-  }, [mascot?.animatedKind, mascot?.main, reacting, resting, visible]);
+  }, [mascot?.animatedKind, mascot?.main, reacting, visible]);
 
   if (!visible || !mascot?.main) return null;
 
   return (
     <button
       ref={rootRef}
-      className={`floating-mascot ${reacting ? "is-reacting" : ""} ${resting ? "is-resting" : ""}`}
+      className={`floating-mascot ${reacting ? "is-reacting" : ""}`}
       type="button"
       aria-label={`${mascot.label}. Puedes moverlo por la pantalla.`}
       onPointerDown={(event) => {

@@ -2871,8 +2871,6 @@ p {
 .floating-mascot__accessory { position: absolute; z-index: 3; right: 1px; bottom: 14px; width: 38px; height: 38px; object-fit: contain; animation: mascot-accessory 1.1s ease-in-out infinite; pointer-events: none; }
 .floating-mascot__shadow { position: absolute; z-index: 1; right: 17px; bottom: 13px; left: 17px; height: 12px; border-radius: 50%; background: rgb(45 31 62 / 15%); filter: blur(3px); animation: mascot-shadow 1.8s ease-in-out infinite; }
 .floating-mascot.is-reacting .floating-mascot__body { animation: mascot-celebrate .7s cubic-bezier(.2,.8,.25,1); }
-.floating-mascot.is-resting .floating-mascot__body { animation-duration: 3.2s; }
-.floating-mascot.is-resting { opacity: .82; }
 
 .mascot-setting { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .mascot-setting h2 { margin-bottom: 3px; }

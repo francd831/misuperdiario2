@@ -1,22 +1,30 @@
 import { Download, LogOut, RotateCcw, Star } from "lucide-react";
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  MASCOT_ARRIVED_EVENT,
-  MASCOT_TRAVEL_EVENT,
-  type MascotTravelDetail,
-} from "../../app/mascot/FloatingMascot";
 import adventureMap from "../../assets/home/adventure-map-premium.webp";
+import creativeRoom from "../../assets/home/creative-room-base.webp";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
 import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
 
-const worlds = [
+const adventureWorlds = [
   { id: "video", to: "/record/video", title: "Cine de los recuerdos", action: "Vídeo", className: "adventure-world--video" },
   { id: "voice", to: "/record/audio", title: "El rincón de las voces", action: "Voz", className: "adventure-world--voice" },
   { id: "write", to: "/record/text", title: "La casa de las historias", action: "Escribir", className: "adventure-world--write" },
   { id: "photo", to: "/daily-photo", title: "Mirador de las fotos", action: "Foto", className: "adventure-world--photo" },
 ];
+
+const basicWorlds: typeof adventureWorlds = [
+  { id: "video", to: "/record/video", title: "El mini cine", action: "Vídeo", className: "adventure-world--video" },
+  { id: "voice", to: "/record/audio", title: "Estudio de voz", action: "Voz", className: "adventure-world--voice" },
+  { id: "write", to: "/record/text", title: "Mesa de historias", action: "Escribir", className: "adventure-world--write" },
+  { id: "photo", to: "/daily-photo", title: "Rincón de fotos", action: "Foto", className: "adventure-world--photo" },
+];
+
+const basicScene = { id: "room", background: creativeRoom, worlds: basicWorlds } as const;
+const homeScenes = {
+  aventuraPirata: { id: "pirate", background: adventureMap, worlds: adventureWorlds },
+} as const;
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -26,11 +34,9 @@ type InstallPromptEvent = Event & {
 export default function HomePage() {
   const { activeProfile, logout } = useProfiles();
   const navigate = useNavigate();
-  const navigationTimer = useRef<number>();
-  const pendingRoute = useRef<string>();
   const [balance, setBalance] = useState(0);
-  const [travellingTo, setTravellingTo] = useState<string>();
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent>();
+  const scene = activeProfile?.activePackId === "aventuraPirata" ? homeScenes.aventuraPirata : basicScene;
 
   useEffect(() => {
     if (!activeProfile) return;
@@ -51,31 +57,6 @@ export default function HomePage() {
     window.addEventListener("beforeinstallprompt", captureInstallPrompt);
     return () => window.removeEventListener("beforeinstallprompt", captureInstallPrompt);
   }, []);
-
-  useEffect(() => {
-    const handleArrival = (event: Event) => {
-      const detail = (event as CustomEvent<{ id: string }>).detail;
-      if (!pendingRoute.current || detail.id !== travellingTo) return;
-      window.clearTimeout(navigationTimer.current);
-      navigate(pendingRoute.current);
-    };
-    window.addEventListener(MASCOT_ARRIVED_EVENT, handleArrival);
-    return () => {
-      window.removeEventListener(MASCOT_ARRIVED_EVENT, handleArrival);
-      window.clearTimeout(navigationTimer.current);
-    };
-  }, [navigate, travellingTo]);
-
-  const visitWorld = (event: MouseEvent<HTMLButtonElement>, world: (typeof worlds)[number]) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    pendingRoute.current = world.to;
-    setTravellingTo(world.id);
-    window.dispatchEvent(new CustomEvent<MascotTravelDetail>(MASCOT_TRAVEL_EVENT, {
-      detail: { id: world.id, x: bounds.left + bounds.width / 2, y: bounds.bottom - 18 },
-    }));
-    window.clearTimeout(navigationTimer.current);
-    navigationTimer.current = window.setTimeout(() => navigate(world.to), 2600);
-  };
 
   return (
     <section className="game-home adventure-home">
@@ -110,14 +91,14 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="adventure-board adventure-board--premium" aria-label="Mapa de mundos de Mi Súper Diario" style={{ "--adventure-map": `url(${adventureMap})` } as CSSProperties}>
+      <main className={`adventure-board adventure-board--premium adventure-board--${scene.id}`} aria-label="Mundos de Mi Súper Diario" style={{ "--adventure-map": `url(${scene.background})` } as CSSProperties}>
         <div className="adventure-map-stage">
-          {worlds.map((world, index) => (
+          {scene.worlds.map((world, index) => (
             <button
               key={world.id}
               type="button"
-              className={`adventure-world ${world.className} ${travellingTo === world.id ? "is-destination" : ""}`}
-              onClick={(event) => visitWorld(event, world)}
+              className={`adventure-world ${world.className}`}
+              onClick={() => navigate(world.to)}
               aria-label={`${world.action}: ${world.title}`}
               style={{ "--world-order": index } as CSSProperties}
             />
