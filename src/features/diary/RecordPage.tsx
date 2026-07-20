@@ -22,6 +22,7 @@ import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
+import { MemoryDrawer } from "../../shared/ui/MemoryDrawer";
 import cinemaMemoriesBase from "../../assets/recording/cinema-memories-base.webp";
 import storyDeskBase from "../../assets/recording/story-desk-base.webp";
 import voiceStudioBase from "../../assets/recording/voice-studio-base.webp";
@@ -77,6 +78,17 @@ function TodayVideoCard({ entry, packs, onDelete }: { entry: DiaryEntry; packs: 
   );
 }
 
+function TodayAudioCard({ entry, onDelete }: { entry: DiaryEntry; onDelete: (entry: DiaryEntry) => void }) {
+  const url = useObjectUrl(entry.mediaBlob);
+  return (
+    <article className="memory-audio-card">
+      <div><strong>{entry.title || "Voz de hoy"}</strong><small>{formatSeconds(entry.durationSeconds ?? 0)}{entry.note ? ` · ${entry.note}` : ""}</small></div>
+      {url && <audio src={url} controls />}
+      <button className="danger-icon-action" type="button" onClick={() => onDelete(entry)} aria-label="Borrar grabación"><Trash2 size={18} /></button>
+    </article>
+  );
+}
+
 export default function RecordPage() {
   const navigate = useNavigate();
   const { type = "text" } = useParams();
@@ -98,6 +110,9 @@ export default function RecordPage() {
   const [effectsOpen, setEffectsOpen] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
   const [todayVideos, setTodayVideos] = useState<DiaryEntry[]>([]);
+  const [todayAudios, setTodayAudios] = useState<DiaryEntry[]>([]);
+  const [textEntries, setTextEntries] = useState<DiaryEntry[]>([]);
+  const [memoriesOpen, setMemoriesOpen] = useState(false);
   const [previousTextEntry, setPreviousTextEntry] = useState<DiaryEntry>();
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
@@ -127,9 +142,22 @@ export default function RecordPage() {
     setDailyCount(videos.filter((entry) => entry.date === date).length);
   }, [activeProfile, entryType]);
 
+  const refreshTodayAudios = useCallback(async () => {
+    if (!activeProfile || entryType !== "audio") return;
+    const date = new Date().toISOString().slice(0, 10);
+    const audios = await entryRepository.listByProfileAndType(activeProfile.id, "audio");
+    const today = audios.filter((entry) => entry.date === date);
+    setTodayAudios(today);
+    setDailyCount(today.length);
+  }, [activeProfile, entryType]);
+
   useEffect(() => {
     void refreshTodayVideos();
   }, [refreshTodayVideos]);
+
+  useEffect(() => {
+    void refreshTodayAudios();
+  }, [refreshTodayAudios]);
 
   useEffect(() => {
     if (!activeProfile || entryType !== "text") return;
@@ -137,8 +165,11 @@ export default function RecordPage() {
     setPreviousTextEntry(undefined);
     void entryRepository.listByProfileAndType(activeProfile.id, "text").then((entries) => {
       const now = Date.now();
-      const previous = entries.find((entry) => !entry.isLocked || Boolean(entry.unlockAt && new Date(entry.unlockAt).getTime() <= now));
-      if (alive) setPreviousTextEntry(previous);
+      const available = entries.filter((entry) => !entry.isLocked || Boolean(entry.unlockAt && new Date(entry.unlockAt).getTime() <= now));
+      if (alive) {
+        setPreviousTextEntry(available[0]);
+        setTextEntries(available);
+      }
     });
     return () => { alive = false; };
   }, [activeProfile, entryType]);
@@ -307,6 +338,7 @@ export default function RecordPage() {
       setSaveSheetOpen(false);
       setDailyCount((count) => count + 1);
       if (entryType === "video") await refreshTodayVideos();
+      if (entryType === "audio") await refreshTodayAudios();
       await achievementService.syncProfile(activeProfile.id);
     } catch {
       setError("No se pudo guardar el recuerdo.");
@@ -331,6 +363,7 @@ export default function RecordPage() {
       });
       setSaveSheetOpen(false);
       if (entryType === "video") await refreshTodayVideos();
+      if (entryType === "audio") await refreshTodayAudios();
     } catch {
       setError("No se pudieron guardar los detalles.");
     }
@@ -348,6 +381,12 @@ export default function RecordPage() {
     if (!window.confirm("¿Quieres borrar este vídeo? No se podrá recuperar.")) return;
     await entryRepository.remove(entry.id);
     await refreshTodayVideos();
+  }
+
+  async function deleteAudio(entry: DiaryEntry) {
+    if (!window.confirm("¿Quieres borrar esta grabación? No se podrá recuperar.")) return;
+    await entryRepository.remove(entry.id);
+    await refreshTodayAudios();
   }
 
   function selectFrame(frame: PackAsset) {
@@ -463,6 +502,12 @@ export default function RecordPage() {
           ) : null}
         </section>
 
+        <button className="world-memory-trigger" type="button" onClick={() => setMemoriesOpen(true)}>
+          {entryType === "video" ? <Film size={18} /> : <Play size={18} />}
+          <span>{entryType === "video" ? "Ver mis vídeos de hoy" : "Escuchar mis voces de hoy"}</span>
+          <strong>{entryType === "video" ? todayVideos.length : todayAudios.length}</strong>
+        </button>
+
         {entryType === "video" && effectsOpen && (
           <section className="cinema-effects-drawer" aria-label="Mesa de efectos">
             <VisualToolCarousel
@@ -477,19 +522,20 @@ export default function RecordPage() {
           </section>
         )}
 
-        {entryType === "video" && todayVideos.length > 0 && (
-          <section className="today-memories" aria-labelledby="today-videos-title">
-            <div className="today-memories__header">
-              <div><span>Cartelera de hoy</span><h2 id="today-videos-title">Mis proyecciones</h2></div>
-              <strong aria-label={`${todayVideos.length} ${todayVideos.length === 1 ? "vídeo" : "vídeos"}`}>{todayVideos.length}</strong>
-            </div>
-            <div className="today-video-grid">
-              {todayVideos.map((entry) => (
-                <TodayVideoCard key={entry.id} entry={entry} packs={packs} onDelete={(item) => void deleteVideo(item)} />
-              ))}
-            </div>
-          </section>
-        )}
+        <MemoryDrawer
+          open={memoriesOpen}
+          onClose={() => setMemoriesOpen(false)}
+          eyebrow={entryType === "video" ? "Cartelera de hoy" : "Archivo de hoy"}
+          title={entryType === "video" ? "Mis vídeos" : "Mis voces"}
+        >
+          {entryType === "video" ? (
+            todayVideos.length ? <div className="today-video-grid">{todayVideos.map((entry) => <TodayVideoCard key={entry.id} entry={entry} packs={packs} onDelete={(item) => void deleteVideo(item)} />)}</div>
+              : <div className="memory-drawer__empty"><Film size={28} /><strong>Aún no has grabado ningún vídeo hoy</strong></div>
+          ) : (
+            todayAudios.length ? <div className="memory-audio-list">{todayAudios.map((entry) => <TodayAudioCard key={entry.id} entry={entry} onDelete={(item) => void deleteAudio(item)} />)}</div>
+              : <div className="memory-drawer__empty"><Play size={28} /><strong>Aún no has guardado ninguna voz hoy</strong></div>
+          )}
+        </MemoryDrawer>
 
         {mediaBlob && savedEntryId && !saveSheetOpen && (
           <aside className="quick-save-confirmation" role="status" aria-live="polite">
@@ -585,6 +631,12 @@ export default function RecordPage() {
           </button>
         </div>
       </form>
+      <button className="world-memory-trigger" type="button" onClick={() => setMemoriesOpen(true)}><Film size={18} /><span>Ver mis páginas</span><strong>{textEntries.length}</strong></button>
+      <MemoryDrawer open={memoriesOpen} onClose={() => setMemoriesOpen(false)} eyebrow="Mi diario" title="Páginas anteriores">
+        {textEntries.length ? (
+          <div className="memory-text-list">{textEntries.map((entry) => <article key={entry.id} className="memory-text-card"><time>{new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long" }).format(new Date(entry.createdAt))}</time><strong>{entry.title || "Mi página"}</strong><p>{entry.note}</p></article>)}</div>
+        ) : <div className="memory-drawer__empty"><Film size={28} /><strong>Tu diario todavía está esperando su primera página</strong></div>}
+      </MemoryDrawer>
     </section>
   );
 }

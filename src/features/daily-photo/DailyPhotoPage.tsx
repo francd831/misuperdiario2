@@ -23,6 +23,7 @@ import { useProfiles } from "../../core/profiles/ProfileContext";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
+import { MemoryDrawer } from "../../shared/ui/MemoryDrawer";
 import photoCornerBase from "../../assets/recording/photo-corner-base.webp";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
@@ -84,6 +85,7 @@ export default function DailyPhotoPage() {
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [effectsOpen, setEffectsOpen] = useState(false);
+  const [photosOpen, setPhotosOpen] = useState(false);
   const [cameraAspectRatio, setCameraAspectRatio] = useState("1 / 1");
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
@@ -313,6 +315,10 @@ export default function DailyPhotoPage() {
         </div>
       </section>
 
+      <button className="world-memory-trigger" type="button" onClick={() => setPhotosOpen(true)}>
+        <Camera size={18} /><span>Ver mis fotos</span><strong>{photos.length}</strong>
+      </button>
+
       {(capturedBlob || !editingPhotoId) && (
         <>
           {effectsOpen && (
@@ -331,25 +337,18 @@ export default function DailyPhotoPage() {
 
       {error && <p className="form-error">{error}</p>}
 
-      <section className="photo-archive" aria-labelledby="photo-archive-title">
-        <header className="photo-archive__header">
-          <div><span>Archivo del mirador</span><h2 id="photo-archive-title">Mis fotos</h2></div>
-          {photos.length > 0 && (
-            <button className="photo-archive__timelapse" type="button" onClick={openTimelapse}>
-              <Play size={16} fill="currentColor" /> <span>Ver timelapse</span><small>{photos.length} {photos.length === 1 ? "foto" : "fotos"}</small>
-            </button>
-          )}
-        </header>
-        {photos.length === 0 ? (
-          <div className="photo-archive__empty"><Camera size={25} /><div><strong>Aún no hay fotos</strong><span>Haz la primera para comenzar tu película.</span></div></div>
-        ) : (
-          <div className="photo-grid">
-            {photos.map((photo) => (
-              <PhotoThumb key={photo.id} photo={photo} onEdit={editPhoto} onDelete={(item) => void deletePhoto(item)} />
-            ))}
-          </div>
+      <MemoryDrawer open={photosOpen} onClose={() => setPhotosOpen(false)} eyebrow="Archivo del mirador" title="Mis fotos">
+        {photos.length > 0 && (
+          <button className="photo-archive__timelapse" type="button" onClick={openTimelapse}>
+            <Play size={16} fill="currentColor" /> <span>Ver timelapse</span><small>{photos.length} {photos.length === 1 ? "foto" : "fotos"}</small>
+          </button>
         )}
-      </section>
+        {photos.length === 0 ? (
+          <div className="memory-drawer__empty"><Camera size={25} /><strong>Aún no hay fotos. Haz la primera para comenzar tu película.</strong></div>
+        ) : (
+          <div className="photo-grid">{photos.map((photo) => <PhotoThumb key={photo.id} photo={photo} onEdit={(item) => { setPhotosOpen(false); editPhoto(item); }} onDelete={(item) => void deletePhoto(item)} />)}</div>
+        )}
+      </MemoryDrawer>
     </section>
   );
 }
