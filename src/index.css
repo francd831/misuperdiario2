@@ -3894,6 +3894,69 @@ p {
   box-shadow: 0 0 50px rgba(4, 18, 29, .28);
 }
 
+.map-mascot {
+  --map-mascot-direction: 1;
+  position: absolute;
+  z-index: 40;
+  display: block;
+  width: clamp(66px, 8vw, 104px);
+  height: clamp(58px, 7vw, 92px);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transform: translate(-50%, -72%);
+  will-change: top, left;
+}
+
+.map-mascot:focus-visible {
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px #fff, 0 0 0 8px #f6c453;
+}
+
+.map-mascot__sprite {
+  position: absolute;
+  z-index: 2;
+  inset: -12% -10%;
+  display: block;
+  background-position: 0 66.666%;
+  background-repeat: no-repeat;
+  background-size: 800% 400%;
+  filter: drop-shadow(0 7px 6px rgba(5, 22, 31, .28));
+  pointer-events: none;
+  transform: scaleX(var(--map-mascot-direction));
+  transform-origin: center bottom;
+}
+
+.map-mascot__shadow {
+  position: absolute;
+  z-index: 1;
+  right: 18%;
+  bottom: 4%;
+  left: 18%;
+  height: 13%;
+  border-radius: 50%;
+  background: rgba(4, 20, 28, .3);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.adventure-map-stage:has(.adventure-world.is-destination) .adventure-world:not(.is-destination) {
+  cursor: wait;
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .map-mascot {
+    width: clamp(58px, 8vw, 82px);
+    height: clamp(52px, 7vw, 74px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-mascot { will-change: auto; }
+}
+
 .app-frame--home .adventure-board--premium .adventure-world__sign {
   max-width: 92%;
   white-space: normal;
@@ -4818,6 +4881,8 @@ p {
   gap: 12px;
   overflow-x: auto;
   overflow-y: hidden;
+  border-radius: clamp(28px, 4.2vw, 52px);
+  clip-path: inset(0 round clamp(28px, 4.2vw, 52px));
   padding: 12px 14px 16px;
   scroll-padding-inline: 10px;
   scroll-snap-type: x mandatory;
@@ -4891,7 +4956,14 @@ p {
 
 @media (max-width: 720px) {
   .store-world { aspect-ratio: 1.05; background-size: auto 100%; }
-  .store-world__packs { top: 20.5%; left: 9%; width: 82%; height: 60.5%; }
+  .store-world__packs {
+    top: 20.5%;
+    left: 9%;
+    width: 82%;
+    height: 60.5%;
+    border-radius: clamp(24px, 7vw, 42px);
+    clip-path: inset(0 round clamp(24px, 7vw, 42px));
+  }
   .store-world__packs .pack-card { flex-basis: min(54vw, 215px); }
   .store-world__beta { left: 8%; }
   .store-world__message { right: 8%; }

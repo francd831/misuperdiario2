@@ -45,7 +45,7 @@ describe("App shell", () => {
     renderAt("/home");
 
     expect(await screen.findByRole("heading", { name: "Hola, Luna" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Solete. Puedes moverlo por la pantalla." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Solete, guía del mapa" })).toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Navegación principal" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Diario" })).toHaveAttribute("href", "/diary");
     expect(screen.getByRole("link", { name: "0 estrellas disponibles" })).toHaveAttribute("href", "/store");
