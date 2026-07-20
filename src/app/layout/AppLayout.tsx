@@ -45,6 +45,10 @@ export function AppLayout() {
   const activePackId = activeProfile?.activePackId ?? fallbackPackId;
   const activePack = packLoader.getPack(activePackId) ?? packLoader.getPack(fallbackPackId);
   const style = useMemo(() => themeVariables(activePack), [activePack]);
+  const isImmersiveWorld = location.pathname === "/home"
+    || location.pathname.startsWith("/record/")
+    || location.pathname === "/daily-photo"
+    || location.pathname === "/daily-photo/timelapse";
 
   useEffect(() => {
     const orientation = screen.orientation as ScreenOrientation & {
@@ -67,7 +71,7 @@ export function AppLayout() {
   }, []);
 
   return (
-    <div className={`app-frame ${location.pathname === "/home" ? "app-frame--home" : ""}`} data-pack-theme={activePack?.id ?? fallbackPackId} style={style}>
+    <div className={`app-frame ${location.pathname === "/home" ? "app-frame--home" : ""} ${isImmersiveWorld ? "app-frame--immersive" : ""}`} data-pack-theme={activePack?.id ?? fallbackPackId} style={style}>
       <main className="app-main">
         <Outlet />
       </main>

@@ -3215,6 +3215,147 @@ p {
   }
 }
 
+/* One-screen recording flow. Collections and tools are drawers, never a second
+   document section that makes the illustrated world scroll away. */
+.app-frame--immersive {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-frame--immersive .app-main,
+.app-frame--immersive .record-page,
+.app-frame--immersive .daily-photo-page {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.world-memory-trigger {
+  position: fixed;
+  z-index: 70;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(16%, calc(env(safe-area-inset-bottom) + 58px));
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgb(255 232 168 / 52%);
+  border-radius: 14px;
+  background: rgb(31 24 39 / 86%);
+  color: #fff8e8;
+  padding: 7px 9px 7px 13px;
+  font: inherit;
+  font-size: clamp(.65rem, 1.35vw, .78rem);
+  max-width: 24vw;
+  font-weight: 900;
+  box-shadow: 0 8px 22px rgb(13 8 20 / 30%), inset 0 1px rgb(255 255 255 / 12%);
+  backdrop-filter: blur(10px);
+}
+
+.world-memory-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.world-memory-trigger strong {
+  display: grid;
+  min-width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 9px;
+  background: #ffd36b;
+  color: #4b3109;
+  font-size: .7rem;
+}
+
+.world-memory-trigger:active { transform: translateY(1px) scale(.98); }
+
+.memory-drawer-layer {
+  position: fixed;
+  z-index: 900;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: linear-gradient(180deg, transparent 0 26%, rgb(12 8 17 / 32%) 100%);
+  padding: 0 max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
+  animation: memory-layer-in .18s ease-out;
+}
+
+.memory-drawer {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(92vw, 980px);
+  max-height: min(64dvh, 520px);
+  overflow: hidden;
+  border: 1px solid rgb(255 227 155 / 38%);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  background:
+    radial-gradient(ellipse at 18% 0, rgb(255 207 104 / 14%), transparent 35%),
+    linear-gradient(145deg, rgb(52 42 67 / 98%), rgb(23 18 31 / 99%) 72%);
+  color: #fff;
+  padding: 7px 16px max(12px, env(safe-area-inset-bottom));
+  box-shadow: 0 -20px 55px rgb(8 5 13 / 38%), inset 0 1px rgb(255 255 255 / 10%);
+  animation: memory-drawer-up .3s cubic-bezier(.22, .82, .28, 1);
+}
+
+.memory-drawer__handle { width: 48px; height: 4px; justify-self: center; border-radius: 999px; background: rgb(255 255 255 / 34%); }
+.memory-drawer__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 0 9px; }
+.memory-drawer__header > div { display: grid; gap: 1px; }
+.memory-drawer__header span { color: #ffd671; font-size: .6rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+.memory-drawer__header h2 { margin: 0; color: #fff9ea; font-size: clamp(1rem, 2vw, 1.25rem); }
+.memory-drawer__header button { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgb(255 255 255 / 18%); border-radius: 12px; background: rgb(255 255 255 / 10%); color: #fff; }
+.memory-drawer__content { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 2px 3px 8px; scrollbar-width: thin; scrollbar-color: #ffd671 transparent; }
+.memory-drawer__empty { display: grid; min-height: 110px; place-items: center; align-content: center; gap: 8px; color: #d7cbdc; text-align: center; }
+.memory-drawer__empty strong { color: #fff; font-size: .78rem; }
+
+.memory-drawer .today-video-grid,
+.memory-drawer .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 230px)); justify-content: start; gap: 12px; overflow: visible; }
+.memory-drawer .photo-archive__timelapse { margin: 0 0 10px auto; }
+.memory-audio-list,
+.memory-text-list { display: grid; gap: 9px; }
+.memory-audio-card { display: grid; grid-template-columns: minmax(110px, .8fr) minmax(190px, 1.4fr) auto; align-items: center; gap: 10px; border: 1px solid rgb(255 255 255 / 12%); border-radius: 15px; background: rgb(255 255 255 / 7%); padding: 9px; }
+.memory-audio-card > div { display: grid; min-width: 0; gap: 2px; }
+.memory-audio-card strong { color: #fff; font-size: .78rem; }
+.memory-audio-card small { overflow: hidden; color: #c8bbd0; font-size: .62rem; text-overflow: ellipsis; white-space: nowrap; }
+.memory-audio-card audio { width: 100%; height: 36px; }
+.memory-text-list { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.memory-text-card { min-height: 112px; border-radius: 4px 13px 13px 4px; background: #fff4d7; color: #594334; padding: 12px 14px; box-shadow: inset 4px 0 #d39b5c, 0 6px 14px rgb(8 5 13 / 18%); }
+.memory-text-card time { display: block; margin-bottom: 5px; color: #9a765a; font-size: .58rem; text-transform: capitalize; }
+.memory-text-card strong { display: block; color: #604536; font-family: "Segoe Print", "Bradley Hand", cursive; font-size: .8rem; }
+.memory-text-card p { display: -webkit-box; overflow: hidden; margin: 5px 0 0; color: #765d4c; font-size: .65rem; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+
+/* Effects use the same compact overlay behaviour as the collections. */
+.app-frame--immersive .cinema-effects-drawer,
+.app-frame--immersive .daily-photo-page > .visual-tools {
+  position: fixed;
+  z-index: 500;
+  right: max(8px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  left: max(8px, env(safe-area-inset-left));
+  width: auto;
+  max-height: 42dvh;
+  overflow: auto;
+  margin: 0;
+  border-radius: 20px;
+}
+
+@keyframes memory-layer-in { from { opacity: 0; } }
+@keyframes memory-drawer-up { from { transform: translateY(100%); } }
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .memory-drawer { width: min(88vw, 900px); max-height: 58dvh; border-radius: 19px 19px 0 0; padding-inline: 12px; }
+  .memory-drawer__header { padding-block: 3px 6px; }
+  .memory-drawer__header button { width: 34px; height: 34px; }
+  .memory-drawer .today-video-grid,
+  .memory-drawer .photo-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 205px)); }
+  .world-memory-trigger { min-height: 40px; bottom: max(16%, calc(env(safe-area-inset-bottom) + 54px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-drawer-layer,
+  .memory-drawer { animation: none; }
+}
+
 /* Panoramic adventure map */
 .adventure-home {
   position: relative;
@@ -5048,14 +5189,27 @@ p {
   gap: 12px;
   overflow-x: auto;
   overflow-y: hidden;
-  border-radius: clamp(28px, 4.2vw, 52px);
-  clip-path: inset(5px 13px 7px 9px round clamp(24px, 3.8vw, 46px));
+  border-radius: 78px 78px 46px 46px;
+  clip-path: inset(9px 19px 0 14px round 78px 78px 46px 46px);
   padding: 17px 27px 23px 23px;
   scroll-padding-inline: 10px;
   scroll-snap-type: x mandatory;
   scrollbar-color: #bd8351 transparent;
   scrollbar-width: thin;
 }
+.store-world__packs::-webkit-scrollbar { height: 10px; }
+.store-world__packs::-webkit-scrollbar-track {
+  margin-inline: 32px;
+  border-radius: 999px;
+  background: rgb(112 72 42 / 18%);
+  box-shadow: inset 0 1px 2px rgb(85 50 26 / 18%);
+}
+.store-world__packs::-webkit-scrollbar-thumb {
+  border: 2px solid rgb(244 218 170 / 82%);
+  border-radius: 999px;
+  background: #a96c3d;
+}
+.store-world__packs::-webkit-scrollbar-thumb:hover { background: #87502c; }
 .store-world__packs .pack-card {
   flex: 0 0 clamp(184px, 25vw, 228px);
   min-width: 0;
@@ -5128,8 +5282,8 @@ p {
     left: 9%;
     width: 82%;
     height: 60.5%;
-    border-radius: clamp(24px, 7vw, 42px);
-    clip-path: inset(4px 10px 6px 8px round clamp(21px, 6vw, 36px));
+    border-radius: 58px 58px 34px 34px;
+    clip-path: inset(7px 14px 0 11px round 58px 58px 34px 34px);
     padding: 16px 22px 21px 19px;
   }
   .store-world__packs .pack-card { flex-basis: min(54vw, 215px); }
@@ -5145,4 +5299,139 @@ p {
   .store-world__packs .pack-card__body { height: 57%; padding: 7px 8px; }
   .store-world__beta { top: 17.7%; font-size: .54rem; }
   .store-world__message { top: 14%; right: 6%; }
+}
+
+@media (max-width: 720px) and (pointer: coarse) {
+  .store-world__packs { scrollbar-width: none; }
+  .store-world__packs::-webkit-scrollbar { display: none; height: 0; }
+}
+
+/* Immersive game worlds -----------------------------------------------------
+   The illustrated room is the application surface. There is no decorative
+   app canvas around it, and the artwork plus its hit areas scale as one unit. */
+.app-frame--immersive {
+  width: 100%;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: #0b2238;
+}
+
+.app-frame--immersive::before,
+.app-frame--immersive::after {
+  display: none;
+}
+
+.app-frame--immersive .app-main {
+  width: 100%;
+  max-width: none;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+}
+
+.app-frame--immersive .page-stack {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* Home always covers the real viewport. The stage is allowed to extend beyond
+   one axis so panoramic phones never expose black side bars. */
+.app-frame--home .adventure-home,
+.app-frame--home .adventure-board--premium {
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  aspect-ratio: auto;
+}
+
+.app-frame--home .adventure-board--premium {
+  overflow: hidden;
+}
+
+.app-frame--home .adventure-map-stage {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  flex: 0 0 auto;
+  aspect-ratio: 1848 / 856;
+  background-image:
+    linear-gradient(180deg, rgba(8, 25, 43, .14), transparent 22%),
+    var(--adventure-map);
+  box-shadow: none;
+}
+
+/* Tablet artwork has its own 8:5 coordinate system. */
+@media (orientation: landscape) and (pointer: coarse) and (max-aspect-ratio: 1.85) {
+  .app-frame--home .adventure-map-stage {
+    width: 100vw;
+    height: 100dvh;
+    aspect-ratio: 8 / 5;
+    background-image:
+      linear-gradient(180deg, rgba(8, 25, 43, .1), transparent 20%),
+      var(--adventure-map-tablet);
+  }
+}
+
+/* Each recording room fills the first screen while keeping its native
+   coordinate system. Extra width/height is cropped by the app, never padded by
+   the obsolete global background. Historical content remains below the room. */
+.app-frame--immersive .record-page,
+.app-frame--immersive .daily-photo-page {
+  align-items: center;
+  gap: 0;
+  overflow-x: clip;
+  padding: 0 0 max(16px, env(safe-area-inset-bottom));
+  background: #171321;
+}
+
+.app-frame--immersive .responsive-world-scene {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  flex: 0 0 auto;
+  border-radius: 0;
+  aspect-ratio: auto;
+  box-shadow: none;
+}
+
+.responsive-world-scene--video { --scene-ratio-number: 1.9455; }
+.responsive-world-scene--voice { --scene-ratio-number: 2.1667; }
+.responsive-world-scene--story { --scene-ratio-number: 2.0537; }
+.responsive-world-scene--photo { --scene-ratio-number: 1.8224; }
+
+.app-frame--immersive .record-page--video .cinema-studio,
+.app-frame--immersive .record-page--audio .capture-studio--audio {
+  width: 100%;
+  max-width: none;
+}
+
+/* Keep secondary drawers and archives visually attached to their room. */
+.app-frame--immersive .cinema-effects-drawer,
+.app-frame--immersive .record-page--video .today-memories,
+.app-frame--immersive .daily-photo-page > .visual-tools,
+.app-frame--immersive .photo-archive {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .app-frame--immersive .world-scene__back,
+  .app-frame--immersive .cinema-stage__back {
+    left: max(2%, env(safe-area-inset-left));
+  }
+
+  .app-frame--immersive .world-scene__counter,
+  .app-frame--immersive .cinema-stage__ticket,
+  .app-frame--immersive .photo-room__timelapse {
+    right: max(2%, env(safe-area-inset-right));
+  }
 }
