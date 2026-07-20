@@ -98,6 +98,7 @@ export default function RecordPage() {
   const [effectsOpen, setEffectsOpen] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
   const [todayVideos, setTodayVideos] = useState<DiaryEntry[]>([]);
+  const [previousTextEntry, setPreviousTextEntry] = useState<DiaryEntry>();
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
@@ -107,6 +108,7 @@ export default function RecordPage() {
   const previewUrl = useObjectUrl(mediaBlob);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
+  const doodleAssets = (activePack?.stickers.length ? activePack.stickers : packs.find((pack) => pack.manifest.id === "base")?.stickers ?? []).slice(0, 3);
 
   useEffect(() => {
     void storagePolicyRepository.get().then(setPolicy);
@@ -128,6 +130,18 @@ export default function RecordPage() {
   useEffect(() => {
     void refreshTodayVideos();
   }, [refreshTodayVideos]);
+
+  useEffect(() => {
+    if (!activeProfile || entryType !== "text") return;
+    let alive = true;
+    setPreviousTextEntry(undefined);
+    void entryRepository.listByProfileAndType(activeProfile.id, "text").then((entries) => {
+      const now = Date.now();
+      const previous = entries.find((entry) => !entry.isLocked || Boolean(entry.unlockAt && new Date(entry.unlockAt).getTime() <= now));
+      if (alive) setPreviousTextEntry(previous);
+    });
+    return () => { alive = false; };
+  }, [activeProfile, entryType]);
 
   const stopTracks = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -534,6 +548,19 @@ export default function RecordPage() {
       <form className="story-room responsive-world-scene responsive-world-scene--story" style={{ backgroundImage: `url(${storyDeskBase})` }} onSubmit={handleTextSubmit}>
         {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="text" path={sceneMascotPaths.text} />}
         <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
+        <section className="story-room__previous" aria-label={previousTextEntry ? "Página anterior del diario" : `Dibujo del pack ${activePack?.manifest.name ?? "básico"}`}>
+          {previousTextEntry ? (
+            <>
+              <time>{new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long" }).format(new Date(previousTextEntry.createdAt))}</time>
+              <h2>{previousTextEntry.title || "Mi página anterior"}</h2>
+              <p>{previousTextEntry.note}</p>
+            </>
+          ) : (
+            <div className="story-room__doodle" aria-hidden="true">
+              {doodleAssets.map((asset, index) => <img key={asset.id} className={`story-room__doodle-item--${index + 1}`} src={asset.url} alt="" />)}
+            </div>
+          )}
+        </section>
         <div className="story-room__page">
           <p className="story-room__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</p>
           <label className="visually-hidden" htmlFor="diary-title">Título</label>
@@ -548,7 +575,6 @@ export default function RecordPage() {
             rows={9}
             required
           />
-          <span className="story-room__letters">{note.length} letras</span>
         </div>
 
         <div className="story-room__actions">
