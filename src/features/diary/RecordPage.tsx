@@ -480,8 +480,8 @@ export default function RecordPage() {
         {entryType === "video" && todayVideos.length > 0 && (
           <section className="today-memories" aria-labelledby="today-videos-title">
             <div className="today-memories__header">
-              <div><span>Hoy</span><h2 id="today-videos-title">Tus vídeos</h2></div>
-              <strong>{todayVideos.length}</strong>
+              <div><span>Cartelera de hoy</span><h2 id="today-videos-title">Mis proyecciones</h2></div>
+              <strong aria-label={`${todayVideos.length} ${todayVideos.length === 1 ? "vídeo" : "vídeos"}`}>{todayVideos.length}</strong>
             </div>
             <div className="today-video-grid">
               {todayVideos.map((entry) => (
