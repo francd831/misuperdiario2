@@ -1,4 +1,4 @@
-import { BookOpen, Download, LogOut, RotateCcw, Settings, Star } from "lucide-react";
+import { BookOpen, Download, LogOut, Settings, Star } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MapMascot, type MapPoint } from "../../app/mascot/MapMascot";
@@ -112,12 +112,6 @@ export default function HomePage() {
 
   return (
     <section className="game-home adventure-home">
-      <div className="rotate-device" role="status">
-        <span className="rotate-device__phone"><RotateCcw aria-hidden="true" size={30} /></span>
-        <strong>Gira el móvil</strong>
-        <span>La aventura se juega en horizontal</span>
-      </div>
-
       <header className="player-hud adventure-hud">
         <div className="player-hud__profile">
           {activeProfile ? <ProfileAvatar profile={activeProfile} className="player-avatar" /> : <span className="player-avatar">?</span>}

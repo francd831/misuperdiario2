@@ -29,6 +29,13 @@ import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
 import { VisualToolCarousel } from "../stickers/VisualToolCarousel";
+import { SceneMascot } from "../../app/mascot/SceneMascot";
+
+const sceneMascotPaths = {
+  video: [{ x: 9, y: 82 }, { x: 8, y: 30 }, { x: 20, y: 14 }, { x: 80, y: 14 }, { x: 92, y: 30 }, { x: 91, y: 82 }],
+  audio: [{ x: 8, y: 82 }, { x: 8, y: 23 }, { x: 20, y: 11 }, { x: 81, y: 11 }, { x: 92, y: 24 }, { x: 92, y: 82 }],
+  text: [{ x: 8, y: 82 }, { x: 8, y: 22 }, { x: 21, y: 10 }, { x: 80, y: 10 }, { x: 92, y: 24 }, { x: 92, y: 82 }],
+};
 
 function formatSeconds(seconds: number) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -319,7 +326,8 @@ export default function RecordPage() {
       <section className={`page-stack record-page record-page--${entryType}`}>
         <section className={`capture-studio capture-studio--${entryType} ${entryType === "video" ? "cinema-studio" : ""}`} data-pack={activePack?.manifest.id ?? "base"}>
           {entryType === "video" ? (
-            <div className="cinema-stage" style={{ backgroundImage: `url(${cinemaMemoriesBase})` }}>
+            <div className="cinema-stage responsive-world-scene responsive-world-scene--video" style={{ backgroundImage: `url(${cinemaMemoriesBase})` }}>
+              {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="video" path={sceneMascotPaths.video} />}
               <button className="cinema-stage__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
               <span className="cinema-stage__ticket">{dailyCount}/{dailyMax ?? "-"} hoy</span>
               <div className="video-viewfinder cinema-screen">
@@ -348,7 +356,8 @@ export default function RecordPage() {
               </div>
             </div>
           ) : (
-            <div className="voice-room" style={{ backgroundImage: `url(${voiceStudioBase})` }}>
+            <div className="voice-room responsive-world-scene responsive-world-scene--voice" style={{ backgroundImage: `url(${voiceStudioBase})` }}>
+              {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="audio" path={sceneMascotPaths.audio} />}
               <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
               <span className="world-scene__counter">{dailyCount}/{dailyMax ?? "-"} hoy</span>
               <button
@@ -477,7 +486,8 @@ export default function RecordPage() {
 
   return (
     <section className="page-stack record-page record-page--text">
-      <form className="story-room" style={{ backgroundImage: `url(${storyDeskBase})` }} onSubmit={handleTextSubmit}>
+      <form className="story-room responsive-world-scene responsive-world-scene--story" style={{ backgroundImage: `url(${storyDeskBase})` }} onSubmit={handleTextSubmit}>
+        {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="text" path={sceneMascotPaths.text} />}
         <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
         <div className="story-room__page">
           <p className="story-room__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</p>

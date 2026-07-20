@@ -28,6 +28,12 @@ import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
 import { VisualToolCarousel } from "../stickers/VisualToolCarousel";
+import { SceneMascot } from "../../app/mascot/SceneMascot";
+
+const photoMascotPath = [
+  { x: 8, y: 82 }, { x: 8, y: 23 }, { x: 20, y: 11 },
+  { x: 81, y: 11 }, { x: 92, y: 24 }, { x: 92, y: 82 },
+];
 
 function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (photo: DailyPhoto) => void; onDelete: (photo: DailyPhoto) => void }) {
   const url = useObjectUrl(photo.thumbnailBlob ?? photo.blob);
@@ -238,7 +244,8 @@ export default function DailyPhotoPage() {
 
   return (
     <section className="page-stack daily-photo-page">
-      <section className="photo-room" style={{ backgroundImage: `url(${photoCornerBase})` }}>
+      <section className="photo-room responsive-world-scene responsive-world-scene--photo" style={{ backgroundImage: `url(${photoCornerBase})` }}>
+        {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="photo" path={photoMascotPath} />}
         <Link className="world-scene__back" to="/home" aria-label="Volver a la habitación"><ArrowLeft size={22} /></Link>
         <Link className="photo-room__timelapse" to="/daily-photo/timelapse" aria-label="Abrir timelapse"><Play size={18} /></Link>
         {hasToday && !capturedBlob && <span className="photo-room__today">Foto de hoy guardada</span>}

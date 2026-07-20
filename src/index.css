@@ -3545,39 +3545,27 @@ p {
   .adventure-board--premium .adventure-world.is-destination .adventure-world__name { opacity: 1; transform: translateY(0); }
 }
 
+/* A normal browser tab may refuse the Screen Orientation API. In that case
+   the complete game viewport is still rendered as landscape, even when the
+   operating system keeps the browser in portrait. */
 @media (orientation: portrait) and (max-width: 700px) {
-  .app-frame--home .rotate-device {
+  html,
+  body,
+  #root { width: 100%; height: 100%; overflow: hidden; }
+
+  .app-frame {
     position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    gap: 10px;
-    background: linear-gradient(160deg, var(--theme-background), #fff 54%, var(--theme-secondary-soft));
-    color: var(--ink);
-    padding: 28px;
-    text-align: center;
+    top: 0;
+    left: 0;
+    width: 100dvh;
+    height: 100dvw;
+    min-height: 0;
+    overflow: auto;
+    transform: rotate(90deg) translateY(-100%);
+    transform-origin: top left;
   }
 
-  .rotate-device__phone {
-    display: grid;
-    width: 66px;
-    height: 104px;
-    margin-bottom: 14px;
-    place-items: center;
-    border: 6px solid var(--theme-primary);
-    border-radius: 18px;
-    color: var(--theme-primary);
-    animation: rotate-phone 1.8s ease-in-out infinite;
-  }
-
-  .rotate-device strong { font-size: 1.7rem; font-weight: 950; }
-  .rotate-device > span:last-child { color: var(--muted); font-weight: 800; }
-}
-
-@keyframes rotate-phone {
-  45%, 100% { transform: rotate(90deg); }
+  .app-frame .app-main { min-height: 100%; }
 }
 
 /* Premium illustrated map */
@@ -3948,6 +3936,50 @@ p {
   pointer-events: none;
 }
 
+.scene-mascot {
+  --map-mascot-direction: 1;
+  position: absolute;
+  z-index: 1;
+  width: clamp(44px, 6.2vw, 68px);
+  height: clamp(40px, 5.6vw, 61px);
+  transform: translate(-50%, -68%);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  will-change: top, left;
+}
+
+.scene-mascot:active { cursor: grabbing; }
+.scene-mascot:focus-visible { border-radius: 50%; box-shadow: 0 0 0 3px #fff, 0 0 0 6px #f6c453; }
+.scene-mascot__sprite {
+  position: absolute;
+  z-index: 2;
+  inset: -12% -10%;
+  background-position: 0 66.666%;
+  background-repeat: no-repeat;
+  background-size: 800% 400%;
+  filter: drop-shadow(0 5px 5px rgba(5, 22, 31, .24));
+  pointer-events: none;
+  transform: scaleX(var(--map-mascot-direction));
+  transform-origin: center bottom;
+}
+.scene-mascot__shadow {
+  position: absolute;
+  z-index: 1;
+  right: 18%;
+  bottom: 4%;
+  left: 18%;
+  height: 12%;
+  border-radius: 50%;
+  background: rgba(4, 20, 28, .24);
+  filter: blur(3px);
+  pointer-events: none;
+}
+
 .adventure-map-stage:has(.adventure-world.is-destination) .adventure-world:not(.is-destination) {
   cursor: wait;
 }
@@ -4067,6 +4099,25 @@ p {
   }
 }
 
+/* Responsive illustrated-world contract. Packs keep one coordinate system per
+   viewport family, while the artwork always preserves its native proportions. */
+.responsive-world-scene {
+  width: min(100%, 980px);
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 26px;
+  aspect-ratio: var(--scene-ratio-wide);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  container-type: inline-size;
+  isolation: isolate;
+}
+.responsive-world-scene--video { --scene-ratio-wide: 1749 / 899; }
+.responsive-world-scene--voice { --scene-ratio-wide: 1846 / 852; }
+.responsive-world-scene--story { --scene-ratio-wide: 1797 / 875; }
+.responsive-world-scene--photo { --scene-ratio-wide: 1693 / 929; }
+
 /* Base-pack cinema: the illustrated location is the UI surface. */
 .record-page--video { background: transparent; }
 .record-page--video .cinema-studio {
@@ -4083,12 +4134,7 @@ p {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 26px;
   padding: 0;
-  aspect-ratio: 1749 / 899;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
   box-shadow: 0 24px 58px rgb(27 13 10 / 30%);
 }
 
@@ -4168,13 +4214,7 @@ p {
 .record-page--video .cinema-action,
 .record-page--video .cinema-control { min-height: 40px; }
 
-@media (max-width: 640px) {
-  .record-page--video .cinema-stage {
-    border-radius: 20px;
-    aspect-ratio: 1.1;
-    background-size: auto 100%;
-  }
-  .record-page--video .cinema-screen.video-viewfinder { top: 20.8%; left: 3.5%; width: 93%; height: 56.8%; }
+@media (orientation: landscape) and (max-height: 600px) {
   .record-page--video .cinema-console { right: 9%; bottom: 2%; left: 9%; min-height: 56px; padding: 6px 8px; }
   .record-page--video .cinema-effects { padding-inline: 9px; }
   .record-page--video .cinema-record { width: 48px; height: 48px; }
@@ -4220,14 +4260,6 @@ p {
 .record-page--audio .capture-studio--audio { overflow: visible; border: 0; background: transparent; box-shadow: none; }
 .voice-room {
   position: relative;
-  width: min(100%, 980px);
-  margin-inline: auto;
-  overflow: hidden;
-  border-radius: 26px;
-  aspect-ratio: 1846 / 852;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
   box-shadow: 0 24px 58px rgb(42 22 49 / 25%);
 }
 .voice-room__mic {
@@ -4287,14 +4319,6 @@ p {
 .record-page--text { background: transparent; }
 .story-room {
   position: relative;
-  width: min(100%, 980px);
-  margin-inline: auto;
-  overflow: hidden;
-  border-radius: 26px;
-  aspect-ratio: 1797 / 875;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
   box-shadow: 0 24px 58px rgb(76 42 18 / 24%);
 }
 .story-room__page,
@@ -4319,14 +4343,6 @@ p {
 .daily-photo-page { background: transparent; }
 .photo-room {
   position: relative;
-  width: min(100%, 980px);
-  margin-inline: auto;
-  overflow: hidden;
-  border-radius: 26px;
-  aspect-ratio: 1693 / 929;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
   box-shadow: 0 24px 58px rgb(71 39 40 / 24%);
 }
 .photo-room__timelapse {
@@ -4355,16 +4371,12 @@ p {
 .photo-room .photo-shutter { width: 50px; height: 50px; }
 .photo-room .photo-shutter span { width: 38px; height: 38px; }
 
-@media (max-width: 640px) {
+@media (orientation: landscape) and (max-height: 600px) {
   .world-scene__back, .photo-room__timelapse { width: 40px; height: 40px; }
-  .voice-room { aspect-ratio: 1.05; background-size: auto 100%; }
-  .voice-room__mic { top: 18.5%; left: 28%; width: 44%; height: 74%; }
-  .voice-room__console { right: 7%; bottom: 2%; left: 7%; min-height: 54px; padding: 5px 7px; }
+  .voice-room__console { right: 22%; bottom: 2%; left: 22%; min-height: 54px; padding: 5px 7px; }
   .voice-room audio { width: min(155px, 42%); }
   .voice-room__console > small { display: none; }
-  .story-room { aspect-ratio: 1.05; background-size: auto 100%; }
-  .story-room__page { top: 32%; left: 7%; width: 40.5%; height: 48%; }
-  .story-room__tools { top: 33%; left: 52%; width: 46%; gap: 6px; }
+  .story-room__tools { gap: 6px; }
   .story-room__date { margin-bottom: 4px; font-size: .5rem; }
   .story-room__date { padding-left: 18px; }
   .story-room__title { padding-left: 14px; }
@@ -4372,9 +4384,7 @@ p {
   .story-room__note { font-size: .62rem; line-height: 1.48; }
   .story-room__lock { padding: 5px; font-size: .55rem; }
   .story-room__save { min-height: 35px; font-size: .56rem; }
-  .photo-room { aspect-ratio: 1.05; background-size: auto 100%; }
-  .photo-room__preview { top: 29.5%; left: 8.5%; width: 83%; height: 53.3%; }
-  .photo-room__controls { right: 8%; bottom: 2%; left: 8%; min-height: 54px; padding: 5px 7px; }
+  .photo-room__controls { right: 22%; bottom: 2%; left: 22%; min-height: 54px; padding: 5px 7px; }
   .photo-room__controls .secondary-action, .photo-room__controls .primary-action { padding-inline: 8px; font-size: .65rem; }
   .photo-room__today { top: 25.2%; font-size: .58rem; }
 }

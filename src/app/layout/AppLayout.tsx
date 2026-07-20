@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from "react";
+import { useEffect, useMemo, type CSSProperties } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { packLoader } from "../../core/packs/packLoader";
 import type { PackManifest } from "../../core/packs/types";
@@ -45,6 +45,26 @@ export function AppLayout() {
   const activePackId = activeProfile?.activePackId ?? fallbackPackId;
   const activePack = packLoader.getPack(activePackId) ?? packLoader.getPack(fallbackPackId);
   const style = useMemo(() => themeVariables(activePack), [activePack]);
+
+  useEffect(() => {
+    const orientation = screen.orientation as ScreenOrientation & {
+      lock?: (value: "landscape") => Promise<void>;
+    };
+    const requestLandscape = () => {
+      void orientation?.lock?.("landscape").catch(() => {
+        // Normal browser tabs may reject orientation locking. CSS keeps the
+        // application landscape in that case; installed PWAs use this lock.
+      });
+    };
+
+    requestLandscape();
+    document.addEventListener("fullscreenchange", requestLandscape);
+    window.addEventListener("appinstalled", requestLandscape);
+    return () => {
+      document.removeEventListener("fullscreenchange", requestLandscape);
+      window.removeEventListener("appinstalled", requestLandscape);
+    };
+  }, []);
 
   return (
     <div className={`app-frame ${location.pathname === "/home" ? "app-frame--home" : ""}`} data-pack-theme={activePack?.id ?? fallbackPackId} style={style}>

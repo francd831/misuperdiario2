@@ -50,6 +50,24 @@ function uniquePath(points: MapPoint[]) {
   return points.filter((point, index) => index === 0 || distance(point, points[index - 1]) > .1);
 }
 
+function smoothPath(points: MapPoint[], passes = 3) {
+  let result = points;
+  for (let pass = 0; pass < passes; pass += 1) {
+    const rounded = [{ ...result[0] }];
+    for (let index = 0; index < result.length - 1; index += 1) {
+      const start = result[index];
+      const end = result[index + 1];
+      rounded.push(
+        { x: start.x * .75 + end.x * .25, y: start.y * .75 + end.y * .25 },
+        { x: start.x * .25 + end.x * .75, y: start.y * .25 + end.y * .75 },
+      );
+    }
+    rounded.push({ ...result.at(-1)! });
+    result = rounded;
+  }
+  return uniquePath(result);
+}
+
 export function MapMascot({ profileId, sceneId, hub, routes, destinationId, onArrive }: MapMascotProps) {
   const rootRef = useRef<HTMLButtonElement>(null);
   const spriteRef = useRef<HTMLSpanElement>(null);
@@ -116,10 +134,12 @@ export function MapMascot({ profileId, sceneId, hub, routes, destinationId, onAr
     }
 
     const originRoute = currentDestination.current ? routes[currentDestination.current] : undefined;
-    const routeBackToHub = originRoute
-      ? [...originRoute].reverse().slice(1).concat({ ...hub })
-      : [{ ...hub }];
-    const path = uniquePath([{ ...position.current }, ...routeBackToHub, ...destinationPath]);
+    const rawPath = originRoute
+      ? [{ ...position.current }, ...[...originRoute].reverse().slice(1), { ...hub }, ...destinationPath]
+      : distance(position.current, hub) < 1
+        ? [{ ...position.current }, ...destinationPath]
+        : [{ ...position.current }, { ...end }];
+    const path = smoothPath(uniquePath(rawPath));
     const routeLength = path.slice(1).reduce((total, point, index) => total + distance(path[index], point), 0);
     travel.current = {
       destinationId,
