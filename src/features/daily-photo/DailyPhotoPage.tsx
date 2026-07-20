@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Camera, Maximize2, Play, RotateCcw, Save, SlidersHorizontal, Trash2, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
@@ -71,13 +71,13 @@ function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (p
 }
 
 export default function DailyPhotoPage() {
+  const navigate = useNavigate();
   const { activeProfile } = useProfiles();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [policy, setPolicy] = useState<StoragePolicy | null>(null);
   const [photos, setPhotos] = useState<DailyPhoto[]>([]);
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
-  const [caption, setCaption] = useState("");
   const [error, setError] = useState("");
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
@@ -163,14 +163,12 @@ export default function DailyPhotoPage() {
           profileId: activeProfile.id,
           blob: capturedBlob,
           thumbnailBlob,
-          caption,
           overlayProject: overlays,
         },
         policy.allowDailyPhotoReplacement,
       );
       await achievementService.syncProfile(activeProfile.id);
       setCapturedBlob(null);
-      setCaption("");
       setOverlays(clearOverlays());
       setSelectedOverlayId(null);
       await refreshPhotos();
@@ -207,7 +205,6 @@ export default function DailyPhotoPage() {
 
   function editPhoto(photo: DailyPhoto) {
     setCapturedBlob(photo.blob);
-    setCaption(photo.caption ?? "");
     setOverlays(normalizeOverlayProject(photo.overlayProject));
     setEditingPhotoId(photo.id);
     setSelectedOverlayId(null);
@@ -221,7 +218,6 @@ export default function DailyPhotoPage() {
     try {
       await dailyPhotoRepository.updateOverlayProject(editingPhotoId, overlays);
       setCapturedBlob(null);
-      setCaption("");
       setOverlays(clearOverlays());
       setEditingPhotoId(null);
       setSelectedOverlayId(null);
@@ -242,12 +238,16 @@ export default function DailyPhotoPage() {
     await refreshPhotos();
   }
 
+  function openTimelapse() {
+    void document.documentElement.requestFullscreen?.().catch(() => undefined);
+    navigate("/daily-photo/timelapse");
+  }
+
   return (
     <section className="page-stack daily-photo-page">
       <section className="photo-room responsive-world-scene responsive-world-scene--photo" style={{ backgroundImage: `url(${photoCornerBase})` }}>
         {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="photo" path={photoMascotPath} />}
         <Link className="world-scene__back" to="/home" aria-label="Volver a la habitación"><ArrowLeft size={22} /></Link>
-        <Link className="photo-room__timelapse" to="/daily-photo/timelapse" aria-label="Abrir timelapse"><Play size={18} /></Link>
         {hasToday && !capturedBlob && <span className="photo-room__today">Foto de hoy guardada</span>}
         <div className="photo-room__preview">
           <div className="sticker-stage" style={{ aspectRatio: cameraAspectRatio }}>
@@ -315,10 +315,6 @@ export default function DailyPhotoPage() {
 
       {(capturedBlob || !editingPhotoId) && (
         <>
-          <label className="photo-caption">
-            <span>Pie de foto</span>
-            <input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="¿Qué quieres recordar?" />
-          </label>
           {effectsOpen && (
             <VisualToolCarousel
               pack={activePack}
@@ -335,19 +331,25 @@ export default function DailyPhotoPage() {
 
       {error && <p className="form-error">{error}</p>}
 
-      {photos.length === 0 ? (
-        <section className="empty-state">
-          <Camera size={32} />
-          <h2>Aun no hay fotos</h2>
-          <p>Haz tu primera foto diaria para empezar el timelapse.</p>
-        </section>
-      ) : (
-        <div className="photo-grid">
-          {photos.map((photo) => (
-            <PhotoThumb key={photo.id} photo={photo} onEdit={editPhoto} onDelete={(item) => void deletePhoto(item)} />
-          ))}
-        </div>
-      )}
+      <section className="photo-archive" aria-labelledby="photo-archive-title">
+        <header className="photo-archive__header">
+          <div><span>Archivo del mirador</span><h2 id="photo-archive-title">Mis fotos</h2></div>
+          {photos.length > 0 && (
+            <button className="photo-archive__timelapse" type="button" onClick={openTimelapse}>
+              <Play size={16} fill="currentColor" /> <span>Ver timelapse</span><small>{photos.length} {photos.length === 1 ? "foto" : "fotos"}</small>
+            </button>
+          )}
+        </header>
+        {photos.length === 0 ? (
+          <div className="photo-archive__empty"><Camera size={25} /><div><strong>Aún no hay fotos</strong><span>Haz la primera para comenzar tu película.</span></div></div>
+        ) : (
+          <div className="photo-grid">
+            {photos.map((photo) => (
+              <PhotoThumb key={photo.id} photo={photo} onEdit={editPhoto} onDelete={(item) => void deletePhoto(item)} />
+            ))}
+          </div>
+        )}
+      </section>
     </section>
   );
 }
