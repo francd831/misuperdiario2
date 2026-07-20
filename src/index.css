@@ -3905,9 +3905,15 @@ p {
   outline: 0;
   background: transparent;
   padding: 0;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
   transform: translate(-50%, -72%);
   will-change: top, left;
+}
+
+.map-mascot:active {
+  cursor: grabbing;
 }
 
 .map-mascot:focus-visible {
