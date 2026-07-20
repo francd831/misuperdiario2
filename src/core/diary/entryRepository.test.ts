@@ -6,7 +6,9 @@ vi.mock("../storage/db", () => {
 
   return {
     dbSet: vi.fn(async (_store: string, value: any) => {
-      entries.push(value);
+      const index = entries.findIndex((entry) => entry.id === value.id);
+      if (index >= 0) entries[index] = value;
+      else entries.push(value);
     }),
     dbGet: vi.fn(async (_store: string, id: string) => entries.find((entry) => entry.id === id)),
     dbDelete: vi.fn(async (_store: string, id: string) => {
@@ -67,5 +69,24 @@ describe("entryRepository", () => {
     await entryRepository.remove(entry.id);
 
     expect(await entryRepository.get(entry.id)).toBeUndefined();
+  });
+
+  it("adds optional details after a media entry is safely stored", async () => {
+    const entry = await entryRepository.createMediaEntry({
+      profileId: "profile-details",
+      type: "audio",
+      durationSeconds: 8,
+      mediaBlob: new Blob(["audio"], { type: "audio/webm" }),
+    });
+
+    const updated = await entryRepository.updateDetails(entry.id, {
+      title: "Mi canción",
+      note: "La grabé esta tarde",
+      isLocked: false,
+      unlockAt: undefined,
+    });
+
+    expect(updated.title).toBe("Mi canción");
+    expect((await entryRepository.get(entry.id))?.note).toBe("La grabé esta tarde");
   });
 });

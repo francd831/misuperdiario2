@@ -90,4 +90,19 @@ export const entryRepository = {
     await dbSet("entries", updated);
     return updated;
   },
+
+  async updateDetails(id: string, details: Pick<DiaryEntry, "title" | "note" | "isLocked" | "unlockAt">) {
+    const entry = await this.get(id);
+    if (!entry) throw new Error("Entrada no encontrada.");
+    const updated: DiaryEntry = {
+      ...entry,
+      title: details.title?.trim() || undefined,
+      note: details.note?.trim() || undefined,
+      isLocked: Boolean(details.isLocked),
+      unlockAt: details.isLocked ? details.unlockAt : undefined,
+      updatedAt: now(),
+    };
+    await dbSet("entries", updated);
+    return updated;
+  },
 };

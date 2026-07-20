@@ -93,6 +93,8 @@ export default function RecordPage() {
   const [elapsed, setElapsed] = useState(0);
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [saveSheetOpen, setSaveSheetOpen] = useState(false);
+  const [savedEntryId, setSavedEntryId] = useState<string>();
+  const [saving, setSaving] = useState(false);
   const [effectsOpen, setEffectsOpen] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
   const [todayVideos, setTodayVideos] = useState<DiaryEntry[]>([]);
@@ -166,6 +168,24 @@ export default function RecordPage() {
 
   useEffect(() => () => stopTracks(), [stopTracks]);
 
+  useEffect(() => {
+    if (!saveSheetOpen || !window.visualViewport) return undefined;
+    const viewport = window.visualViewport;
+    const updateViewport = () => {
+      document.documentElement.style.setProperty("--save-viewport-height", `${viewport.height}px`);
+      document.documentElement.style.setProperty("--save-viewport-top", `${viewport.offsetTop}px`);
+    };
+    updateViewport();
+    viewport.addEventListener("resize", updateViewport);
+    viewport.addEventListener("scroll", updateViewport);
+    return () => {
+      viewport.removeEventListener("resize", updateViewport);
+      viewport.removeEventListener("scroll", updateViewport);
+      document.documentElement.style.removeProperty("--save-viewport-height");
+      document.documentElement.style.removeProperty("--save-viewport-top");
+    };
+  }, [saveSheetOpen]);
+
   async function handleTextSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -238,6 +258,7 @@ export default function RecordPage() {
       recorderRef.current = recorder;
       setElapsed(0);
       setMediaBlob(null);
+      setSavedEntryId(undefined);
       setSaveSheetOpen(false);
       setSelectedOverlayId(null);
       recorder.start(1000);
@@ -261,29 +282,49 @@ export default function RecordPage() {
     }
   }
 
-  async function saveMediaEntry() {
+  async function quickSaveMediaEntry() {
     setError("");
-    if (!activeProfile || entryType === "text" || !mediaBlob) return;
+    if (!activeProfile || entryType === "text" || !mediaBlob || saving) return;
+    setSaving(true);
+    try {
+      const entry = await entryRepository.createMediaEntry({
+        profileId: activeProfile.id,
+        type: entryType,
+        durationSeconds: elapsed,
+        mediaBlob,
+        overlayProject: entryType === "video" ? overlays : undefined,
+      });
+      setSavedEntryId(entry.id);
+      setSaveSheetOpen(false);
+      setDailyCount((count) => count + 1);
+      if (entryType === "video") await refreshTodayVideos();
+      await achievementService.syncProfile(activeProfile.id);
+    } catch {
+      setError("No se pudo guardar el recuerdo.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
+  async function saveMediaDetails() {
+    setError("");
+    if (!savedEntryId) return;
     if (isLocked && !unlockAt) {
       setError("Elige una fecha para la capsula del tiempo.");
       return;
     }
-
-    await entryRepository.createMediaEntry({
-      profileId: activeProfile.id,
-      type: entryType,
-      title,
-      note,
-      durationSeconds: elapsed,
-      mediaBlob,
-      overlayProject: entryType === "video" ? overlays : undefined,
-      isLocked,
-      unlockAt: isLocked ? new Date(unlockAt).toISOString() : undefined,
-    });
-    await achievementService.syncProfile(activeProfile.id);
-
-    navigate("/diary");
+    try {
+      await entryRepository.updateDetails(savedEntryId, {
+        title,
+        note,
+        isLocked,
+        unlockAt: isLocked ? new Date(unlockAt).toISOString() : undefined,
+      });
+      setSaveSheetOpen(false);
+      if (entryType === "video") await refreshTodayVideos();
+    } catch {
+      setError("No se pudieron guardar los detalles.");
+    }
   }
 
   function addSticker(sticker: PackAsset) {
@@ -379,8 +420,8 @@ export default function RecordPage() {
                 {previewUrl && <audio src={previewUrl} controls />}
                 {mediaBlob && (
                   <div className="voice-room__actions">
-                    <button type="button" onClick={() => setMediaBlob(null)}><RotateCcw size={17} /> Repetir</button>
-                    <button type="button" onClick={() => setSaveSheetOpen(true)}><Save size={17} /> Guardar</button>
+                    <button type="button" onClick={() => { setMediaBlob(null); setSavedEntryId(undefined); }}><RotateCcw size={17} /> Repetir</button>
+                    {!savedEntryId && <button type="button" disabled={saving} onClick={() => void quickSaveMediaEntry()}><Save size={17} /> {saving ? "Guardando" : "Guardar"}</button>}
                   </div>
                 )}
                 <small>Máximo {formatSeconds(maxSeconds ?? 0)}</small>
@@ -404,8 +445,8 @@ export default function RecordPage() {
                   </>
                 ) : (
                   <>
-                    <button className="cinema-action" type="button" onClick={() => setMediaBlob(null)}><RotateCcw size={18} /> Repetir</button>
-                    <button className="cinema-action cinema-action--save" type="button" onClick={() => setSaveSheetOpen(true)}><Save size={18} /> Guardar</button>
+                    <button className="cinema-action" type="button" onClick={() => { setMediaBlob(null); setSavedEntryId(undefined); }}><RotateCcw size={18} /> Repetir</button>
+                    {!savedEntryId && <button className="cinema-action cinema-action--save" type="button" disabled={saving} onClick={() => void quickSaveMediaEntry()}><Save size={18} /> {saving ? "Guardando" : "Guardar"}</button>}
                   </>
                 )}
               </div>
@@ -441,7 +482,16 @@ export default function RecordPage() {
           </section>
         )}
 
-        {mediaBlob && saveSheetOpen && (
+        {mediaBlob && savedEntryId && !saveSheetOpen && (
+          <aside className="quick-save-confirmation" role="status" aria-live="polite">
+            <span className="quick-save-confirmation__icon"><Save size={20} /></span>
+            <div><strong>Recuerdo guardado</strong><small>Ya está a salvo en tu diario</small></div>
+            <button type="button" onClick={() => setSaveSheetOpen(true)}>Añadir detalles</button>
+            <button type="button" onClick={() => navigate("/diary")}>Ver diario</button>
+          </aside>
+        )}
+
+        {mediaBlob && savedEntryId && saveSheetOpen && (
           <div className="save-sheet-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSaveSheetOpen(false); }}>
             <section className="save-sheet" role="dialog" aria-modal="true" aria-labelledby="save-sheet-title">
               <div className="save-sheet__handle" aria-hidden="true" />
@@ -452,10 +502,10 @@ export default function RecordPage() {
                 </div>
                 <button type="button" onClick={() => setSaveSheetOpen(false)} aria-label="Cerrar"><X size={20} /></button>
               </header>
-              <form className="save-sheet__form" onSubmit={(event) => { event.preventDefault(); void saveMediaEntry(); }}>
+              <form className="save-sheet__form" onSubmit={(event) => { event.preventDefault(); void saveMediaDetails(); }}>
                 <label className="save-sheet__field">
                   <span>Título <small>opcional</small></span>
-                  <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Ponle un nombre a este momento" autoFocus />
+                  <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Ponle un nombre a este momento" />
                 </label>
                 <label className="save-sheet__field">
                   <span>Nota <small>opcional</small></span>
@@ -473,7 +523,7 @@ export default function RecordPage() {
                   </label>
                 )}
                 {error && <p className="form-error">{error}</p>}
-                <button className="primary-action save-sheet__submit" type="submit"><Save size={18} /> Añadir al diario</button>
+                <button className="primary-action save-sheet__submit" type="submit"><Save size={18} /> Guardar detalles</button>
               </form>
             </section>
           </div>
