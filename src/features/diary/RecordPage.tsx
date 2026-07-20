@@ -200,17 +200,12 @@ export default function RecordPage() {
       return;
     }
 
-    if (isLocked && !unlockAt) {
-      setError("Elige una fecha para la capsula del tiempo.");
-      return;
-    }
-
     await entryRepository.createTextEntry({
       profileId: activeProfile.id,
       title,
       note,
-      isLocked,
-      unlockAt: isLocked ? new Date(unlockAt).toISOString() : undefined,
+      isLocked: false,
+      unlockAt: undefined,
     });
     await achievementService.syncProfile(activeProfile.id);
 
@@ -556,19 +551,7 @@ export default function RecordPage() {
           <span className="story-room__letters">{note.length} letras</span>
         </div>
 
-        <div className="story-room__tools">
-          <label className="story-room__lock">
-            <input type="checkbox" checked={isLocked} onChange={(event) => setIsLocked(event.target.checked)} />
-            <LockKeyhole size={17} /> Cápsula del tiempo
-          </label>
-
-          {isLocked && (
-            <label className="story-room__unlock">
-              Abrir el
-              <input value={unlockAt} onChange={(event) => setUnlockAt(event.target.value)} type="date" />
-            </label>
-          )}
-
+        <div className="story-room__actions">
           {error && <p className="form-error">{error}</p>}
 
           <button className="story-room__save" type="submit">
