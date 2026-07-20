@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Eye, Lock, ShoppingBag, Sparkles, Star } from "lucide-react";
-import { packService } from "../../core/packs/packService";
+import { ArrowLeft, Check, Eye, Lock, ShoppingBag, Sparkles, Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import worldBoutique from "../../assets/store/world-boutique-base.webp";
+import { packService, PREVIEW_ALL_PACKS } from "../../core/packs/packService";
 import type { PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
 import type { WalletSummary } from "../../core/wallet/types";
-import { PageHeader } from "../../shared/ui/PageHeader";
 
 export default function StorePage() {
   const { activeProfile, refresh } = useProfiles();
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
-  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set(["base"]));
+  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(() => PREVIEW_ALL_PACKS ? new Set(packs.map((pack) => pack.manifest.id)) : new Set(["base"]));
   const [wallet, setWallet] = useState<WalletSummary>({ balance: 0, transactions: [] });
   const [openPackId, setOpenPackId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -63,29 +64,19 @@ export default function StorePage() {
 
   return (
     <section className="page-stack store-page">
-      <PageHeader
-        title="Tienda"
-        icon={<ShoppingBag size={22} />}
-        backTo="/home"
-      />
-
-      <section className="game-hud" aria-label="Saldo de estrellas">
-        <div>
-          <span className="game-hud__label">Tus estrellas</span>
-          <strong>
-            <Star size={24} fill="currentColor" /> {wallet.balance}
-          </strong>
+      <section className="store-world" style={{ backgroundImage: `url(${worldBoutique})` }}>
+        <Link className="world-scene__back store-world__back" to="/home" aria-label="Volver al inicio"><ArrowLeft size={22} /></Link>
+        <div className="store-world__balance" aria-label={`Tienes ${wallet.balance} estrellas`}>
+          <Star size={20} fill="currentColor" /> <strong>{wallet.balance}</strong>
         </div>
-        <p>Guarda recuerdos para ganar mas y abrir nuevos mundos.</p>
-      </section>
 
-      {import.meta.env.DEV && (
-        <p className="form-success">Modo de pruebas: todos los packs están disponibles.</p>
+      {(PREVIEW_ALL_PACKS || import.meta.env.DEV) && (
+        <p className="store-world__beta">Modo de pruebas · todo abierto</p>
       )}
 
-      {message && <p className={messageTone === "success" ? "form-success" : "form-error"}>{message}</p>}
+      {message && <p className={`store-world__message ${messageTone === "success" ? "is-success" : "is-error"}`}>{message}</p>}
 
-      <div className="pack-grid">
+      <div className="pack-grid store-world__packs">
         {sortedPacks.map(({ manifest, previewUrl, stickers, frames, filters, speechBubbles, stamps, masks, effects }) => {
           const unlocked = unlockedIds.has(manifest.id);
           const active = activePackId === manifest.id;
@@ -149,6 +140,7 @@ export default function StorePage() {
           );
         })}
       </div>
+      </section>
 
       <section className="status-panel">
         <h2>Ultimos movimientos</h2>

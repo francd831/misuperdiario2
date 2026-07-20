@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Camera, Play, RotateCcw, Save, SlidersHorizontal, Trash2 } from "lucide-react";
+import { ArrowLeft, Camera, Maximize2, Play, RotateCcw, Save, SlidersHorizontal, Trash2, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { createImageThumbnail, blobFromCanvas } from "../../core/daily-photo/imageProcessing";
@@ -31,7 +31,9 @@ import { VisualToolCarousel } from "../stickers/VisualToolCarousel";
 
 function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (photo: DailyPhoto) => void; onDelete: (photo: DailyPhoto) => void }) {
   const url = useObjectUrl(photo.thumbnailBlob ?? photo.blob);
+  const fullUrl = useObjectUrl(photo.blob);
   const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <article className="photo-tile">
@@ -39,6 +41,7 @@ function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (p
       <FilterCanvas overlays={photo.overlayProject} packs={packs} />
       <FrameCanvas overlays={photo.overlayProject} packs={packs} />
       <StickerCanvas overlays={photo.overlayProject ?? []} packs={packs} />
+      <button className="memory-expand-button" type="button" onClick={() => setExpanded(true)} aria-label="Ampliar foto"><Maximize2 size={17} /></button>
       <div className="memory-card-actions">
         <button type="button" onClick={() => onEdit(photo)}>Editar</button>
         <button className="danger-icon-action" type="button" onClick={() => onDelete(photo)} aria-label="Borrar foto">
@@ -46,6 +49,17 @@ function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (p
         </button>
       </div>
       <span>{new Date(photo.date).toLocaleDateString("es", { day: "numeric", month: "short" })}</span>
+      {expanded && fullUrl && (
+        <div className="memory-lightbox" role="dialog" aria-modal="true" aria-label="Foto ampliada" onMouseDown={(event) => { if (event.target === event.currentTarget) setExpanded(false); }}>
+          <button className="memory-lightbox__close" type="button" onClick={() => setExpanded(false)} aria-label="Cerrar"><X size={22} /></button>
+          <div className="memory-lightbox__stage memory-lightbox__stage--photo">
+            <img src={fullUrl} alt={photo.caption || `Foto del ${photo.date}`} />
+            <FilterCanvas overlays={photo.overlayProject} packs={packs} />
+            <FrameCanvas overlays={photo.overlayProject} packs={packs} />
+            <StickerCanvas overlays={photo.overlayProject ?? []} packs={packs} />
+          </div>
+        </div>
+      )}
     </article>
   );
 }

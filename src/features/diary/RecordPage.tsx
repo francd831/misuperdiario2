@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Clapperboard, Film, LockKeyhole, Pause, Play, RotateCcw, Save, Square, Trash2, X } from "lucide-react";
+import { ArrowLeft, Clapperboard, Film, LockKeyhole, Maximize2, Pause, Play, RotateCcw, Save, Square, Trash2, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -36,6 +36,7 @@ function formatSeconds(seconds: number) {
 
 function TodayVideoCard({ entry, packs, onDelete }: { entry: DiaryEntry; packs: PackWithAssets[]; onDelete: (entry: DiaryEntry) => void }) {
   const url = useObjectUrl(entry.mediaBlob);
+  const [expanded, setExpanded] = useState(false);
   return (
     <article className="today-video-card">
       <div className="sticker-stage">
@@ -43,6 +44,7 @@ function TodayVideoCard({ entry, packs, onDelete }: { entry: DiaryEntry; packs: 
         <FilterCanvas overlays={entry.overlayProject} packs={packs} />
         <StickerCanvas overlays={entry.overlayProject ?? []} packs={packs} />
         <FrameCanvas overlays={entry.overlayProject} packs={packs} />
+        <button className="memory-expand-button" type="button" onClick={() => setExpanded(true)} aria-label="Ampliar vídeo"><Maximize2 size={17} /></button>
       </div>
       <div className="today-video-card__info">
         <div>
@@ -53,6 +55,17 @@ function TodayVideoCard({ entry, packs, onDelete }: { entry: DiaryEntry; packs: 
           <Trash2 size={18} />
         </button>
       </div>
+      {expanded && url && (
+        <div className="memory-lightbox" role="dialog" aria-modal="true" aria-label="Vídeo ampliado" onMouseDown={(event) => { if (event.target === event.currentTarget) setExpanded(false); }}>
+          <button className="memory-lightbox__close" type="button" onClick={() => setExpanded(false)} aria-label="Cerrar"><X size={22} /></button>
+          <div className="memory-lightbox__stage memory-lightbox__stage--video">
+            <video src={url} controls autoPlay playsInline />
+            <FilterCanvas overlays={entry.overlayProject} packs={packs} />
+            <StickerCanvas overlays={entry.overlayProject ?? []} packs={packs} />
+            <FrameCanvas overlays={entry.overlayProject} packs={packs} />
+          </div>
+        </div>
+      )}
     </article>
   );
 }

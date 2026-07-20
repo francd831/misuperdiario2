@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BookOpen, Camera, FileText, Lock, Mic, Search, Sparkles, Trash2, Video } from "lucide-react";
+import { ArrowLeft, Camera, FileText, Lock, Maximize2, Mic, Search, Sparkles, Trash2, Video, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import memoryGallery from "../../assets/diary/memory-gallery-base.webp";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -19,7 +21,6 @@ import { packService } from "../../core/packs/packService";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
-import { PageHeader } from "../../shared/ui/PageHeader";
 import { AssetTray } from "../stickers/AssetTray";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
@@ -86,7 +87,7 @@ function photoToTimelineItem(photo: DailyPhoto): TimelineItem {
     date: photo.date,
     title: "Foto diaria",
     note: photo.caption,
-    photoBlob: photo.thumbnailBlob ?? photo.blob,
+    photoBlob: photo.blob,
     overlayProject: photo.overlayProject,
     createdAt: photo.createdAt,
     updatedAt: photo.updatedAt,
@@ -198,19 +199,19 @@ export default function DiaryPage() {
 
   return (
     <section className="page-stack diary-page">
-      <PageHeader
-        title="Diario"
-        icon={<BookOpen size={22} />}
-        backTo="/home"
-      />
+      <section className="diary-world diary-gallery" style={{ backgroundImage: `url(${memoryGallery})` }}>
+        <Link className="world-scene__back diary-world__back" to="/home" aria-label="Volver al inicio">
+          <ArrowLeft size={22} />
+        </Link>
 
-      <section className="diary-toolbar">
+        <section className="diary-album">
+          <section className="diary-toolbar">
         <label className="diary-search">
           <Search size={18} />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar recuerdo"
+            placeholder="Buscar recuerdos"
           />
         </label>
         <div className="diary-counter" aria-label={`${filteredItems.length} recuerdos visibles`}>
@@ -221,10 +222,10 @@ export default function DiaryPage() {
       </section>
 
       {filteredItems.length === 0 ? (
-        <section className="empty-state">
+        <section className="empty-state diary-empty">
           <Lock size={28} />
-          <h2>{query ? "No encuentro ese recuerdo" : "Aun no hay recuerdos"}</h2>
-          <p>{query ? "Prueba con otra palabra." : "Empieza creando un video, una voz, una foto o un texto desde el inicio."}</p>
+          <h2>{query ? "No encuentro ese recuerdo" : "Tu galería está esperando"}</h2>
+          <p>{query ? "Prueba con otra palabra." : "Las fotos, vídeos, voces e historias que crees aparecerán aquí."}</p>
         </section>
       ) : (
         <div className="diary-timeline" aria-label="Línea temporal de recuerdos">
@@ -272,6 +273,8 @@ export default function DiaryPage() {
           ))}
         </div>
       )}
+        </section>
+      </section>
     </section>
   );
 }
@@ -348,6 +351,8 @@ function EntryCard({
   const photoUrl = useObjectUrl(entry.kind === "photo" ? entry.photoBlob : undefined);
   const overlays = editingEntryId === entry.id ? draftOverlays : entry.overlayProject;
   const canDecorate = entry.kind === "entry" && entry.type === "video";
+  const canExpand = (entry.type === "photo" && Boolean(photoUrl)) || (entry.type === "video" && Boolean(mediaUrl));
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <article className={`entry-card entry-card--${entry.type}`}>
@@ -389,6 +394,9 @@ function EntryCard({
               onRemove={onRemoveFrame}
             />
           </div>
+        )}
+        {canExpand && (
+          <button className="memory-expand-inline" type="button" onClick={() => setExpanded(true)}><Maximize2 size={15} /> Ampliar</button>
         )}
         {canDecorate && editingEntryId !== entry.id && (
           <button className="secondary-action" type="button" onClick={() => onStartEdit(entry)}>
@@ -454,6 +462,18 @@ function EntryCard({
           <Trash2 size={17} />
         </button>
       </div>
+      {expanded && canExpand && (
+        <div className="memory-lightbox" role="dialog" aria-modal="true" aria-label={`${entry.type === "photo" ? "Foto" : "Vídeo"} ampliado`} onMouseDown={(event) => { if (event.target === event.currentTarget) setExpanded(false); }}>
+          <button className="memory-lightbox__close" type="button" onClick={() => setExpanded(false)} aria-label="Cerrar"><X size={22} /></button>
+          <div className={`memory-lightbox__stage memory-lightbox__stage--${entry.type}`}>
+            {entry.type === "photo" && photoUrl && <img src={photoUrl} alt="" />}
+            {entry.type === "video" && mediaUrl && <video src={mediaUrl} controls autoPlay playsInline />}
+            <FilterCanvas overlays={overlays} packs={packs} />
+            <StickerCanvas overlays={overlays ?? []} packs={packs} />
+            <FrameCanvas overlays={overlays} packs={packs} />
+          </div>
+        </div>
+      )}
     </article>
   );
 }

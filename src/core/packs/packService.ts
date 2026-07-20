@@ -3,9 +3,11 @@ import { walletService } from "../wallet/walletService";
 import { entitlementRepository } from "./entitlementRepository";
 import { packLoader } from "./packLoader";
 
-// During local development every world is available for visual and mascot testing.
-// Production builds continue using the real entitlement and purchase flow.
-const previewAllPacks = import.meta.env.DEV || import.meta.env.VITE_PREVIEW_ALL_PACKS === "true";
+// Beta switch: keep every world available in local and deployed test builds.
+// Set this to false immediately before the public production release.
+export const PREVIEW_ALL_PACKS = true;
+
+const previewAllPacks = PREVIEW_ALL_PACKS || import.meta.env.DEV || import.meta.env.VITE_PREVIEW_ALL_PACKS === "true";
 
 export const packService = {
   listPacks() {
