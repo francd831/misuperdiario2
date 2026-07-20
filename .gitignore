@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Android build outputs and local SDK paths
+android/.gradle/
+android/local.properties
+android/**/build/
+*.jks
+*.keystore
+releases/*.apk
