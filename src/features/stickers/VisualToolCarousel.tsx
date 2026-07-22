@@ -1,5 +1,5 @@
-import { Frame, MessageCircle, ScanFace, Sparkles, Stamp, Sticker, WandSparkles } from "lucide-react";
-import { useState } from "react";
+import { Frame, MessageCircle, ScanFace, Sparkles, Stamp, Sticker, WandSparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 
 type ToolId = "stickers" | "frames" | "filters" | "speechBubbles" | "stamps" | "masks" | "effects";
@@ -12,6 +12,7 @@ interface VisualToolCarouselProps {
   onVisual: (asset: PackAsset, kind: "speechBubbles" | "stamps" | "masks" | "effects") => void;
   onClearFrame: () => void;
   onClearFilter: () => void;
+  onClose?: () => void;
 }
 
 const tools = [
@@ -28,6 +29,15 @@ export function VisualToolCarousel(props: VisualToolCarouselProps) {
   const [active, setActive] = useState<ToolId>("stickers");
   const assets = props.pack?.[active] ?? [];
 
+  useEffect(() => {
+    if (!props.onClose) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") props.onClose?.();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [props.onClose]);
+
   function select(asset: PackAsset) {
     if (active === "stickers") props.onSticker(asset);
     else if (active === "frames") props.onFrame(asset);
@@ -37,6 +47,12 @@ export function VisualToolCarousel(props: VisualToolCarouselProps) {
 
   return (
     <section className="visual-tools" aria-label="Herramientas de edición visual">
+      {props.onClose && (
+        <div className="visual-tools__header">
+          <strong>Personalizar</strong>
+          <button type="button" onClick={props.onClose} aria-label="Cerrar herramientas"><X size={20} /></button>
+        </div>
+      )}
       <nav className="visual-tools__tabs" aria-label="Tipos de decoración">
         {tools.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" className={active === id ? "is-active" : ""} onClick={() => setActive(id)} aria-pressed={active === id}>

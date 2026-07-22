@@ -6,6 +6,7 @@ import { LoadingScreen } from "./shared/ui/LoadingScreen";
 
 const WelcomePage = lazy(() => import("./features/onboarding/WelcomePage"));
 const ProfileSelectPage = lazy(() => import("./features/profiles/ProfileSelectPage"));
+const CreateProfilePage = lazy(() => import("./features/profiles/CreateProfilePage"));
 const HomePage = lazy(() => import("./features/home/HomePage"));
 const DiaryPage = lazy(() => import("./features/diary/DiaryPage"));
 const RecordPage = lazy(() => import("./features/diary/RecordPage"));
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/" element={<AppLayout />}>
           <Route index element={<WelcomePage />} />
           <Route path="profiles" element={<ProfileSelectPage />} />
+          <Route path="profiles/new" element={<CreateProfilePage />} />
           <Route path="home" element={<HomePage />} />
           <Route path="diary" element={<DiaryPage />} />
           <Route path="record/:type?" element={<RecordPage />} />

@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Camera, FileText, Lock, Maximize2, Mic, Search, Sparkles, Trash2, Video, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import memoryGallery from "../../assets/diary/memory-gallery-base.webp";
+import pawprintsMuseumGallery from "../../assets/diary/pawprints-museum-gallery-animals-v1.png";
+import cliffFossilMuseumGallery from "../../assets/diary/cliff-fossil-museum-gallery-dinosaurs-v1.png";
+import footballClubMuseumGallery from "../../assets/diary/football-club-museum-gallery-v1.png";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -108,6 +111,9 @@ export default function DiaryPage() {
   const [draftOverlays, setDraftOverlays] = useState<OverlayProject>({ stickers: [] });
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
+  const galleryBackground = activePack?.manifest.id === "animalesDivertidos"
+    ? pawprintsMuseumGallery
+    : activePack?.manifest.id === "dinosaurios" ? cliffFossilMuseumGallery : activePack?.manifest.id === "futbol" ? footballClubMuseumGallery : memoryGallery;
 
   const refreshItems = useCallback(async () => {
     if (!activeProfile) return;
@@ -199,7 +205,7 @@ export default function DiaryPage() {
 
   return (
     <section className="page-stack diary-page">
-      <section className="diary-world diary-gallery" style={{ backgroundImage: `url(${memoryGallery})` }}>
+      <section className="diary-world diary-gallery" data-pack={activePack?.manifest.id} style={{ backgroundImage: `url(${galleryBackground})` }}>
         <Link className="world-scene__back diary-world__back" to="/home" aria-label="Volver al inicio">
           <ArrowLeft size={22} />
         </Link>

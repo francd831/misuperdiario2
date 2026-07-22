@@ -4,6 +4,7 @@
   "description": "¡Vive la pasión del fútbol con balones, trofeos y estadios!",
   "version": "1.0.0",
   "author": "Video Diario",
+  "preview": "preview.png",
   "free": false,
   "theme": {
     "primary": "145 70% 40%",

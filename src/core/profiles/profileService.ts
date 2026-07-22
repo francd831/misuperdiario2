@@ -1,5 +1,6 @@
 import { hashPin, isValidPin, verifyPin } from "../auth/pinService";
 import { walletService } from "../wallet/walletService";
+import { dbDelete, dbListByIndex } from "../storage/db";
 import { profileRepository } from "./profileRepository";
 import type { Profile, ProfileAvatarPreset, ProfileRole } from "./types";
 
@@ -73,6 +74,7 @@ export const profileService = {
     input: {
       name: string;
       pin?: string;
+      removePin?: boolean;
       avatarPreset?: ProfileAvatarPreset;
       avatarPhotoDataUrl?: string;
     },
@@ -89,10 +91,30 @@ export const profileService = {
     await profileRepository.save({
       ...profile,
       name,
-      pinHash: cleanPin ? await hashPin(cleanPin) : profile.pinHash,
+      pinHash: profile.role === "child" && input.removePin
+        ? undefined
+        : cleanPin ? await hashPin(cleanPin) : profile.pinHash,
       avatarPreset: input.avatarPhotoDataUrl ? undefined : input.avatarPreset ?? profile.avatarPreset ?? "star",
       avatarPhotoDataUrl: input.avatarPhotoDataUrl,
     });
+  },
+
+  async changeAdminPin(currentPin: string, nextPin: string) {
+    if (!isValidPin(nextPin)) throw new Error("El nuevo PIN debe tener 4 dígitos.");
+    const admin = await profileRepository.getAdmin();
+    if (!admin || !(await verifyPin(currentPin, admin.pinHash))) throw new Error("El PIN actual no es correcto.");
+    await profileRepository.save({ ...admin, pinHash: await hashPin(nextPin) });
+  },
+
+  async deleteChild(profileId: string) {
+    const profile = await profileRepository.get(profileId);
+    if (!profile || profile.role !== "child") throw new Error("Perfil infantil no encontrado.");
+    const stores = ["entries", "dailyPhotos", "packEntitlements", "walletTransactions", "achievements"] as const;
+    await Promise.all(stores.map(async (store) => {
+      const records = await dbListByIndex(store, "by-profile", profileId);
+      await Promise.all(records.map((record) => dbDelete(store, record.id)));
+    }));
+    await profileRepository.remove(profileId);
   },
 
   login(profileId: string) {

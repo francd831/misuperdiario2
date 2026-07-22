@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, Eye, Lock, ShoppingBag, Sparkles, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import worldBoutique from "../../assets/store/world-boutique-base.webp";
+import forestMarketStore from "../../assets/store/forest-market-store-animals-v1.png";
+import prehistoricExplorerMarket from "../../assets/store/prehistoric-explorer-market-store-dinosaurs-v1.png";
+import footballKitStore from "../../assets/store/football-kit-store-v1.png";
 import { packService, PREVIEW_ALL_PACKS } from "../../core/packs/packService";
 import type { PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
@@ -18,6 +21,7 @@ export default function StorePage() {
   const [messageTone, setMessageTone] = useState<"success" | "error">("success");
 
   const activePackId = activeProfile?.activePackId ?? "base";
+  const storeBackground = activePackId === "animalesDivertidos" ? forestMarketStore : activePackId === "dinosaurios" ? prehistoricExplorerMarket : activePackId === "futbol" ? footballKitStore : worldBoutique;
 
   async function refreshEntitlements() {
     if (!activeProfile) return;
@@ -64,7 +68,7 @@ export default function StorePage() {
 
   return (
     <section className="page-stack store-page">
-      <section className="store-world" style={{ backgroundImage: `url(${worldBoutique})` }}>
+      <section className="store-world" data-pack={activePackId} style={{ backgroundImage: `url(${storeBackground})` }}>
         <Link className="world-scene__back store-world__back" to="/home" aria-label="Volver al inicio"><ArrowLeft size={22} /></Link>
         <div className="store-world__balance" aria-label={`Tienes ${wallet.balance} estrellas`}>
           <Star size={20} fill="currentColor" /> <strong>{wallet.balance}</strong>
@@ -140,21 +144,6 @@ export default function StorePage() {
           );
         })}
       </div>
-      </section>
-
-      <section className="status-panel">
-        <h2>Ultimos movimientos</h2>
-        {wallet.transactions.length === 0 ? (
-          <p>Aun no hay movimientos.</p>
-        ) : (
-          <div className="transaction-list">
-            {wallet.transactions.slice(0, 5).map((transaction) => (
-              <p key={transaction.id}>
-                <strong>{transaction.amount > 0 ? "+" : ""}{transaction.amount}</strong> {transaction.reason}
-              </p>
-            ))}
-          </div>
-        )}
       </section>
     </section>
   );

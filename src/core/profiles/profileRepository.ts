@@ -1,4 +1,4 @@
-import { dbGet, dbList, dbListByIndex, dbSet } from "../storage/db";
+import { dbDelete, dbGet, dbList, dbListByIndex, dbSet } from "../storage/db";
 import type { Profile } from "./types";
 
 export const profileRepository = {
@@ -24,5 +24,9 @@ export const profileRepository = {
       ...profile,
       updatedAt: new Date().toISOString(),
     });
+  },
+
+  async remove(id: string) {
+    await dbDelete("profiles", id);
   },
 };

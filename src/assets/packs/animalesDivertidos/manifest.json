@@ -1,10 +1,11 @@
 {
   "id": "animalesDivertidos",
-  "name": "Animales Divertidos",
-  "description": "¡Llena tu diario de amigos peludos, emplumados y escamosos!",
+  "name": "Mundo Animal",
+  "description": "Explora el Valle de las Huellas y descubre la vida de sus animales.",
   "version": "1.0.0",
   "author": "Video Diario",
   "free": false,
+  "preview": "preview-naturalistic-v2.png",
   "theme": {
     "primary": "145 55% 45%",
     "secondary": "35 75% 90%",

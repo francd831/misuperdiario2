@@ -13,8 +13,9 @@ interface ProfileContextValue {
   createChild: (name: string, pin?: string) => Promise<void>;
   updateProfile: (
     profileId: string,
-    input: { name: string; pin?: string; avatarPreset?: ProfileAvatarPreset; avatarPhotoDataUrl?: string },
+    input: { name: string; pin?: string; removePin?: boolean; avatarPreset?: ProfileAvatarPreset; avatarPhotoDataUrl?: string },
   ) => Promise<void>;
+  deleteChild: (profileId: string) => Promise<void>;
   login: (profileId: string, pin: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -60,6 +61,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       },
       async updateProfile(profileId, input) {
         await profileService.updateProfile(profileId, input);
+        await refresh();
+      },
+      async deleteChild(profileId) {
+        await profileService.deleteChild(profileId);
         await refresh();
       },
       async login(profileId, pin) {

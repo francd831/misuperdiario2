@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { packLoader } from "../../core/packs/packLoader";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 
-type AnimatedMascotKind =
+export type AnimatedMascotKind =
   | "star"
+  | "fox"
   | "cat"
   | "trex"
   | "football"
@@ -18,8 +19,9 @@ type AnimatedMascotKind =
 
 const spriteLoaders: Record<AnimatedMascotKind, () => Promise<string>> = {
   star: () => import("../../assets/mascots/golden-star-sprites-32.webp").then((module) => module.default),
+  fox: () => import("../../assets/mascots/realistic-fox-sprites-28-fixed-v2.png").then((module) => module.default),
   cat: () => import("../../assets/mascots/orange-cat-sprites-32-fixed.webp").then((module) => module.default),
-  trex: () => import("../../assets/mascots/green-trex-sprites-32-fixed.webp").then((module) => module.default),
+  trex: () => import("../../assets/mascots/realistic-trex-sprites-32-v2.png").then((module) => module.default),
   football: () => import("../../assets/mascots/football-player-sprites-32.webp").then((module) => module.default),
   basketball: () => import("../../assets/mascots/basketball-player-sprites-32.webp").then((module) => module.default),
   astronaut: () => import("../../assets/mascots/astronaut-sprites-32.webp").then((module) => module.default),
@@ -36,7 +38,7 @@ export const MASCOT_VISIBILITY_EVENT = "misuperdiario:mascot-visibility";
 
 const mascotByPack: Record<string, { asset: string; accessory?: string; label: string }> = {
   base: { asset: "sol", label: "Solete" },
-  animalesDivertidos: { asset: "gato", label: "Gatito" },
+  animalesDivertidos: { asset: "gato", label: "Zorro del valle" },
   dinosaurios: { asset: "trex", label: "T-Rex" },
   futbol: { asset: "arbitro", accessory: "balon", label: "Futbolista" },
   baloncesto: { asset: "equipacion", accessory: "balon", label: "Jugador de baloncesto" },
@@ -51,7 +53,7 @@ const mascotByPack: Record<string, { asset: string; accessory?: string; label: s
 
 const animatedKindByPack: Record<string, AnimatedMascotKind> = {
   base: "star",
-  animalesDivertidos: "cat",
+  animalesDivertidos: "fox",
   dinosaurios: "trex",
   futbol: "football",
   baloncesto: "basketball",
@@ -63,6 +65,16 @@ const animatedKindByPack: Record<string, AnimatedMascotKind> = {
   dulcePasteleria: "cupcake",
   artePintura: "paintbrush",
 };
+
+export function loadPackMascotSprite(packId: string) {
+  const kind = animatedKindByPack[packId] ?? "star";
+  return spriteLoaders[kind]().then((url) => ({
+    kind,
+    url,
+    columns: kind === "fox" ? 7 : 8,
+    label: mascotByPack[packId]?.label ?? "Solete",
+  }));
+}
 
 function findAsset(pack: PackWithAssets, id?: string): PackAsset | undefined {
   return pack.stickers.find((asset) => asset.id === id) ?? pack.stickers[0];
@@ -154,7 +166,7 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
       const trick = Math.random();
       travelMode = mascot.animatedKind === "trex"
         ? (trick < .38 ? "run" : "walk")
-        : mascot.animatedKind === "cat"
+        : mascot.animatedKind === "cat" || mascot.animatedKind === "fox"
           ? trick < .28 ? "jump" : trick < .58 ? "run" : "walk"
           : trick < .42 ? "run" : "walk";
       jumpStarted = time;
@@ -210,7 +222,7 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
             } else {
               travelMode = "idle";
               idleStarted = time;
-              targetAt.current = mascot.animatedKind === "cat" && Math.random() < .38
+              targetAt.current = (mascot.animatedKind === "cat" || mascot.animatedKind === "fox") && Math.random() < .38
                 ? time + 2700
                 : time + 1200 + Math.random() * 1500;
             }
@@ -222,22 +234,24 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
         visualRef.current.style.setProperty("--mascot-direction", target.current.x < position.current.x ? "-1" : "1");
       }
       if (spriteFrameRef.current && mascot.animatedKind) {
+        const columns = mascot.animatedKind === "fox" ? 7 : 8;
         const jumping = travelMode === "jump";
-        const idleFrame = Math.floor(Math.max(0, time - idleStarted) / 310) % 8;
-        const reactionFrame = Math.min(7, Math.floor((time - reactionStarted) / 120));
-        const teleportFrame = Math.min(7, Math.floor((time - teleportStarted) / 120));
+        const idleFrame = Math.floor(Math.max(0, time - idleStarted) / 310) % columns;
+        const reactionFrame = Math.min(columns - 1, Math.floor((time - reactionStarted) / 120));
+        const teleportFrame = Math.min(columns - 1, Math.floor((time - teleportStarted) / 120));
         const frame = travelMode === "teleport"
-          ? 24 + teleportFrame
+          ? columns * 3 + teleportFrame
           : reacting || travelMode === "roar" || jumping
-            ? 24 + (reacting ? reactionFrame : Math.floor(time / 105) % 8)
+            ? columns * 3 + (reacting ? reactionFrame : Math.floor(time / 105) % columns)
             : travelMode === "run"
-              ? 8 + Math.floor(time / 72) % 8
+              ? columns + Math.floor(time / 72) % columns
               : travelMode === "walk"
-                ? Math.floor(time / 108) % 8
-                : 16 + idleFrame;
-        const column = frame % 8;
-        const row = Math.floor(frame / 8);
-        spriteFrameRef.current.style.backgroundPosition = `${column * 100 / 7}% ${row * 100 / 3}%`;
+                ? Math.floor(time / 108) % columns
+                : columns * 2 + idleFrame;
+        const column = frame % columns;
+        const row = Math.floor(frame / columns);
+        spriteFrameRef.current.style.backgroundSize = `${columns * 100}% 400%`;
+        spriteFrameRef.current.style.backgroundPosition = `${column * 100 / (columns - 1)}% ${row * 100 / 3}%`;
         const jumpProgress = jumping ? Math.min(1, (time - jumpStarted) / 820) : 0;
         spriteFrameRef.current.style.setProperty("--sprite-lift", `${jumping ? -Math.sin(jumpProgress * Math.PI) * 42 : 0}px`);
       }

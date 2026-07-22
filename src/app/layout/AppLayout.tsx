@@ -46,6 +46,9 @@ export function AppLayout() {
   const activePack = packLoader.getPack(activePackId) ?? packLoader.getPack(fallbackPackId);
   const style = useMemo(() => themeVariables(activePack), [activePack]);
   const isImmersiveWorld = location.pathname === "/home"
+    || location.pathname === "/admin"
+    || location.pathname === "/diary"
+    || location.pathname === "/store"
     || location.pathname.startsWith("/record/")
     || location.pathname === "/daily-photo"
     || location.pathname === "/daily-photo/timelapse";

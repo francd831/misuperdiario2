@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "author": "Video Diario",
   "free": false,
+  "preview": "preview-valley-eras-v1.png",
   "theme": {
     "primary": "85 60% 40%",
     "secondary": "35 70% 88%",

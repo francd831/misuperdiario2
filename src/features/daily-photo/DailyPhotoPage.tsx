@@ -25,6 +25,9 @@ import type { StoragePolicy } from "../../core/profiles/types";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { MemoryDrawer } from "../../shared/ui/MemoryDrawer";
 import photoCornerBase from "../../assets/recording/photo-corner-base.webp";
+import safariLookoutPhotoAnimals from "../../assets/recording/safari-lookout-photo-animals-v1.png";
+import prehistoricLookoutPhotoDinosaurs from "../../assets/recording/prehistoric-lookout-photo-dinosaurs-v1.png";
+import footballChampionsPhoto from "../../assets/recording/football-champions-photo-v1.png";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -89,6 +92,9 @@ export default function DailyPhotoPage() {
   const [cameraAspectRatio, setCameraAspectRatio] = useState("1 / 1");
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
+  const photoSceneBackground = activePack?.manifest.id === "animalesDivertidos"
+    ? safariLookoutPhotoAnimals
+    : activePack?.manifest.id === "dinosaurios" ? prehistoricLookoutPhotoDinosaurs : activePack?.manifest.id === "futbol" ? footballChampionsPhoto : photoCornerBase;
   const hasToday = useMemo(() => photos.some((photo) => photo.date === new Date().toISOString().slice(0, 10)), [photos]);
 
   const stopCamera = useCallback(() => {
@@ -247,8 +253,8 @@ export default function DailyPhotoPage() {
 
   return (
     <section className="page-stack daily-photo-page">
-      <section className="photo-room responsive-world-scene responsive-world-scene--photo" style={{ backgroundImage: `url(${photoCornerBase})` }}>
-        {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="photo" path={photoMascotPath} />}
+      <section className="photo-room responsive-world-scene responsive-world-scene--photo" data-pack={activePack?.manifest.id} style={{ backgroundImage: `url(${photoSceneBackground})` }}>
+        {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="photo" path={photoMascotPath} packId={activePack?.manifest.id} />}
         <Link className="world-scene__back" to="/home" aria-label="Volver a la habitación"><ArrowLeft size={22} /></Link>
         {hasToday && !capturedBlob && <span className="photo-room__today">Foto de hoy guardada</span>}
         <div className="photo-room__preview">
@@ -324,6 +330,7 @@ export default function DailyPhotoPage() {
           {effectsOpen && (
             <VisualToolCarousel
               pack={activePack}
+              onClose={() => setEffectsOpen(false)}
               onSticker={addSticker}
               onFrame={selectFrame}
               onFilter={selectFilter}

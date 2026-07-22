@@ -1,12 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import starSprite from "../../assets/mascots/golden-star-sprites-32.webp";
-import { MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "./FloatingMascot";
+import { loadPackMascotSprite, MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "./FloatingMascot";
 import type { MapPoint } from "./MapMascot";
 
 type SceneMascotProps = {
   profileId: string;
   sceneId: string;
   path: MapPoint[];
+  packId?: string;
 };
 
 function positionKey(profileId: string, sceneId: string) {
@@ -47,7 +48,7 @@ function storedPosition(profileId: string, sceneId: string, fallback: MapPoint) 
   return fallback;
 }
 
-export function SceneMascot({ profileId, sceneId, path }: SceneMascotProps) {
+export function SceneMascot({ profileId, sceneId, path, packId = "base" }: SceneMascotProps) {
   const rootRef = useRef<HTMLButtonElement>(null);
   const spriteRef = useRef<HTMLSpanElement>(null);
   const position = useRef(nearestPointOnPath(storedPosition(profileId, sceneId, path[0]), path));
@@ -55,6 +56,15 @@ export function SceneMascot({ profileId, sceneId, path }: SceneMascotProps) {
   const dragging = useRef<{ pointerId: number; moved: boolean; startX: number; startY: number }>();
   const idleUntil = useRef(performance.now() + 1400);
   const visible = useRef(localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
+  const [sprite, setSprite] = useState({ url: starSprite, columns: 8, label: "Solete" });
+
+  useEffect(() => {
+    let alive = true;
+    void loadPackMascotSprite(packId).then((next) => {
+      if (alive) setSprite({ url: next.url, columns: next.columns, label: next.label });
+    });
+    return () => { alive = false; };
+  }, [packId]);
 
   useEffect(() => {
     let request = 0;
@@ -88,14 +98,15 @@ export function SceneMascot({ profileId, sceneId, path }: SceneMascotProps) {
       if (spriteRef.current) {
         const moving = !dragging.current && time >= idleUntil.current && !reducedMotion;
         const row = moving ? 0 : 2;
-        const column = Math.floor(time / (moving ? 118 : 330)) % 8;
-        spriteRef.current.style.backgroundPosition = `${column * 100 / 7}% ${row * 100 / 3}%`;
+        const column = Math.floor(time / (moving ? 118 : 330)) % sprite.columns;
+        spriteRef.current.style.backgroundSize = `${sprite.columns * 100}% 400%`;
+        spriteRef.current.style.backgroundPosition = `${column * 100 / (sprite.columns - 1)}% ${row * 100 / 3}%`;
       }
       request = requestAnimationFrame(animate);
     };
     request = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(request);
-  }, [path]);
+  }, [path, sprite.columns]);
 
   useEffect(() => {
     const updateVisibility = () => {
@@ -116,7 +127,7 @@ export function SceneMascot({ profileId, sceneId, path }: SceneMascotProps) {
       className="scene-mascot"
       type="button"
       hidden={!visible.current}
-      aria-label="Mover a Solete"
+      aria-label={`Mover a ${sprite.label}`}
       onPointerDown={(event) => {
         dragging.current = { pointerId: event.pointerId, moved: false, startX: event.clientX, startY: event.clientY };
         event.currentTarget.setPointerCapture(event.pointerId);
@@ -143,7 +154,7 @@ export function SceneMascot({ profileId, sceneId, path }: SceneMascotProps) {
       }}
       onPointerCancel={() => { dragging.current = undefined; }}
     >
-      <span ref={spriteRef} className="scene-mascot__sprite" style={{ backgroundImage: `url(${starSprite})` }} />
+      <span ref={spriteRef} className="scene-mascot__sprite" style={{ backgroundImage: `url(${sprite.url})` }} />
       <i className="scene-mascot__shadow" aria-hidden="true" />
     </button>
   );

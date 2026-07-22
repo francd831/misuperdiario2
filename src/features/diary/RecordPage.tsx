@@ -24,8 +24,20 @@ import { storagePolicyRepository } from "../../core/settings/storagePolicyReposi
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { MemoryDrawer } from "../../shared/ui/MemoryDrawer";
 import cinemaMemoriesBase from "../../assets/recording/cinema-memories-base.webp";
+import greatOakCinemaAnimals from "../../assets/recording/great-oak-cinema-animals-v1.png";
+import explorerCabinWritingAnimals from "../../assets/recording/explorer-cabin-writing-animals-v2-standard-book.png";
+import roarCaveAnimals from "../../assets/recording/roar-cave-animals-v1.png";
+import crystalCaveCinemaDinosaurs from "../../assets/recording/crystal-cave-cinema-dinosaurs-v1.png";
+import fossilAmphitheaterVoiceDinosaurs from "../../assets/recording/fossil-amphitheater-voice-dinosaurs-v1.png";
+import ancientTreeWritingDinosaurs from "../../assets/recording/ancient-tree-writing-dinosaurs-v1.png";
+import dinosaurFieldSketchTrex from "../../assets/recording/dinosaur-field-sketch-trex.png";
+import dinosaurFieldSketchTriceratops from "../../assets/recording/dinosaur-field-sketch-triceratops.png";
+import dinosaurFieldSketchRaptor from "../../assets/recording/dinosaur-field-sketch-raptor.png";
 import storyDeskBase from "../../assets/recording/story-desk-base.webp";
 import voiceStudioBase from "../../assets/recording/voice-studio-base.webp";
+import footballStadiumVideo from "../../assets/recording/football-stadium-video-v1.png";
+import footballCommentaryVoice from "../../assets/recording/football-commentary-voice-v1.png";
+import footballTacticsWriting from "../../assets/recording/football-tactics-writing-v1.png";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -37,6 +49,12 @@ const sceneMascotPaths = {
   audio: [{ x: 8, y: 82 }, { x: 8, y: 23 }, { x: 20, y: 11 }, { x: 81, y: 11 }, { x: 92, y: 24 }, { x: 92, y: 82 }],
   text: [{ x: 8, y: 82 }, { x: 8, y: 22 }, { x: 21, y: 10 }, { x: 80, y: 10 }, { x: 92, y: 24 }, { x: 92, y: 82 }],
 };
+
+const dinosaurFieldSketches: PackAsset[] = [
+  { id: "dinosaur-field-sketch-trex", packId: "dinosaurios", name: "Tyrannosaurus rex", url: dinosaurFieldSketchTrex },
+  { id: "dinosaur-field-sketch-triceratops", packId: "dinosaurios", name: "Triceratops", url: dinosaurFieldSketchTriceratops },
+  { id: "dinosaur-field-sketch-raptor", packId: "dinosaurios", name: "Raptor emplumado", url: dinosaurFieldSketchRaptor },
+];
 
 function formatSeconds(seconds: number) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -123,7 +141,13 @@ export default function RecordPage() {
   const previewUrl = useObjectUrl(mediaBlob);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
-  const doodleAssets = (activePack?.stickers.length ? activePack.stickers : packs.find((pack) => pack.manifest.id === "base")?.stickers ?? []).slice(0, 3);
+  const packId = activePack?.manifest.id;
+  const videoSceneBackground = packId === "animalesDivertidos" ? greatOakCinemaAnimals : packId === "dinosaurios" ? crystalCaveCinemaDinosaurs : packId === "futbol" ? footballStadiumVideo : cinemaMemoriesBase;
+  const voiceSceneBackground = packId === "animalesDivertidos" ? roarCaveAnimals : packId === "dinosaurios" ? fossilAmphitheaterVoiceDinosaurs : packId === "futbol" ? footballCommentaryVoice : voiceStudioBase;
+  const storySceneBackground = packId === "animalesDivertidos" ? explorerCabinWritingAnimals : packId === "dinosaurios" ? ancientTreeWritingDinosaurs : packId === "futbol" ? footballTacticsWriting : storyDeskBase;
+  const doodleAssets = packId === "dinosaurios"
+    ? dinosaurFieldSketches
+    : (activePack?.stickers.length ? activePack.stickers : packs.find((pack) => pack.manifest.id === "base")?.stickers ?? []).slice(0, 3);
 
   useEffect(() => {
     void storagePolicyRepository.get().then(setPolicy);
@@ -415,8 +439,8 @@ export default function RecordPage() {
       <section className={`page-stack record-page record-page--${entryType}`}>
         <section className={`capture-studio capture-studio--${entryType} ${entryType === "video" ? "cinema-studio" : ""}`} data-pack={activePack?.manifest.id ?? "base"}>
           {entryType === "video" ? (
-            <div className="cinema-stage responsive-world-scene responsive-world-scene--video" style={{ backgroundImage: `url(${cinemaMemoriesBase})` }}>
-              {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="video" path={sceneMascotPaths.video} />}
+            <div className="cinema-stage responsive-world-scene responsive-world-scene--video" style={{ backgroundImage: `url(${videoSceneBackground})` }}>
+              {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="video" path={sceneMascotPaths.video} packId={activePack?.manifest.id} />}
               <button className="cinema-stage__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
               <span className="cinema-stage__ticket">{dailyCount}/{dailyMax ?? "-"} hoy</span>
               <div className="video-viewfinder cinema-screen">
@@ -445,8 +469,8 @@ export default function RecordPage() {
               </div>
             </div>
           ) : (
-            <div className="voice-room responsive-world-scene responsive-world-scene--voice" style={{ backgroundImage: `url(${voiceStudioBase})` }}>
-              {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="audio" path={sceneMascotPaths.audio} />}
+            <div className="voice-room responsive-world-scene responsive-world-scene--voice" style={{ backgroundImage: `url(${voiceSceneBackground})` }}>
+              {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="audio" path={sceneMascotPaths.audio} packId={activePack?.manifest.id} />}
               <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
               <span className="world-scene__counter">{dailyCount}/{dailyMax ?? "-"} hoy</span>
               <button
@@ -512,6 +536,7 @@ export default function RecordPage() {
           <section className="cinema-effects-drawer" aria-label="Mesa de efectos">
             <VisualToolCarousel
               pack={activePack}
+              onClose={() => setEffectsOpen(false)}
               onSticker={addSticker}
               onFrame={selectFrame}
               onFilter={selectFilter}
@@ -591,8 +616,8 @@ export default function RecordPage() {
 
   return (
     <section className="page-stack record-page record-page--text">
-      <form className="story-room responsive-world-scene responsive-world-scene--story" style={{ backgroundImage: `url(${storyDeskBase})` }} onSubmit={handleTextSubmit}>
-        {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="text" path={sceneMascotPaths.text} />}
+      <form className="story-room responsive-world-scene responsive-world-scene--story" style={{ backgroundImage: `url(${storySceneBackground})` }} onSubmit={handleTextSubmit}>
+        {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="text" path={sceneMascotPaths.text} packId={activePack?.manifest.id} />}
         <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
         <section className="story-room__previous" aria-label={previousTextEntry ? "Página anterior del diario" : `Dibujo del pack ${activePack?.manifest.name ?? "básico"}`}>
           {previousTextEntry ? (
