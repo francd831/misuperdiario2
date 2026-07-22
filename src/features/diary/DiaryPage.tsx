@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Camera, FileText, Lock, Maximize2, Mic, Search, Sparkles, Trash2, Video, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import memoryGallery from "../../assets/diary/memory-gallery-base.webp";
-import pawprintsMuseumGallery from "../../assets/diary/pawprints-museum-gallery-animals-v1.png";
-import cliffFossilMuseumGallery from "../../assets/diary/cliff-fossil-museum-gallery-dinosaurs-v1.png";
-import footballClubMuseumGallery from "../../assets/diary/football-club-museum-gallery-v1.png";
 import { dailyPhotoRepository } from "../../core/daily-photo/dailyPhotoRepository";
 import type { DailyPhoto } from "../../core/daily-photo/types";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -21,6 +17,7 @@ import {
 } from "../../core/overlays/overlayProject";
 import type { FrameOverlay, OverlayProject, StickerOverlay } from "../../core/overlays/types";
 import { packService } from "../../core/packs/packService";
+import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
@@ -111,9 +108,7 @@ export default function DiaryPage() {
   const [draftOverlays, setDraftOverlays] = useState<OverlayProject>({ stickers: [] });
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
-  const galleryBackground = activePack?.manifest.id === "animalesDivertidos"
-    ? pawprintsMuseumGallery
-    : activePack?.manifest.id === "dinosaurios" ? cliffFossilMuseumGallery : activePack?.manifest.id === "futbol" ? footballClubMuseumGallery : memoryGallery;
+  const galleryBackground = getPackSceneBackgrounds(activePack?.manifest.id).gallery;
 
   const refreshItems = useCallback(async () => {
     if (!activeProfile) return;

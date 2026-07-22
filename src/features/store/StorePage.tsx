@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, Eye, Lock, ShoppingBag, Sparkles, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import worldBoutique from "../../assets/store/world-boutique-base.webp";
-import forestMarketStore from "../../assets/store/forest-market-store-animals-v1.png";
-import prehistoricExplorerMarket from "../../assets/store/prehistoric-explorer-market-store-dinosaurs-v1.png";
-import footballKitStore from "../../assets/store/football-kit-store-v1.png";
 import { packService, PREVIEW_ALL_PACKS } from "../../core/packs/packService";
+import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import type { PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
@@ -21,7 +18,7 @@ export default function StorePage() {
   const [messageTone, setMessageTone] = useState<"success" | "error">("success");
 
   const activePackId = activeProfile?.activePackId ?? "base";
-  const storeBackground = activePackId === "animalesDivertidos" ? forestMarketStore : activePackId === "dinosaurios" ? prehistoricExplorerMarket : activePackId === "futbol" ? footballKitStore : worldBoutique;
+  const storeBackground = getPackSceneBackgrounds(activePackId).store;
 
   async function refreshEntitlements() {
     if (!activeProfile) return;

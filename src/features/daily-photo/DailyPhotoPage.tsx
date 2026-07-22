@@ -18,16 +18,13 @@ import {
 } from "../../core/overlays/overlayProject";
 import type { OverlayProject } from "../../core/overlays/types";
 import { packService } from "../../core/packs/packService";
+import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { MemoryDrawer } from "../../shared/ui/MemoryDrawer";
-import photoCornerBase from "../../assets/recording/photo-corner-base.webp";
-import safariLookoutPhotoAnimals from "../../assets/recording/safari-lookout-photo-animals-v1.png";
-import prehistoricLookoutPhotoDinosaurs from "../../assets/recording/prehistoric-lookout-photo-dinosaurs-v1.png";
-import footballChampionsPhoto from "../../assets/recording/football-champions-photo-v1.png";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -93,9 +90,7 @@ export default function DailyPhotoPage() {
   const [cameraAspectRatio, setCameraAspectRatio] = useState("4 / 3");
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
-  const photoSceneBackground = activePack?.manifest.id === "animalesDivertidos"
-    ? safariLookoutPhotoAnimals
-    : activePack?.manifest.id === "dinosaurios" ? prehistoricLookoutPhotoDinosaurs : activePack?.manifest.id === "futbol" ? footballChampionsPhoto : photoCornerBase;
+  const photoSceneBackground = getPackSceneBackgrounds(activePack?.manifest.id).photo;
   const hasToday = useMemo(() => photos.some((photo) => photo.date === new Date().toISOString().slice(0, 10)), [photos]);
 
   const stopCamera = useCallback(() => {

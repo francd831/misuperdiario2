@@ -3,12 +3,10 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "../../app/mascot/FloatingMascot";
 import { packLoader } from "../../core/packs/packLoader";
+import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { ProfileAvatarPreset } from "../../core/profiles/types";
 import { ProfileAvatar, profileAvatarPresets } from "../../shared/ui/ProfileAvatar";
-import animalRefugeClinic from "../../assets/settings/animal-refuge-clinic-settings-v1.png";
-import prehistoricFieldStation from "../../assets/settings/prehistoric-field-station-settings-dinosaurs-v1.png";
-import footballLockerSettings from "../../assets/settings/football-locker-settings-v1.png";
 
 async function stopStream(stream?: MediaStream | null) {
   stream?.getTracks().forEach((track) => track.stop());
@@ -44,10 +42,9 @@ export default function SettingsPage() {
     "--settings-background": themeColor(packTheme?.background, "hsl(40 33% 98%)"),
     "--settings-foreground": themeColor(packTheme?.foreground, "hsl(270 24% 20%)"),
     "--settings-preview": activePack?.previewUrl ? `url(${activePack.previewUrl})` : "none",
-    "--settings-scene": activePack?.manifest.id === "animalesDivertidos"
-      ? `url(${animalRefugeClinic})`
-      : activePack?.manifest.id === "dinosaurios" ? `url(${prehistoricFieldStation})`
-        : activePack?.manifest.id === "futbol" ? `url(${footballLockerSettings})` : "none",
+    "--settings-scene": getPackSceneBackgrounds(activePack?.manifest.id).settings
+      ? `url(${getPackSceneBackgrounds(activePack?.manifest.id).settings})`
+      : "none",
   } as React.CSSProperties;
 
   useEffect(() => {

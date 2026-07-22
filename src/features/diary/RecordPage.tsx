@@ -17,27 +17,16 @@ import {
 } from "../../core/overlays/overlayProject";
 import type { OverlayProject } from "../../core/overlays/types";
 import { packService } from "../../core/packs/packService";
+import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { StoragePolicy } from "../../core/profiles/types";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { MemoryDrawer } from "../../shared/ui/MemoryDrawer";
-import cinemaMemoriesBase from "../../assets/recording/cinema-memories-base.webp";
-import greatOakCinemaAnimals from "../../assets/recording/great-oak-cinema-animals-v1.png";
-import explorerCabinWritingAnimals from "../../assets/recording/explorer-cabin-writing-animals-v2-standard-book.png";
-import roarCaveAnimals from "../../assets/recording/roar-cave-animals-v1.png";
-import crystalCaveCinemaDinosaurs from "../../assets/recording/crystal-cave-cinema-dinosaurs-v1.png";
-import fossilAmphitheaterVoiceDinosaurs from "../../assets/recording/fossil-amphitheater-voice-dinosaurs-v1.png";
-import ancientTreeWritingDinosaurs from "../../assets/recording/ancient-tree-writing-dinosaurs-v1.png";
 import dinosaurFieldSketchTrex from "../../assets/recording/dinosaur-field-sketch-trex.png";
 import dinosaurFieldSketchTriceratops from "../../assets/recording/dinosaur-field-sketch-triceratops.png";
 import dinosaurFieldSketchRaptor from "../../assets/recording/dinosaur-field-sketch-raptor.png";
-import storyDeskBase from "../../assets/recording/story-desk-base.webp";
-import voiceStudioBase from "../../assets/recording/voice-studio-base.webp";
-import footballStadiumVideo from "../../assets/recording/football-stadium-video-v1.png";
-import footballCommentaryVoice from "../../assets/recording/football-commentary-voice-v1.png";
-import footballTacticsWriting from "../../assets/recording/football-tactics-writing-v1.png";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
@@ -143,9 +132,10 @@ export default function RecordPage() {
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
   const packId = activePack?.manifest.id;
-  const videoSceneBackground = packId === "animalesDivertidos" ? greatOakCinemaAnimals : packId === "dinosaurios" ? crystalCaveCinemaDinosaurs : packId === "futbol" ? footballStadiumVideo : cinemaMemoriesBase;
-  const voiceSceneBackground = packId === "animalesDivertidos" ? roarCaveAnimals : packId === "dinosaurios" ? fossilAmphitheaterVoiceDinosaurs : packId === "futbol" ? footballCommentaryVoice : voiceStudioBase;
-  const storySceneBackground = packId === "animalesDivertidos" ? explorerCabinWritingAnimals : packId === "dinosaurios" ? ancientTreeWritingDinosaurs : packId === "futbol" ? footballTacticsWriting : storyDeskBase;
+  const sceneBackgrounds = getPackSceneBackgrounds(packId);
+  const videoSceneBackground = sceneBackgrounds.video;
+  const voiceSceneBackground = sceneBackgrounds.voice;
+  const storySceneBackground = sceneBackgrounds.writing;
   const doodleAssets = packId === "dinosaurios"
     ? dinosaurFieldSketches
     : (activePack?.stickers.length ? activePack.stickers : packs.find((pack) => pack.manifest.id === "base")?.stickers ?? []).slice(0, 3);
