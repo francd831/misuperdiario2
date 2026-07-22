@@ -40,7 +40,6 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: [
           "**/*.{js,css,html,ico,svg,woff,woff2,webmanifest}",
-          "assets/adventure-map-premium-*.webp",
         ],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/~oauth/],
@@ -84,6 +83,21 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          if (id.includes("react-dom") || id.includes("react-router-dom") || /node_modules[\\/]react[\\/]/.test(id)) {
+            return "react-vendor";
+          }
+          if (id.includes("lucide-react")) return "icons";
+          if (id.includes("idb")) return "storage";
+          return undefined;
+        },
+      },
     },
   },
 }));

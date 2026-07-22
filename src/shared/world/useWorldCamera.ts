@@ -50,7 +50,7 @@ export function useWorldCamera({
   const drag = useRef<DragState>();
   const activePointers = useRef(new Map<number, WorldPoint>());
   const pinch = useRef<{ distance: number; zoom: number; anchorX: number; anchorY: number }>();
-  const suppressSceneClick = useRef(false);
+  const suppressSceneClickUntil = useRef(0);
   const tapHandler = useRef(onSceneTap);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -105,10 +105,9 @@ export function useWorldCamera({
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    suppressSceneClick.current = false;
+    const interactive = Boolean((event.target as HTMLElement).closest("a, button, input, textarea, select"));
+    if (interactive) suppressSceneClickUntil.current = 0;
     activePointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    viewport.setPointerCapture(event.pointerId);
-    setIsDragging(true);
     if (activePointers.current.size === 1) {
       drag.current = {
         pointerId: event.pointerId,
@@ -117,10 +116,15 @@ export function useWorldCamera({
         scrollLeft: viewport.scrollLeft,
         scrollTop: viewport.scrollTop,
         moved: false,
-        interactive: Boolean((event.target as HTMLElement).closest("a, button, input, textarea, select")),
+        interactive,
       };
+      if (interactive) return;
+      viewport.setPointerCapture(event.pointerId);
+      setIsDragging(true);
       return;
     }
+    viewport.setPointerCapture(event.pointerId);
+    setIsDragging(true);
     const [first, second] = [...activePointers.current.values()];
     const rect = viewport.getBoundingClientRect();
     const centerX = (first.x + second.x) / 2 - rect.left;
@@ -131,7 +135,7 @@ export function useWorldCamera({
       anchorX: (viewport.scrollLeft + centerX) / Math.max(1, viewport.scrollWidth),
       anchorY: (viewport.scrollTop + centerY) / Math.max(1, viewport.scrollHeight),
     };
-    suppressSceneClick.current = true;
+    suppressSceneClickUntil.current = Date.now() + 300;
     if (drag.current) drag.current.moved = true;
   };
 
@@ -155,12 +159,12 @@ export function useWorldCamera({
       return;
     }
     const activeDrag = drag.current;
-    if (!activeDrag || activeDrag.pointerId !== event.pointerId) return;
+    if (!activeDrag || activeDrag.pointerId !== event.pointerId || activeDrag.interactive) return;
     const movementX = event.clientX - activeDrag.startX;
     const movementY = event.clientY - activeDrag.startY;
     if (Math.hypot(movementX, movementY) > DRAG_THRESHOLD) {
       activeDrag.moved = true;
-      suppressSceneClick.current = true;
+      suppressSceneClickUntil.current = Date.now() + 300;
     }
     viewport.scrollLeft = activeDrag.scrollLeft - movementX;
     viewport.scrollTop = activeDrag.scrollTop - movementY;
@@ -195,10 +199,10 @@ export function useWorldCamera({
   };
 
   const onClickCapture = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!suppressSceneClick.current) return;
+    if (Date.now() > suppressSceneClickUntil.current) return;
     event.preventDefault();
     event.stopPropagation();
-    suppressSceneClick.current = false;
+    suppressSceneClickUntil.current = 0;
   };
 
   const panBy = (x: number, y = 0) => viewportRef.current?.scrollBy({ left: x, top: y, behavior: "smooth" });

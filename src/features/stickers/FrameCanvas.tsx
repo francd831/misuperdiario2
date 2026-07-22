@@ -20,14 +20,17 @@ function clamp(value: number, min: number, max: number) {
 
 export function FrameCanvas({ overlays, packs, editable = false, selected = false, onSelect, onUpdate, onRemove }: FrameCanvasProps) {
   const frame = normalizeOverlayProject(overlays).frame;
+  const gestures = useOverlayGestures({
+    x: frame?.x ?? 50,
+    y: frame?.y ?? 50,
+    scale: frame?.scale ?? 1,
+    rotation: frame?.rotation ?? 0,
+    minScale: .5, maxScale: 2, onSelect, onUpdate: (patch) => onUpdate?.(patch),
+  });
   if (!frame) return null;
 
   const asset = packs.find((pack) => pack.manifest.id === frame.packId)?.frames.find((item) => item.id === frame.assetId);
   if (!asset) return null;
-  const gestures = useOverlayGestures({
-    x: frame.x, y: frame.y, scale: frame.scale, rotation: frame.rotation,
-    minScale: .5, maxScale: 2, onSelect, onUpdate: (patch) => onUpdate?.(patch),
-  });
 
   return (
     <span

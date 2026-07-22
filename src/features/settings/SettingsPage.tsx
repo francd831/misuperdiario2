@@ -1,6 +1,6 @@
 import { ArrowLeft, Camera, Check, KeyRound, Save, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "../../app/mascot/FloatingMascot";
 import { packLoader } from "../../core/packs/packLoader";
 import { useProfiles } from "../../core/profiles/ProfileContext";
@@ -119,6 +119,8 @@ export default function SettingsPage() {
   }
 
   const previewProfile = activeProfile ? { ...activeProfile, name, avatarPreset, avatarPhotoDataUrl } : undefined;
+
+  if (!activeProfile) return <Navigate to="/profiles" replace />;
 
   return (
     <section className="world-settings" data-pack={activeProfile?.activePackId ?? "base"} style={settingsStyle}>
