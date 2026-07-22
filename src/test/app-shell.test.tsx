@@ -37,8 +37,8 @@ describe("App shell", () => {
   it("renders the welcome route", async () => {
     renderAt("/");
 
-    expect(await screen.findByRole("heading", { name: "Mi Super Diario" })).toBeInTheDocument();
-    expect(screen.getByText(/Tus recuerdos, solo tuyos/i)).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "Mi Super Diario" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Entrar al recibidor" })).toBeInTheDocument();
   });
 
   it("renders the family foyer with existing profiles plus one empty door and adult access", async () => {
@@ -60,7 +60,7 @@ describe("App shell", () => {
   it("renders the game home with its compact navigation", async () => {
     renderAt("/home");
 
-    expect(await screen.findByRole("heading", { name: "Hola, Luna" })).toBeInTheDocument();
+    expect(await screen.findByRole("main", { name: "Habitación creativa explorable" })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Solete, personaje del mundo" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Tienda: Kiosco de mundos" })).toHaveAttribute("href", "/store");
     expect(screen.getByRole("link", { name: "Historial: Librería de recuerdos" })).toHaveAttribute("href", "/diary");

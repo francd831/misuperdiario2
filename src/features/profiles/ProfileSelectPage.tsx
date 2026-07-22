@@ -2,23 +2,30 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Delete, Plus, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import carouselFoyer from "../../assets/profiles/profile-carousel-foyer-family-control-title.png";
-import baseDoor from "../../assets/profiles/doors/door-base.png";
+import baseDoor from "../../assets/profiles/doors/door-base-v2.png";
 import animalsDoor from "../../assets/profiles/doors/door-animals.png";
-import dinosaurDoor from "../../assets/profiles/doors/door-dinosaurs-v2.png";
+import dinosaurDoor from "../../assets/profiles/doors/door-dinosaurs-v3.png";
 import artDoor from "../../assets/profiles/doors/door-arte-pintura.png";
 import pirateDoor from "../../assets/profiles/doors/door-aventura-pirata.png";
 import basketballDoor from "../../assets/profiles/doors/door-baloncesto.png";
 import pastryDoor from "../../assets/profiles/doors/door-dulce-pasteleria.png";
 import magicSchoolDoor from "../../assets/profiles/doors/door-escuela-magia.png";
 import spaceDoor from "../../assets/profiles/doors/door-espacio.png";
-import footballDoor from "../../assets/profiles/doors/door-futbol-v2.png";
+import footballDoor from "../../assets/profiles/doors/door-futbol-v3.png";
 import magicKingdomDoor from "../../assets/profiles/doors/door-reino-magico.png";
 import speedDoor from "../../assets/profiles/doors/door-super-velocidad.png";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { Profile } from "../../core/profiles/types";
 import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
 
-function doorForPack(packId: string | undefined) {
+type DoorDefinition = {
+  url: string;
+  theme: string;
+};
+
+const baseDoorDefinition: DoorDefinition = { url: baseDoor, theme: "base" };
+
+function doorForPack(packId: string | undefined): DoorDefinition {
   if (packId === "animalesDivertidos") return { url: animalsDoor, theme: "animals" };
   if (packId === "dinosaurios") return { url: dinosaurDoor, theme: "dinosaurs" };
   if (packId === "futbol") return { url: footballDoor, theme: "football" };
@@ -30,7 +37,7 @@ function doorForPack(packId: string | undefined) {
   if (packId === "espacio") return { url: spaceDoor, theme: "space" };
   if (packId === "reinoMagico") return { url: magicKingdomDoor, theme: "magic-kingdom" };
   if (packId === "superVelocidad") return { url: speedDoor, theme: "speed" };
-  return { url: baseDoor, theme: "base" };
+  return baseDoorDefinition;
 }
 
 function nameSize(name: string) {
@@ -46,6 +53,8 @@ export default function ProfileSelectPage() {
   const [selectedProfile, setSelectedProfile] = useState<Profile>();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
+  const [centeredIndex, setCenteredIndex] = useState(0);
+  const doorCount = children.length + 1;
 
   const updateCarouselPerspective = useCallback(() => {
     const track = trackRef.current;
@@ -61,6 +70,7 @@ export default function ProfileSelectPage() {
       const clampedDistance = Math.max(-3, Math.min(3, normalizedDistance));
       door.style.setProperty("--carousel-distance", clampedDistance.toFixed(3));
       door.style.setProperty("--carousel-abs-distance", Math.abs(clampedDistance).toFixed(3));
+      door.style.zIndex = String(Math.max(1, doors.length * 10 - Math.round(Math.abs(clampedDistance) * 10)));
       const distance = Math.abs(doorCenter - center);
       if (distance < closestDistance) {
         closestDistance = distance;
@@ -72,6 +82,7 @@ export default function ProfileSelectPage() {
       if (index === closestIndex) door.setAttribute("aria-current", "true");
       else door.removeAttribute("aria-current");
     });
+    setCenteredIndex((current) => current === closestIndex ? current : closestIndex);
   }, []);
 
   useEffect(() => {
@@ -123,6 +134,14 @@ export default function ProfileSelectPage() {
     track.scrollBy({ left: direction * ((door?.offsetWidth ?? track.clientWidth * .55) + 24), behavior: "smooth" });
   }
 
+  function focusDoor(index: number) {
+    const track = trackRef.current;
+    const doors = track ? Array.from(track.querySelectorAll<HTMLElement>(".profile-carousel__door")) : [];
+    const door = doors[index];
+    if (!track || !door) return;
+    track.scrollTo({ left: door.offsetLeft + door.offsetWidth / 2 - track.clientWidth / 2, behavior: "smooth" });
+  }
+
   return (
     <section className="profile-carousel" aria-label="Seleccionar perfil" style={{ backgroundImage: `url(${carouselFoyer})` }}>
       <h1 className="visually-hidden">¿Quién eres?</h1>
@@ -131,21 +150,36 @@ export default function ProfileSelectPage() {
         {[...children, undefined].map((profile, index) => {
           const door = doorForPack(profile?.activePackId);
           if (!profile) return (
-            <Link key={`empty-${index}`} className="profile-carousel__door profile-carousel__door--empty" data-door-theme="base" data-name-size="long" to={`/profiles/new?door=${index + 1}`} aria-label={`Crear perfil en la puerta ${index + 1}`}>
+            <Link key={`empty-${index}`} className="profile-carousel__door profile-carousel__door--empty" data-door-theme="base" data-name-size="long" to={`/profiles/new?door=${index + 1}`} aria-label={`Crear perfil en la puerta ${index + 1}`} aria-posinset={index + 1} aria-setsize={doorCount}>
               <img src={baseDoor} alt="" aria-hidden="true" />
-              <strong>Nuevo perfil</strong>
+              <span className="profile-carousel__nameplate"><strong>Nuevo perfil</strong></span>
               <span className="profile-carousel__plus"><Plus /></span>
             </Link>
           );
           return (
-            <button key={profile.id} className="profile-carousel__door" data-door-theme={door.theme} data-name-size={nameSize(profile.name)} type="button" aria-label={`Entrar como ${profile.name}`} onClick={() => selectProfile(profile)}>
+            <button key={profile.id} className="profile-carousel__door" data-door-theme={door.theme} data-name-size={nameSize(profile.name)} type="button" aria-label={`Entrar como ${profile.name}`} aria-posinset={index + 1} aria-setsize={doorCount} onClick={() => selectProfile(profile)}>
               <img src={door.url} alt="" aria-hidden="true" />
-              <strong>{profile.name}</strong>
+              <span className="profile-carousel__nameplate"><strong>{profile.name}</strong></span>
             </button>
           );
         })}
       </div>
       <button className="profile-carousel__arrow profile-carousel__arrow--right" type="button" aria-label="Puerta siguiente" onClick={() => moveCarousel(1)}><ChevronRight /></button>
+
+      {doorCount > 1 && (
+        <nav className="profile-carousel__positions" aria-label="Perfiles disponibles">
+          {[...children, undefined].map((profile, index) => (
+            <button
+              key={profile?.id ?? "new-profile"}
+              type="button"
+              className={index === centeredIndex ? "is-active" : ""}
+              aria-current={index === centeredIndex ? "true" : undefined}
+              aria-label={profile ? `Mostrar la puerta de ${profile.name}` : "Mostrar la puerta para crear un perfil"}
+              onClick={() => focusDoor(index)}
+            />
+          ))}
+        </nav>
+      )}
 
       <Link className="profile-carousel__family-control" to="/admin" aria-label="Abrir Control familiar">
         <span className="visually-hidden">Control familiar</span>
@@ -158,7 +192,7 @@ export default function ProfileSelectPage() {
             <div className="profile-pin-panel__main">
               <ProfileAvatar profile={selectedProfile} className="profile-pin-panel__avatar" />
               <h2>{selectedProfile.name}</h2>
-              <label><span>PIN</span><input autoFocus inputMode="numeric" maxLength={4} placeholder="••••" type="password" value={pin} onChange={(event) => { setError(""); setPin(event.target.value.replace(/\D/g, "").slice(0, 4)); }} /></label>
+              <label><span>PIN</span><input aria-live="polite" inputMode="none" maxLength={4} placeholder="••••" type="password" value={pin} readOnly /></label>
               {error && <p className="profile-pin-panel__error" role="alert">{error}</p>}
               <button className="profile-pin-panel__enter" type="submit" disabled={pin.length !== 4}>Entrar <ArrowRight aria-hidden="true" /></button>
             </div>

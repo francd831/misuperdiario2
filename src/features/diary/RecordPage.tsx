@@ -136,6 +136,7 @@ export default function RecordPage() {
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const streamRequestRef = useRef(0);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const previewUrl = useObjectUrl(mediaBlob);
@@ -199,6 +200,7 @@ export default function RecordPage() {
   }, [activeProfile, entryType]);
 
   const stopTracks = useCallback(() => {
+    streamRequestRef.current += 1;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     if (videoPreviewRef.current) videoPreviewRef.current.srcObject = null;
@@ -236,6 +238,33 @@ export default function RecordPage() {
   }, [entryType, paused, policy?.maxAudioSeconds, policy?.maxVideoSeconds, recording, stopRecording]);
 
   useEffect(() => () => stopTracks(), [stopTracks]);
+
+  const startVideoPreview = useCallback(async () => {
+    if (entryType !== "video" || !policy || !navigator.mediaDevices?.getUserMedia) return;
+    try {
+      stopTracks();
+      const requestId = ++streamRequestRef.current;
+      const constraints = getMediaConstraints("video", policy.videoQuality);
+      const stream = await navigator.mediaDevices.getUserMedia({ video: constraints.video, audio: false });
+      if (requestId !== streamRequestRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      streamRef.current = stream;
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = stream;
+        videoPreviewRef.current.muted = true;
+        await videoPreviewRef.current.play();
+      }
+    } catch {
+      setError("No se pudo acceder a la cámara.");
+    }
+  }, [entryType, policy, stopTracks]);
+
+  useEffect(() => {
+    if (entryType !== "video" || !policy) return;
+    void startVideoPreview();
+  }, [entryType, policy, startVideoPreview]);
 
   useEffect(() => {
     if (!saveSheetOpen || !window.visualViewport) return undefined;
@@ -297,10 +326,16 @@ export default function RecordPage() {
     }
 
     try {
+      if (entryType === "video") stopTracks();
+      const requestId = ++streamRequestRef.current;
       const mimeType = getSupportedRecordingMimeType(entryType);
       const stream = await navigator.mediaDevices.getUserMedia(
         getMediaConstraints(entryType, entryType === "video" ? policy.videoQuality : "medium"),
       );
+      if (requestId !== streamRequestRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
       chunksRef.current = [];
 
@@ -517,7 +552,7 @@ export default function RecordPage() {
                   </>
                 ) : (
                   <>
-                    <button className="cinema-action" type="button" onClick={() => { setMediaBlob(null); setSavedEntryId(undefined); }}><RotateCcw size={18} /> Repetir</button>
+                    <button className="cinema-action" type="button" onClick={() => { setMediaBlob(null); setSavedEntryId(undefined); void startVideoPreview(); }}><RotateCcw size={18} /> Repetir</button>
                     {!savedEntryId && <button className="cinema-action cinema-action--save" type="button" disabled={saving} onClick={() => void quickSaveMediaEntry()}><Save size={18} /> {saving ? "Guardando" : "Guardar"}</button>}
                   </>
                 )}

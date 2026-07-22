@@ -1,39 +1,28 @@
-import { ArrowRight, ShieldCheck } from "lucide-react";
-import { Link } from "react-router-dom";
-import actionPhoto from "../../assets/home/action-photo.webp";
-import actionWrite from "../../assets/home/action-write.webp";
+import { useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import launchCover from "../../assets/onboarding/launch-cover-house-v1.jpg";
+import foyer from "../../assets/profiles/profile-carousel-foyer-family-control-title.png";
+
+const LAUNCH_DURATION_MS = 2600;
 
 export default function WelcomePage() {
+  const navigate = useNavigate();
+  const enterFoyer = useCallback(() => navigate("/profiles", { replace: true }), [navigate]);
+
+  useEffect(() => {
+    const foyerPreload = new Image();
+    foyerPreload.src = foyer;
+    const timer = window.setTimeout(enterFoyer, LAUNCH_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [enterFoyer]);
+
   return (
-    <section className="welcome-screen">
-      <div className="welcome-hero">
-        <div className="welcome-copy">
-          <p className="welcome-kicker">Tus recuerdos, solo tuyos</p>
-          <h1>Mi Super Diario</h1>
-          <p>
-            Guarda lo que viviste con palabras, voz, fotos y vídeo.
-          </p>
-        </div>
-
-        <div className="welcome-memory-preview" aria-label="Ejemplos de recuerdos que puedes crear">
-          <figure className="welcome-memory-card welcome-memory-card--photo">
-            <img src={actionPhoto} alt="Crear un recuerdo con una foto" />
-          </figure>
-          <figure className="welcome-memory-card welcome-memory-card--write">
-            <img src={actionWrite} alt="Escribir un recuerdo personal" />
-          </figure>
-        </div>
-      </div>
-
-      <div className="welcome-actions">
-        <Link className="primary-action" to="/profiles">
-          Entrar en mi diario <ArrowRight aria-hidden="true" size={20} />
-        </Link>
-      </div>
-
-      <Link className="welcome-admin-link" to="/admin">
-        <ShieldCheck aria-hidden="true" size={17} /> Administración familiar
-      </Link>
+    <section className="launch-cover" aria-label="Mi Super Diario">
+      <button className="launch-cover__scene" type="button" onClick={enterFoyer} aria-label="Entrar al recibidor">
+        <img src={launchCover} alt="Entrada de Mi Super Diario" />
+        <span className="launch-cover__light" aria-hidden="true" />
+        <span className="launch-cover__progress" aria-hidden="true"><i /></span>
+      </button>
     </section>
   );
 }

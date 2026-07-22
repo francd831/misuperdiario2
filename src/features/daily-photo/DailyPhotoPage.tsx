@@ -79,6 +79,7 @@ export default function DailyPhotoPage() {
   const { activeProfile } = useProfiles();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const cameraRequestRef = useRef(0);
   const [policy, setPolicy] = useState<StoragePolicy | null>(null);
   const [photos, setPhotos] = useState<DailyPhoto[]>([]);
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
@@ -89,7 +90,7 @@ export default function DailyPhotoPage() {
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [effectsOpen, setEffectsOpen] = useState(false);
   const [photosOpen, setPhotosOpen] = useState(false);
-  const [cameraAspectRatio, setCameraAspectRatio] = useState("1 / 1");
+  const [cameraAspectRatio, setCameraAspectRatio] = useState("4 / 3");
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
   const photoSceneBackground = activePack?.manifest.id === "animalesDivertidos"
@@ -98,6 +99,7 @@ export default function DailyPhotoPage() {
   const hasToday = useMemo(() => photos.some((photo) => photo.date === new Date().toISOString().slice(0, 10)), [photos]);
 
   const stopCamera = useCallback(() => {
+    cameraRequestRef.current += 1;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
   }, []);
@@ -117,7 +119,7 @@ export default function DailyPhotoPage() {
 
   useEffect(() => () => stopCamera(), [stopCamera]);
 
-  async function startCamera() {
+  const startCamera = useCallback(async () => {
     setError("");
     setCapturedBlob(null);
     setEditingPhotoId(null);
@@ -130,12 +132,18 @@ export default function DailyPhotoPage() {
     }
 
     try {
+      const requestId = ++cameraRequestRef.current;
       const quality = policy?.photoQuality ?? "medium";
-      const size = quality === "high" ? 1600 : quality === "low" ? 720 : 1100;
+      const width = quality === "high" ? 1600 : quality === "low" ? 960 : 1280;
+      const height = Math.round(width * 3 / 4);
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: size }, height: { ideal: size } },
+        video: { facingMode: "user", width: { ideal: width }, height: { ideal: height }, aspectRatio: { ideal: 4 / 3 } },
         audio: false,
       });
+      if (requestId !== cameraRequestRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -145,7 +153,12 @@ export default function DailyPhotoPage() {
     } catch {
       setError("No se pudo acceder a la cámara.");
     }
-  }
+  }, [policy?.photoQuality]);
+
+  useEffect(() => {
+    if (!policy) return;
+    void startCamera();
+  }, [policy, startCamera]);
 
   async function capturePhoto() {
     const video = videoRef.current;

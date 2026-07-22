@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Download, Star } from "lucide-react";
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import giantCreativeRoom from "../../assets/home/giant-creative-room-world-v5-no-chest.png";
 import cityOfChampionsWorld from "../../assets/home/city-of-champions-football-concept-v1.png";
@@ -18,6 +18,7 @@ import starSprite from "../../assets/mascots/golden-star-sprites-32.webp";
 import { loadPackMascotSprite, MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "../../app/mascot/FloatingMascot";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
+import { useWorldCamera } from "../../shared/world/useWorldCamera";
 
 const destinations = [
   { id: "video", to: "/record/video", title: "Cine de los recuerdos", short: "Vídeo", x: 14.5, y: 29 },
@@ -141,8 +142,6 @@ const conceptWorlds: Record<string, ConceptWorld> = {
 
 type WorldPoint = { x: number; y: number };
 
-const MIN_WORLD_ZOOM = .62;
-const MAX_WORLD_ZOOM = 1.42;
 const WORLD_ASPECT_RATIO = 1848 / 864;
 
 const roomObstacles = [
@@ -216,23 +215,14 @@ type InstallPromptEvent = Event & {
 export default function HomePage() {
   const { activeProfile, logout } = useProfiles();
   const navigate = useNavigate();
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
   const playerSpriteRef = useRef<HTMLSpanElement>(null);
   const playerPosition = useRef({ x: 50, y: 74 });
   const playerTarget = useRef({ x: 50, y: 74 });
   const pressedKeys = useRef(new Set<string>());
-  const drag = useRef<{ pointerId: number; startX: number; startY: number; scrollLeft: number; scrollTop: number; moved: boolean }>();
-  const activePointers = useRef(new Map<number, { x: number; y: number }>());
-  // Enter every pack with the widest supported view. The user can then
-  // pinch to approach the areas they want to explore.
-  const worldZoom = useRef(MIN_WORLD_ZOOM);
-  const worldBaseSize = useRef({ width: 1900, height: 980 });
-  const pinch = useRef<{ distance: number; zoom: number; anchorX: number; anchorY: number }>();
   const [balance, setBalance] = useState(0);
+  const [focusedDestinationId, setFocusedDestinationId] = useState<DestinationId>();
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent>();
-  const [isDragging, setIsDragging] = useState(false);
   const [mascotVisible, setMascotVisible] = useState(() => localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
   const [playerMascot, setPlayerMascot] = useState({ url: starSprite, label: "Solete", columns: 8 });
   const activePackId = activeProfile?.activePackId ?? "base";
@@ -251,6 +241,21 @@ export default function HomePage() {
     : activePackId === "animalesDivertidos"
     ? animalValleyObstacles
     : activePackId === "dinosaurios" ? dinosaurValleyObstacles : activePackId === "futbol" ? footballCampusObstacles : roomObstacles;
+  const {
+    viewportRef,
+    sceneRef,
+    isDragging,
+    focusAt,
+    panBy,
+    viewportHandlers,
+  } = useWorldCamera({
+    worldKey: activePackId,
+    aspectRatio: activePackId === "futbol" ? 16 / 9 : WORLD_ASPECT_RATIO,
+    initialFocus: { x: 42, y: 72 },
+    onSceneTap: ({ x, y }) => {
+      playerTarget.current = constrainToRoom({ x, y }, activeObstacles);
+    },
+  });
 
   useEffect(() => {
     const updateVisibility = () => setMascotVisible(localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
@@ -379,116 +384,13 @@ export default function HomePage() {
     };
   }, [activePackId, playerMascot.columns]);
 
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    const scene = sceneRef.current;
-    if (!viewport || !scene) return;
-    const sizeWorld = () => {
-      const baseHeight = Math.max(viewport.clientHeight * 1.5, 980);
-      const baseWidth = activePackId === "futbol"
-        ? baseHeight * (16 / 9)
-        : Math.max(viewport.clientWidth * 1.9, baseHeight * WORLD_ASPECT_RATIO);
-      worldBaseSize.current = { width: baseWidth, height: baseHeight };
-      scene.style.width = `${Math.max(viewport.clientWidth, baseWidth * worldZoom.current)}px`;
-      scene.style.height = `${Math.max(viewport.clientHeight, baseHeight * worldZoom.current)}px`;
-    };
-    const centerWorld = () => {
-      sizeWorld();
-      viewport.scrollLeft = Math.max(0, (viewport.scrollWidth - viewport.clientWidth) * .42);
-      viewport.scrollTop = Math.max(0, (viewport.scrollHeight - viewport.clientHeight) * .72);
-    };
-    const frame = window.requestAnimationFrame(centerWorld);
-    window.addEventListener("resize", sizeWorld);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("resize", sizeWorld);
-    };
-  }, [activePackId]);
-
   const moveWorld = (direction: -1 | 1) => {
-    viewportRef.current?.scrollBy({ left: direction * window.innerWidth * .68, behavior: "smooth" });
+    panBy(direction * window.innerWidth * .68);
   };
 
   const exitProfile = async () => {
     await logout();
     navigate("/profiles", { replace: true });
-  };
-
-  const startDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const viewport = viewportRef.current;
-    if (!viewport || (event.target as HTMLElement).closest("a, button")) return;
-    activePointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    viewport.setPointerCapture(event.pointerId);
-    setIsDragging(true);
-    if (activePointers.current.size === 1) {
-      drag.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop, moved: false };
-      return;
-    }
-    const [first, second] = [...activePointers.current.values()];
-    const rect = viewport.getBoundingClientRect();
-    const centerX = (first.x + second.x) / 2 - rect.left;
-    const centerY = (first.y + second.y) / 2 - rect.top;
-    pinch.current = {
-      distance: Math.max(1, Math.hypot(second.x - first.x, second.y - first.y)),
-      zoom: worldZoom.current,
-      anchorX: (viewport.scrollLeft + centerX) / Math.max(1, viewport.scrollWidth),
-      anchorY: (viewport.scrollTop + centerY) / Math.max(1, viewport.scrollHeight),
-    };
-    if (drag.current) drag.current.moved = true;
-  };
-
-  const continueDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const activeDrag = drag.current;
-    const viewport = viewportRef.current;
-    const scene = sceneRef.current;
-    if (!viewport || !scene || !activePointers.current.has(event.pointerId)) return;
-    activePointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (pinch.current && activePointers.current.size >= 2) {
-      const [first, second] = [...activePointers.current.values()];
-      const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
-      const nextZoom = Math.max(MIN_WORLD_ZOOM, Math.min(MAX_WORLD_ZOOM, pinch.current.zoom * distance / pinch.current.distance));
-      const rect = viewport.getBoundingClientRect();
-      const centerX = (first.x + second.x) / 2 - rect.left;
-      const centerY = (first.y + second.y) / 2 - rect.top;
-      worldZoom.current = nextZoom;
-      scene.style.width = `${Math.max(viewport.clientWidth, worldBaseSize.current.width * nextZoom)}px`;
-      scene.style.height = `${Math.max(viewport.clientHeight, worldBaseSize.current.height * nextZoom)}px`;
-      viewport.scrollLeft = pinch.current.anchorX * viewport.scrollWidth - centerX;
-      viewport.scrollTop = pinch.current.anchorY * viewport.scrollHeight - centerY;
-      return;
-    }
-    if (!activeDrag || activeDrag.pointerId !== event.pointerId) return;
-    const movementX = event.clientX - activeDrag.startX;
-    const movementY = event.clientY - activeDrag.startY;
-    if (Math.hypot(movementX, movementY) > 4) activeDrag.moved = true;
-    viewport.scrollLeft = activeDrag.scrollLeft - movementX;
-    viewport.scrollTop = activeDrag.scrollTop - movementY;
-  };
-
-  const finishDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const activeDrag = drag.current;
-    const viewport = viewportRef.current;
-    if (viewport?.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
-    const wasPinching = Boolean(pinch.current);
-    activePointers.current.delete(event.pointerId);
-    pinch.current = undefined;
-    const remaining = [...activePointers.current.entries()][0];
-    if (remaining && viewport) {
-      const [pointerId, point] = remaining;
-      drag.current = { pointerId, startX: point.x, startY: point.y, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop, moved: true };
-    } else {
-      drag.current = undefined;
-      setIsDragging(false);
-    }
-    if (!wasPinching && !activeDrag?.moved && !(event.target as HTMLElement).closest("a, button")) {
-      const scene = sceneRef.current?.getBoundingClientRect();
-      if (scene) {
-        playerTarget.current = constrainToRoom({
-          x: (event.clientX - scene.left) / scene.width * 100,
-          y: (event.clientY - scene.top) / scene.height * 100,
-        }, activeObstacles);
-      }
-    }
   };
 
   return (
@@ -516,10 +418,7 @@ export default function HomePage() {
         <div
           ref={viewportRef}
           className={`world-explorer__viewport${isDragging ? " is-dragging" : ""}`}
-          onPointerDown={startDrag}
-          onPointerMove={continueDrag}
-          onPointerUp={finishDrag}
-          onPointerCancel={finishDrag}
+          {...viewportHandlers}
         >
           <div ref={sceneRef} className="world-explorer__scene" data-pack={activePackId} style={{ backgroundImage: `url(${worldBackground})` }}>
             <button
@@ -538,11 +437,13 @@ export default function HomePage() {
             {worldDestinations.map((destination) => (
               <Link
                 key={destination.id}
-                className={`world-destination world-destination--${destination.id}`}
+                className={`world-destination world-destination--${destination.id}${focusedDestinationId === destination.id ? " is-focused" : ""}`}
                 to={destination.to}
                 aria-label={`${destination.short}: ${destination.title}`}
                 style={{ left: `${destination.x}%`, top: `${destination.y}%` }}
+                onFocus={() => setFocusedDestinationId(destination.id)}
               >
+                <span className="visually-hidden">Entrar en {destination.title}</span>
               </Link>
             ))}
             {mascotVisible && (
@@ -566,14 +467,17 @@ export default function HomePage() {
             <button
               key={destination.id}
               type="button"
+              className={focusedDestinationId === destination.id ? "is-active" : ""}
               onClick={() => {
-                const viewport = viewportRef.current;
-                if (!viewport) return;
-                viewport.scrollTo({ left: viewport.scrollWidth * destination.x / 100 - viewport.clientWidth / 2, behavior: "smooth" });
+                setFocusedDestinationId(destination.id);
+                focusAt({ x: destination.x, y: destination.y });
               }}
+              aria-current={focusedDestinationId === destination.id ? "true" : undefined}
               aria-label={`Ver ${destination.title}`}
               title={destination.title}
-            />
+            >
+              <span aria-hidden="true">{destination.short}</span>
+            </button>
           ))}
         </nav>
         <p className="world-explorer__hint">Toca el suelo o usa las flechas para moverte · Arrastra para explorar · Pellizca para ampliar</p>
