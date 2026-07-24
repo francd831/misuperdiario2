@@ -53,7 +53,6 @@ export default function ProfileSelectPage() {
   const [selectedProfile, setSelectedProfile] = useState<Profile>();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
-  const [centeredIndex, setCenteredIndex] = useState(0);
   const doorCount = children.length + 1;
 
   const updateCarouselPerspective = useCallback(() => {
@@ -82,7 +81,6 @@ export default function ProfileSelectPage() {
       if (index === closestIndex) door.setAttribute("aria-current", "true");
       else door.removeAttribute("aria-current");
     });
-    setCenteredIndex((current) => current === closestIndex ? current : closestIndex);
   }, []);
 
   useEffect(() => {
@@ -134,14 +132,6 @@ export default function ProfileSelectPage() {
     track.scrollBy({ left: direction * ((door?.offsetWidth ?? track.clientWidth * .55) + 24), behavior: "smooth" });
   }
 
-  function focusDoor(index: number) {
-    const track = trackRef.current;
-    const doors = track ? Array.from(track.querySelectorAll<HTMLElement>(".profile-carousel__door")) : [];
-    const door = doors[index];
-    if (!track || !door) return;
-    track.scrollTo({ left: door.offsetLeft + door.offsetWidth / 2 - track.clientWidth / 2, behavior: "smooth" });
-  }
-
   return (
     <section className="profile-carousel" aria-label="Seleccionar perfil" style={{ backgroundImage: `url(${carouselFoyer})` }}>
       <h1 className="visually-hidden">¿Quién eres?</h1>
@@ -165,21 +155,6 @@ export default function ProfileSelectPage() {
         })}
       </div>
       <button className="profile-carousel__arrow profile-carousel__arrow--right" type="button" aria-label="Puerta siguiente" onClick={() => moveCarousel(1)}><ChevronRight /></button>
-
-      {doorCount > 1 && (
-        <nav className="profile-carousel__positions" aria-label="Perfiles disponibles">
-          {[...children, undefined].map((profile, index) => (
-            <button
-              key={profile?.id ?? "new-profile"}
-              type="button"
-              className={index === centeredIndex ? "is-active" : ""}
-              aria-current={index === centeredIndex ? "true" : undefined}
-              aria-label={profile ? `Mostrar la puerta de ${profile.name}` : "Mostrar la puerta para crear un perfil"}
-              onClick={() => focusDoor(index)}
-            />
-          ))}
-        </nav>
-      )}
 
       <Link className="profile-carousel__family-control" to="/admin" aria-label="Abrir Control familiar">
         <span className="visually-hidden">Control familiar</span>

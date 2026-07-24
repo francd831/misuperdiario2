@@ -29,66 +29,66 @@ import footballSettings from "../../assets/settings/football-locker-settings-v1.
 import footballStore from "../../assets/store/football-kit-store-v1.png";
 import footballGallery from "../../assets/diary/football-club-museum-gallery-v1.png";
 
-import artVideo from "../../assets/recording/painted-canvas-cinema-art-v1.png";
+import artVideo from "../../assets/recording/painted-canvas-cinema-art-v2.png";
 import artVoice from "../../assets/recording/artist-voice-studio-art-v1.png";
 import artWriting from "../../assets/recording/artist-diary-art-v1.png";
-import artPhoto from "../../assets/recording/portrait-studio-art-v1.png";
+import artPhoto from "../../assets/recording/portrait-studio-art-v2.png";
 import artSettings from "../../assets/settings/creative-workshop-settings-art-v1.png";
 import artStore from "../../assets/store/market-of-colors-store-art-v1.png";
 import artGallery from "../../assets/diary/art-memory-museum-gallery-v1.png";
 
-import pirateVideo from "../../assets/recording/map-room-cinema-pirate-v1.png";
+import pirateVideo from "../../assets/recording/map-room-cinema-pirate-v2.png";
 import pirateVoice from "../../assets/recording/captain-broadcast-voice-pirate-v1.png";
 import pirateWriting from "../../assets/recording/captain-log-writing-pirate-v1.png";
-import piratePhoto from "../../assets/recording/ship-lookout-photo-pirate-v1.png";
+import piratePhoto from "../../assets/recording/ship-lookout-photo-pirate-v2.png";
 import pirateSettings from "../../assets/settings/captain-cabin-settings-pirate-v1.png";
 import pirateStore from "../../assets/store/pirate-port-market-store-v1.png";
 import pirateGallery from "../../assets/diary/captain-memory-hall-gallery-pirate-v1.png";
 
-import basketballVideo from "../../assets/recording/arena-replay-video-basketball-v1.png";
-import basketballVoice from "../../assets/recording/courtside-voice-basketball-v1.png";
+import basketballVideo from "../../assets/recording/arena-replay-video-basketball-v2.png";
+import basketballVoice from "../../assets/recording/courtside-voice-basketball-v2.png";
 import basketballWriting from "../../assets/recording/coach-playbook-writing-basketball-v1.png";
-import basketballPhoto from "../../assets/recording/press-photo-basketball-v1.png";
+import basketballPhoto from "../../assets/recording/press-photo-basketball-v2.png";
 import basketballSettings from "../../assets/settings/locker-settings-basketball-v1.png";
 import basketballStore from "../../assets/store/team-shop-basketball-v1.png";
 import basketballGallery from "../../assets/diary/club-memory-gallery-basketball-v1.png";
 
-import pastryVideo from "../../assets/recording/cake-theatre-video-pastry-v1.png";
-import pastryVoice from "../../assets/recording/confectionery-voice-pastry-v1.png";
+import pastryVideo from "../../assets/recording/cake-theatre-video-pastry-v2.png";
+import pastryVoice from "../../assets/recording/confectionery-voice-pastry-v2.png";
 import pastryWriting from "../../assets/recording/recipe-diary-writing-pastry-v1.png";
-import pastryPhoto from "../../assets/recording/sweet-portrait-photo-pastry-v1.png";
+import pastryPhoto from "../../assets/recording/sweet-portrait-photo-pastry-v2.png";
 import pastrySettings from "../../assets/settings/bakery-settings-pastry-v1.png";
 import pastryStore from "../../assets/store/dessert-boutique-store-pastry-v1.png";
 import pastryGallery from "../../assets/diary/memory-patisserie-gallery-v1.png";
 
-import magicSchoolVideo from "../../assets/recording/projection-hall-video-magic-school-v1.png";
-import magicSchoolVoice from "../../assets/recording/spell-recital-voice-magic-school-v1.png";
+import magicSchoolVideo from "../../assets/recording/projection-hall-video-magic-school-v2.png";
+import magicSchoolVoice from "../../assets/recording/spell-recital-voice-magic-school-v2.png";
 import magicSchoolWriting from "../../assets/recording/spell-journal-writing-magic-school-v1.png";
-import magicSchoolPhoto from "../../assets/recording/magical-portrait-photo-magic-school-v1.png";
+import magicSchoolPhoto from "../../assets/recording/magical-portrait-photo-magic-school-v2.png";
 import magicSchoolSettings from "../../assets/settings/headmaster-settings-magic-school-v1.png";
 import magicSchoolStore from "../../assets/store/academy-supplies-store-magic-school-v1.png";
 import magicSchoolGallery from "../../assets/diary/school-memory-archive-gallery-v1.png";
 
-import spaceVideo from "../../assets/recording/orbital-cinema-video-space-v1.png";
+import spaceVideo from "../../assets/recording/orbital-cinema-video-space-v2.png";
 import spaceVoice from "../../assets/recording/mission-voice-space-v1.png";
 import spaceWriting from "../../assets/recording/astronaut-log-writing-space-v1.png";
-import spacePhoto from "../../assets/recording/observatory-photo-space-v1.png";
+import spacePhoto from "../../assets/recording/observatory-photo-space-v2.png";
 import spaceSettings from "../../assets/settings/mission-control-settings-space-v1.png";
 import spaceStore from "../../assets/store/interstellar-depot-store-space-v1.png";
 import spaceGallery from "../../assets/diary/cosmic-memory-archive-gallery-v1.png";
 
-import kingdomVideo from "../../assets/recording/royal-story-video-kingdom-v1.png";
-import kingdomVoice from "../../assets/recording/royal-amphitheatre-voice-kingdom-v1.png";
+import kingdomVideo from "../../assets/recording/royal-story-video-kingdom-v2.png";
+import kingdomVoice from "../../assets/recording/royal-amphitheatre-voice-kingdom-v2.png";
 import kingdomWriting from "../../assets/recording/fairytale-diary-writing-kingdom-v1.png";
-import kingdomPhoto from "../../assets/recording/storybook-photo-kingdom-v1.png";
+import kingdomPhoto from "../../assets/recording/storybook-photo-kingdom-v2.png";
 import kingdomSettings from "../../assets/settings/royal-observatory-settings-kingdom-v1.png";
 import kingdomStore from "../../assets/store/fairytale-market-store-kingdom-v1.png";
 import kingdomGallery from "../../assets/diary/palace-memory-gallery-kingdom-v1.png";
 
-import speedVideo from "../../assets/recording/trackside-video-speed-v1.png";
-import speedVoice from "../../assets/recording/race-commentary-voice-speed-v1.png";
+import speedVideo from "../../assets/recording/trackside-video-speed-v2.png";
+import speedVoice from "../../assets/recording/race-commentary-voice-speed-v2.png";
 import speedWriting from "../../assets/recording/driver-log-writing-speed-v1.png";
-import speedPhoto from "../../assets/recording/pitlane-photo-speed-v1.png";
+import speedPhoto from "../../assets/recording/pitlane-photo-speed-v2.png";
 import speedSettings from "../../assets/settings/pit-garage-settings-speed-v1.png";
 import speedStore from "../../assets/store/racing-shop-store-speed-v1.png";
 import speedGallery from "../../assets/diary/racing-memory-hall-gallery-v1.png";

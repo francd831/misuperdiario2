@@ -4692,16 +4692,9 @@ p {
   backdrop-filter: blur(8px);
 }
 .photo-room__today { position: absolute; z-index: 30; top: 25.2%; left: 50%; transform: translateX(-50%); border-radius: 999px; background: rgb(255 240 189 / 88%); color: #684414; padding: 5px 10px; font-size: .65rem; font-weight: 900; }
-.photo-room__preview { position: absolute; z-index: 8; top: 29.5%; left: 26.2%; width: 47.9%; height: 53.3%; overflow: hidden; border-radius: 2.5%; background: #151319; }
+.photo-room__preview { position: absolute; z-index: 8; top: 24.3%; left: 26.2%; width: 47.6%; height: 49.2%; overflow: hidden; border-radius: 2.1%; background: #151319; }
 .photo-room__preview .sticker-stage { width: 100%; height: 100%; border-radius: 0; aspect-ratio: auto !important; background: #151319; }
 .photo-room__preview .camera-preview { display: block; width: 100%; height: 100%; min-height: 0; max-height: none; border: 0; border-radius: 0; aspect-ratio: auto; object-fit: contain; box-shadow: none; }
-.photo-room[data-pack="futbol"] .photo-room__preview {
-  top: 24.3%;
-  left: 26.2%;
-  width: 47.6%;
-  height: 49.2%;
-  border-radius: 2.1%;
-}
 .photo-room[data-pack="futbol"] .photo-room__today { top: 19.5%; }
 .photo-room__controls { position: absolute; z-index: 25; right: 26%; bottom: 2%; left: 26%; display: flex; min-height: 60px; align-items: center; justify-content: center; gap: 9px; border: 1px solid rgb(255 255 255 / 25%); border-radius: 18px; background: rgb(75 44 79 / 76%); padding: 7px 10px; backdrop-filter: blur(10px); }
 .photo-room__controls .secondary-action, .photo-room__controls .primary-action { min-height: 40px; padding-inline: 11px; font-size: .72rem; }
@@ -5419,13 +5412,6 @@ p {
   .store-world__packs { scrollbar-width: none; }
   .store-world__packs::-webkit-scrollbar { display: none; height: 0; }
 }
-.capture-studio[data-pack="animalesDivertidos"] .cinema-screen.video-viewfinder {
-  top: 21.6%;
-  left: 21.8%;
-  width: 55.2%;
-  height: 55.5%;
-}
-
 /* Animales Divertidos: every activity lives in its own Valle de las Huellas location. */
 .capture-studio[data-pack="animalesDivertidos"] .responsive-world-scene,
 .photo-room[data-pack="animalesDivertidos"] {
@@ -5451,13 +5437,6 @@ p {
   width: 25%;
 }
 
-.photo-room[data-pack="animalesDivertidos"] .photo-room__preview {
-  top: 22.2%;
-  left: 21.1%;
-  width: 57.8%;
-  height: 57.2%;
-  border-radius: 2.8%;
-}
 .photo-room[data-pack="animalesDivertidos"] .photo-room__today { top: 18.5%; }
 .photo-room[data-pack="animalesDivertidos"] .photo-room__controls {
   right: 24%;
@@ -5524,14 +5503,6 @@ p {
   --scene-ratio-number: 1.7778;
 }
 
-.capture-studio[data-pack="dinosaurios"] .cinema-screen.video-viewfinder {
-  top: 22.5%;
-  left: 22.8%;
-  width: 53.7%;
-  height: 45.5%;
-  border-radius: 3.2%;
-}
-
 .capture-studio[data-pack="dinosaurios"] .voice-room__mic { top: 23%; left: 43%; width: 14%; height: 54%; }
 .capture-studio[data-pack="dinosaurios"] .voice-room__console { right: 24%; bottom: 2.5%; left: 24%; }
 
@@ -5557,7 +5528,6 @@ p {
   transform: rotate(-2deg);
 }
 
-.photo-room[data-pack="dinosaurios"] .photo-room__preview { top: 16.5%; left: 17.5%; width: 65%; height: 61%; border-radius: 3%; }
 .photo-room[data-pack="dinosaurios"] .photo-room__today { top: 13%; }
 .photo-room[data-pack="dinosaurios"] .photo-room__controls { right: 23%; bottom: 2%; left: 23%; }
 
@@ -6540,52 +6510,6 @@ p {
 .profile-carousel__family-control:focus-visible { outline: 0; }
 .profile-carousel__family-control:active { transform: scale(.97); }
 
-.profile-carousel__positions {
-  position: absolute;
-  z-index: 9;
-  bottom: max(1.8%, env(safe-area-inset-bottom));
-  left: 50%;
-  display: flex;
-  max-width: min(58vw, 520px);
-  justify-content: center;
-  gap: 1px;
-  overflow-x: auto;
-  padding: 0 8px;
-  transform: translateX(-50%);
-  scrollbar-width: none;
-}
-.profile-carousel__positions::-webkit-scrollbar { display: none; }
-.profile-carousel__positions button {
-  position: relative;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-.profile-carousel__positions button::after {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  border: 1px solid rgb(255 248 217 / 78%);
-  border-radius: 50%;
-  background: rgb(56 72 61 / 58%);
-  box-shadow: 0 2px 5px rgb(42 25 13 / 22%);
-  content: "";
-  transform: translate(-50%, -50%);
-  transition: width .18s ease, background-color .18s ease, box-shadow .18s ease;
-}
-.profile-carousel__positions button.is-active::after {
-  width: 24px;
-  border-radius: 999px;
-  background: #fff0a7;
-  box-shadow: 0 0 0 3px rgb(71 91 74 / 72%), 0 3px 8px rgb(42 25 13 / 28%);
-}
-.profile-carousel__positions button:focus-visible { outline: 3px solid #fff2ae; outline-offset: -5px; border-radius: 50%; }
-
 @media (min-width: 700px) and (min-height: 600px) and (pointer: coarse) {
   .profile-carousel__track { padding-inline: 33vw; scroll-padding-inline: 33vw; }
   .profile-carousel__door { flex-basis: 34vw; height: 72dvh; margin-inline: -1.2vw; }
@@ -6601,7 +6525,6 @@ p {
   .profile-carousel__track { inset-block-start: 7%; padding-bottom: 2%; }
   .profile-carousel__door { height: 79dvh; }
   .profile-carousel__title { top: 1.5%; }
-  .profile-carousel__positions { bottom: max(.3%, env(safe-area-inset-bottom)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
