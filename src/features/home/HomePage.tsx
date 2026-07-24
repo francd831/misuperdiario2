@@ -245,7 +245,6 @@ export default function HomePage() {
     viewportRef,
     sceneRef,
     isDragging,
-    focusAt,
     panBy,
     viewportHandlers,
   } = useWorldCamera({
@@ -462,24 +461,6 @@ export default function HomePage() {
           <ChevronRight />
         </button>
 
-        <nav className="world-explorer__map" aria-label="Destinos de la habitación">
-          {worldDestinations.map((destination) => (
-            <button
-              key={destination.id}
-              type="button"
-              className={focusedDestinationId === destination.id ? "is-active" : ""}
-              onClick={() => {
-                setFocusedDestinationId(destination.id);
-                focusAt({ x: destination.x, y: destination.y });
-              }}
-              aria-current={focusedDestinationId === destination.id ? "true" : undefined}
-              aria-label={`Ver ${destination.title}`}
-              title={destination.title}
-            >
-              <span aria-hidden="true">{destination.short}</span>
-            </button>
-          ))}
-        </nav>
         <p className="world-explorer__hint">Toca el suelo o usa las flechas para moverte · Arrastra para explorar · Pellizca para ampliar</p>
       </main>
     </section>

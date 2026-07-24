@@ -87,7 +87,7 @@ export default function DailyPhotoPage() {
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [effectsOpen, setEffectsOpen] = useState(false);
   const [photosOpen, setPhotosOpen] = useState(false);
-  const [cameraAspectRatio, setCameraAspectRatio] = useState("4 / 3");
+  const cameraAspectRatio = "16 / 9";
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
   const photoSceneBackground = getPackSceneBackgrounds(activePack?.manifest.id).photo;
@@ -130,9 +130,9 @@ export default function DailyPhotoPage() {
       const requestId = ++cameraRequestRef.current;
       const quality = policy?.photoQuality ?? "medium";
       const width = quality === "high" ? 1600 : quality === "low" ? 960 : 1280;
-      const height = Math.round(width * 3 / 4);
+      const height = Math.round(width * 9 / 16);
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: width }, height: { ideal: height }, aspectRatio: { ideal: 4 / 3 } },
+        video: { facingMode: "user", width: { ideal: width }, height: { ideal: height }, aspectRatio: { ideal: 16 / 9 } },
         audio: false,
       });
       if (requestId !== cameraRequestRef.current) {
@@ -143,7 +143,6 @@ export default function DailyPhotoPage() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
-        setCameraAspectRatio(`${videoRef.current.videoWidth} / ${videoRef.current.videoHeight}`);
       }
     } catch {
       setError("No se pudo acceder a la cámara.");
@@ -158,12 +157,32 @@ export default function DailyPhotoPage() {
   async function capturePhoto() {
     const video = videoRef.current;
     if (!video || video.videoWidth === 0 || video.videoHeight === 0) return;
+    const targetAspectRatio = 16 / 9;
+    const sourceAspectRatio = video.videoWidth / video.videoHeight;
+    const sourceWidth = sourceAspectRatio > targetAspectRatio
+      ? Math.round(video.videoHeight * targetAspectRatio)
+      : video.videoWidth;
+    const sourceHeight = sourceAspectRatio > targetAspectRatio
+      ? video.videoHeight
+      : Math.round(video.videoWidth / targetAspectRatio);
+    const sourceX = Math.round((video.videoWidth - sourceWidth) / 2);
+    const sourceY = Math.round((video.videoHeight - sourceHeight) / 2);
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = sourceWidth;
+    canvas.height = sourceHeight;
     const context = canvas.getContext("2d");
     if (!context) return;
-    context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+    context.drawImage(
+      video,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      sourceWidth,
+      sourceHeight,
+    );
     setCapturedBlob(await blobFromCanvas(canvas));
     stopCamera();
   }
@@ -272,7 +291,6 @@ export default function DailyPhotoPage() {
               className="camera-preview"
               src={capturedUrl}
               alt="Foto capturada"
-              onLoad={(event) => setCameraAspectRatio(`${event.currentTarget.naturalWidth} / ${event.currentTarget.naturalHeight}`)}
             />
           ) : (
             <video ref={videoRef} className="camera-preview" muted playsInline />

@@ -4694,7 +4694,7 @@ p {
 .photo-room__today { position: absolute; z-index: 30; top: 25.2%; left: 50%; transform: translateX(-50%); border-radius: 999px; background: rgb(255 240 189 / 88%); color: #684414; padding: 5px 10px; font-size: .65rem; font-weight: 900; }
 .photo-room__preview { position: absolute; z-index: 8; top: 24.3%; left: 26.2%; width: 47.6%; height: 49.2%; overflow: hidden; border-radius: 2.1%; background: #151319; }
 .photo-room__preview .sticker-stage { width: 100%; height: 100%; border-radius: 0; aspect-ratio: auto !important; background: #151319; }
-.photo-room__preview .camera-preview { display: block; width: 100%; height: 100%; min-height: 0; max-height: none; border: 0; border-radius: 0; aspect-ratio: auto; object-fit: contain; box-shadow: none; }
+.photo-room__preview .camera-preview { display: block; width: 100%; height: 100%; min-height: 0; max-height: none; border: 0; border-radius: 0; aspect-ratio: auto; object-fit: cover; box-shadow: none; }
 .photo-room[data-pack="futbol"] .photo-room__today { top: 19.5%; }
 .photo-room__controls { position: absolute; z-index: 25; right: 26%; bottom: 2%; left: 26%; display: flex; min-height: 60px; align-items: center; justify-content: center; gap: 9px; border: 1px solid rgb(255 255 255 / 25%); border-radius: 18px; background: rgb(75 44 79 / 76%); padding: 7px 10px; backdrop-filter: blur(10px); }
 .photo-room__controls .secondary-action, .photo-room__controls .primary-action { min-height: 40px; padding-inline: 11px; font-size: .72rem; }
@@ -5295,18 +5295,18 @@ p {
 .store-world__packs {
   position: absolute;
   z-index: 5;
-  top: 20.5%;
-  left: 18.2%;
+  top: 17%;
+  left: 8%;
   display: flex;
-  width: 63.6%;
-  height: 60.5%;
+  width: 84%;
+  height: 70%;
   align-items: stretch;
-  gap: 12px;
+  gap: 14px;
   overflow-x: auto;
   overflow-y: hidden;
-  border-radius: 78px 78px 46px 46px;
-  clip-path: inset(9px 19px 0 14px round 78px 78px 46px 46px);
-  padding: 17px 27px 23px 23px;
+  border-radius: 48px;
+  clip-path: inset(0 round 48px);
+  padding: 18px 24px 24px;
   scroll-padding-inline: 10px;
   scroll-snap-type: x mandatory;
   scrollbar-color: #bd8351 transparent;
@@ -5326,7 +5326,7 @@ p {
 }
 .store-world__packs::-webkit-scrollbar-thumb:hover { background: #87502c; }
 .store-world__packs .pack-card {
-  flex: 0 0 clamp(184px, 25vw, 228px);
+  flex: 0 0 clamp(210px, 27vw, 280px);
   min-width: 0;
   height: 100%;
   overflow: hidden;
@@ -5385,15 +5385,15 @@ p {
 @media (max-width: 720px) {
   .store-world { aspect-ratio: 1.05; background-size: auto 100%; }
   .store-world__packs {
-    top: 20.5%;
-    left: 9%;
-    width: 82%;
-    height: 60.5%;
-    border-radius: 58px 58px 34px 34px;
-    clip-path: inset(7px 14px 0 11px round 58px 58px 34px 34px);
-    padding: 16px 22px 21px 19px;
+    top: 17%;
+    left: 4%;
+    width: 92%;
+    height: 70%;
+    border-radius: 34px;
+    clip-path: inset(0 round 34px);
+    padding: 14px 18px 20px;
   }
-  .store-world__packs .pack-card { flex-basis: min(54vw, 215px); }
+  .store-world__packs .pack-card { flex-basis: min(62vw, 250px); }
   .store-world__beta { left: 8%; }
   .store-world__message { right: 8%; }
   .store-world__balance { right: 5%; bottom: 4%; }
@@ -5450,17 +5450,6 @@ p {
   width: 71%;
   height: 62.5%;
 }
-
-.store-world[data-pack="animalesDivertidos"] .store-world__packs {
-  top: 22%;
-  left: 13.5%;
-  width: 73%;
-  height: 63%;
-  border-radius: 28px;
-  clip-path: inset(0 round 28px);
-}
-.store-world[data-pack="animalesDivertidos"] .store-world__beta { left: 14.5%; }
-.store-world[data-pack="animalesDivertidos"] .store-world__message { right: 14.5%; }
 
 .world-settings[data-pack="animalesDivertidos"] {
   display: block;
@@ -5532,17 +5521,6 @@ p {
 .photo-room[data-pack="dinosaurios"] .photo-room__controls { right: 23%; bottom: 2%; left: 23%; }
 
 .diary-gallery[data-pack="dinosaurios"] .diary-album { top: 22%; left: 24%; width: 52%; height: 55%; border-radius: 26px; }
-
-.store-world[data-pack="dinosaurios"] .store-world__packs {
-  top: 20%;
-  left: 17.5%;
-  width: 65%;
-  height: 55%;
-  border-radius: 24px;
-  clip-path: inset(0 round 24px);
-}
-.store-world[data-pack="dinosaurios"] .store-world__beta { left: 18.5%; }
-.store-world[data-pack="dinosaurios"] .store-world__message { right: 18.5%; }
 
 .world-settings[data-pack="dinosaurios"] {
   display: block;
@@ -7149,77 +7127,6 @@ p {
 .world-explorer__arrow--left { left: 10px; border-radius: 18px 8px 8px 18px; }
 .world-explorer__arrow--right { right: 10px; border-radius: 8px 18px 18px 8px; }
 
-.world-explorer__map {
-  position: absolute;
-  z-index: 22;
-  bottom: max(16px, env(safe-area-inset-bottom));
-  left: 50%;
-  display: flex;
-  max-width: calc(100% - 112px - env(safe-area-inset-left) - env(safe-area-inset-right));
-  gap: 5px;
-  overflow-x: auto;
-  transform: translateX(-50%);
-  border: 1px solid rgb(255 255 255 / 35%);
-  border-radius: 999px;
-  background: rgb(30 34 37 / 62%);
-  padding: 5px 7px;
-  box-shadow: 0 9px 28px rgb(22 15 12 / 28%);
-  backdrop-filter: blur(10px);
-  scrollbar-width: none;
-}
-
-.world-explorer__map::-webkit-scrollbar { display: none; }
-
-.world-explorer__map button {
-  position: relative;
-  display: grid;
-  width: 52px;
-  min-width: 52px;
-  height: 52px;
-  place-items: center;
-  overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 42%);
-  border-radius: 17px;
-  color: #fff7d8;
-  background: rgb(22 29 33 / 62%);
-  padding: 0 9px;
-  cursor: pointer;
-  transition: width 180ms ease, background 140ms ease, transform 140ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.world-explorer__map button::before {
-  width: 11px;
-  aspect-ratio: 1;
-  border: 2px solid rgb(255 255 255 / 80%);
-  border-radius: 50%;
-  background: #e8ab3f;
-  content: "";
-}
-
-.world-explorer__map button span {
-  position: absolute;
-  opacity: 0;
-  font-size: .74rem;
-  font-weight: 950;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.world-explorer__map button:hover,
-.world-explorer__map button:focus-visible { outline: 3px solid #fff3b1; outline-offset: -4px; background: rgb(36 43 45 / 88%); }
-
-.world-explorer__map button.is-active {
-  width: 104px;
-  color: #3c2a13;
-  background: linear-gradient(180deg, #fff4b5, #f2bd55);
-  box-shadow: inset 0 1px rgb(255 255 255 / 70%);
-}
-
-.world-explorer__map button.is-active::before { opacity: 0; }
-.world-explorer__map button.is-active span { opacity: 1; }
-.world-explorer__map button:active { transform: scale(.96); }
-
 .world-explorer__hint {
   position: absolute;
   z-index: 21;
@@ -7277,7 +7184,6 @@ p {
 @media (max-width: 900px), (max-height: 620px) {
   .world-explorer__scene { width: max(210vw, 1700px); height: max(165dvh, 850px); }
   .world-explorer__hint { display: none; }
-  .world-explorer__map { bottom: max(7px, env(safe-area-inset-bottom)); }
   .world-explorer__arrow { width: 42px; height: 60px; }
 }
 
@@ -7286,7 +7192,6 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .world-explorer__map button { transition: none; }
   .world-destination.is-focused::before { animation: none; }
 }
 
