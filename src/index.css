@@ -7568,3 +7568,56 @@ p {
     right: max(2%, env(safe-area-inset-right));
   }
 }
+
+/* The memory museum is the only illustrated room that grows with its content.
+   On touch devices the page itself scrolls, while every pack shares the same
+   generous archive footprint instead of a small nested scroll window. */
+@media (hover: none) and (pointer: coarse) and (max-width: 1400px) {
+  .app-frame--immersive .diary-page:has(.diary-gallery) {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: visible;
+    background: #241b1a;
+  }
+
+  .app-frame--immersive .diary-gallery {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    background-color: #241b1a;
+    background-position: center top;
+    background-size: cover;
+  }
+
+  .app-frame--immersive .diary-gallery .diary-album,
+  .app-frame--immersive .diary-gallery[data-pack] .diary-album {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(90%, 1120px);
+    height: auto;
+    min-height: 72dvh;
+    margin: clamp(82px, 15dvh, 132px) auto max(7dvh, env(safe-area-inset-bottom));
+    padding: clamp(10px, 1.8vw, 18px);
+    overflow: visible;
+    border-radius: clamp(16px, 2.2vw, 28px);
+    background: rgb(255 247 224 / 82%);
+    box-shadow:
+      0 18px 48px rgb(38 23 18 / 24%),
+      inset 0 0 0 1px rgb(255 255 255 / 42%);
+    backdrop-filter: blur(5px);
+  }
+
+  .app-frame--immersive .diary-gallery .diary-timeline {
+    min-height: 62dvh;
+    overflow: visible;
+    padding: 8px 6px 18px 2px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (min-width: 768px) and (max-width: 1400px) {
+  .app-frame--immersive .diary-gallery .entry-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
