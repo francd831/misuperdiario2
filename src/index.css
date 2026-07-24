@@ -6530,7 +6530,6 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .profile-carousel__track { scroll-behavior: auto; }
   .profile-carousel__door { transition: none; }
-  .profile-carousel__positions button::after { transition: none; }
 }
 
 /* Profile door workshop */
@@ -7584,6 +7583,23 @@ p {
   .adult-study__content--expanded {
     overscroll-behavior: contain;
     scroll-padding-bottom: 12px;
+  }
+}
+
+/* Phones in landscape: enlarge both live camera surfaces by exactly 30%. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .record-page--video .cinema-screen.video-viewfinder {
+    top: 12.3%;
+    left: 15%;
+    width: 71.8%;
+    height: 73.8%;
+  }
+
+  .photo-room__preview {
+    top: 16.9%;
+    left: 19.1%;
+    width: 61.9%;
+    height: 64%;
   }
 }
 
