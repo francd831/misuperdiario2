@@ -1,8 +1,8 @@
 import { useEffect, useMemo, type CSSProperties } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { packLoader } from "../../core/packs/packLoader";
 import type { PackManifest } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 const fallbackPackId = "base";
 
 type ThemeVariables = CSSProperties & Record<`--${string}`, string>;
@@ -42,9 +42,10 @@ function themeVariables(pack: PackManifest | undefined): ThemeVariables {
 
 export function AppLayout() {
   const { activeProfile } = useProfiles();
+  const { getPack } = useRemotePacks();
   const location = useLocation();
   const activePackId = activeProfile?.activePackId ?? fallbackPackId;
-  const activePack = packLoader.getPack(activePackId) ?? packLoader.getPack(fallbackPackId);
+  const activePack = getPack(activePackId).manifest;
   const style = useMemo(() => themeVariables(activePack), [activePack]);
   const isImmersiveWorld = location.pathname === "/home"
     || location.pathname === "/admin"

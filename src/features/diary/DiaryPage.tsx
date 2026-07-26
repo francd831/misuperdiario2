@@ -16,10 +16,10 @@ import {
   updateStickerOverlay,
 } from "../../core/overlays/overlayProject";
 import type { FrameOverlay, OverlayProject, StickerOverlay } from "../../core/overlays/types";
-import { packService } from "../../core/packs/packService";
 import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { AssetTray } from "../stickers/AssetTray";
 import { FilterCanvas } from "../stickers/FilterCanvas";
@@ -101,14 +101,14 @@ function sortNewest(items: TimelineItem[]) {
 
 export default function DiaryPage() {
   const { activeProfile } = useProfiles();
+  const { packs, getResources } = useRemotePacks();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [query, setQuery] = useState("");
-  const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
   const [draftOverlays, setDraftOverlays] = useState<OverlayProject>({ stickers: [] });
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
-  const galleryBackground = getPackSceneBackgrounds(activePack?.manifest.id).gallery;
+  const galleryBackground = getPackSceneBackgrounds(activePack?.manifest.id, getResources(activePack?.manifest.id).scenes).gallery;
 
   const refreshItems = useCallback(async () => {
     if (!activeProfile) return;

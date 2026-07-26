@@ -2,11 +2,11 @@ import { ArrowLeft, Camera, Check, KeyRound, Save, ShieldCheck, Sparkles, UserRo
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "../../app/mascot/FloatingMascot";
-import { packLoader } from "../../core/packs/packLoader";
 import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { ProfileAvatarPreset } from "../../core/profiles/types";
 import { ProfileAvatar, profileAvatarPresets } from "../../shared/ui/ProfileAvatar";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 
 async function stopStream(stream?: MediaStream | null) {
   stream?.getTracks().forEach((track) => track.stop());
@@ -19,6 +19,7 @@ function themeColor(value: string | undefined, fallback: string) {
 
 export default function SettingsPage() {
   const { activeProfile, updateProfile } = useProfiles();
+  const { getPack, getResources } = useRemotePacks();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [name, setName] = useState(activeProfile?.name ?? "");
@@ -31,7 +32,7 @@ export default function SettingsPage() {
   const [error, setError] = useState("");
   const [mascotVisible, setMascotVisible] = useState(() => localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
 
-  const activePack = packLoader.getPackWithAssets(activeProfile?.activePackId ?? "base") ?? packLoader.getPackWithAssets("base");
+  const activePack = getPack(activeProfile?.activePackId);
   const packName = activePack?.manifest.name ?? "Básico";
   const packTheme = activePack?.manifest.theme;
   const settingsForeground = activePack?.manifest.id === "espacio"
@@ -45,8 +46,8 @@ export default function SettingsPage() {
     "--settings-background": themeColor(packTheme?.background, "hsl(40 33% 98%)"),
     "--settings-foreground": settingsForeground,
     "--settings-preview": activePack?.previewUrl ? `url(${activePack.previewUrl})` : "none",
-    "--settings-scene": getPackSceneBackgrounds(activePack?.manifest.id).settings
-      ? `url(${getPackSceneBackgrounds(activePack?.manifest.id).settings})`
+    "--settings-scene": getPackSceneBackgrounds(activePack?.manifest.id, getResources(activePack?.manifest.id).scenes).settings
+      ? `url(${getPackSceneBackgrounds(activePack?.manifest.id, getResources(activePack?.manifest.id).scenes).settings})`
       : "none",
   } as React.CSSProperties;
 

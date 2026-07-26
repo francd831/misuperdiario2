@@ -16,7 +16,6 @@ import {
   updateStickerOverlay,
 } from "../../core/overlays/overlayProject";
 import type { OverlayProject } from "../../core/overlays/types";
-import { packService } from "../../core/packs/packService";
 import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
@@ -24,26 +23,18 @@ import type { StoragePolicy } from "../../core/profiles/types";
 import { storagePolicyRepository } from "../../core/settings/storagePolicyRepository";
 import { useObjectUrl } from "../../shared/hooks/useObjectUrl";
 import { MemoryDrawer } from "../../shared/ui/MemoryDrawer";
-import dinosaurFieldSketchTrex from "../../assets/recording/dinosaur-field-sketch-trex.png";
-import dinosaurFieldSketchTriceratops from "../../assets/recording/dinosaur-field-sketch-triceratops.png";
-import dinosaurFieldSketchRaptor from "../../assets/recording/dinosaur-field-sketch-raptor.png";
 import { FilterCanvas } from "../stickers/FilterCanvas";
 import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
 import { VisualToolCarousel } from "../stickers/VisualToolCarousel";
 import { SceneMascot } from "../../app/mascot/SceneMascot";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 
 const sceneMascotPaths = {
   video: [{ x: 9, y: 82 }, { x: 8, y: 30 }, { x: 20, y: 14 }, { x: 80, y: 14 }, { x: 92, y: 30 }, { x: 91, y: 82 }],
   audio: [{ x: 8, y: 82 }, { x: 8, y: 23 }, { x: 20, y: 11 }, { x: 81, y: 11 }, { x: 92, y: 24 }, { x: 92, y: 82 }],
   text: [{ x: 8, y: 82 }, { x: 8, y: 22 }, { x: 21, y: 10 }, { x: 80, y: 10 }, { x: 92, y: 24 }, { x: 92, y: 82 }],
 };
-
-const dinosaurFieldSketches: PackAsset[] = [
-  { id: "dinosaur-field-sketch-trex", packId: "dinosaurios", name: "Tyrannosaurus rex", url: dinosaurFieldSketchTrex },
-  { id: "dinosaur-field-sketch-triceratops", packId: "dinosaurios", name: "Triceratops", url: dinosaurFieldSketchTriceratops },
-  { id: "dinosaur-field-sketch-raptor", packId: "dinosaurios", name: "Raptor emplumado", url: dinosaurFieldSketchRaptor },
-];
 
 function formatSeconds(seconds: number) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -101,6 +92,7 @@ export default function RecordPage() {
   const { type = "text" } = useParams();
   const entryType: EntryType = type === "audio" || type === "video" ? type : "text";
   const { activeProfile } = useProfiles();
+  const { packs, getResources } = useRemotePacks();
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
   const [isLocked, setIsLocked] = useState(false);
@@ -121,7 +113,6 @@ export default function RecordPage() {
   const [textEntries, setTextEntries] = useState<DiaryEntry[]>([]);
   const [memoriesOpen, setMemoriesOpen] = useState(false);
   const [previousTextEntry, setPreviousTextEntry] = useState<DiaryEntry>();
-  const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -132,13 +123,11 @@ export default function RecordPage() {
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
   const packId = activePack?.manifest.id;
-  const sceneBackgrounds = getPackSceneBackgrounds(packId);
+  const sceneBackgrounds = getPackSceneBackgrounds(packId, getResources(packId).scenes);
   const videoSceneBackground = sceneBackgrounds.video;
   const voiceSceneBackground = sceneBackgrounds.voice;
   const storySceneBackground = sceneBackgrounds.writing;
-  const doodleAssets = packId === "dinosaurios"
-    ? dinosaurFieldSketches
-    : (activePack?.stickers.length ? activePack.stickers : packs.find((pack) => pack.manifest.id === "base")?.stickers ?? []).slice(0, 3);
+  const doodleAssets = (activePack?.stickers.length ? activePack.stickers : packs.find((pack) => pack.manifest.id === "base")?.stickers ?? []).slice(0, 3);
 
   useEffect(() => {
     void storagePolicyRepository.get().then(setPolicy);

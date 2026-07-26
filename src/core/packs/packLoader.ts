@@ -10,11 +10,11 @@ const defaultFolders: Record<PackAssetKind, string> = {
   effects: "effects",
 };
 
-const manifestModules = import.meta.glob<{ default: PackManifest }>("/src/assets/packs/**/manifest.json", {
+const manifestModules = import.meta.glob<{ default: PackManifest }>("/src/assets/packs/base/manifest.json", {
   eager: true,
 });
 
-const assetModules = import.meta.glob<string>("/src/assets/packs/**/*", {
+const assetModules = import.meta.glob<string>("/src/assets/packs/base/**/*", {
   eager: true,
   query: "?url",
   import: "default",

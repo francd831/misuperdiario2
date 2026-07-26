@@ -2,23 +2,26 @@ import { ChevronLeft, ChevronRight, Download, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import giantCreativeRoom from "../../assets/home/giant-creative-room-world-v5-no-chest.png";
-import cityOfChampionsWorld from "../../assets/home/city-of-champions-football-concept-v1.png";
-import valleyOfPawprintsWorld from "../../assets/home/valley-of-pawprints-world-v1.png";
-import valleyOfErasWorld from "../../assets/home/valley-of-eras-world-dinosaurs-v1.png";
-import artWorld from "../../assets/home/concepts/world-arte-pintura-v1.png";
-import pirateWorld from "../../assets/home/concepts/world-aventura-pirata-v1.png";
-import basketballWorld from "../../assets/home/concepts/world-baloncesto-v1.png";
-import pastryWorld from "../../assets/home/concepts/world-dulce-pasteleria-v1.png";
-import magicSchoolWorld from "../../assets/home/concepts/world-escuela-magia-v1.png";
-import spaceWorld from "../../assets/home/concepts/world-espacio-v1.png";
-import footballConceptWorld from "../../assets/home/concepts/world-futbol-v1.png";
-import magicKingdomWorld from "../../assets/home/concepts/world-reino-magico-v1.png";
-import speedWorld from "../../assets/home/concepts/world-super-velocidad-v1.png";
 import starSprite from "../../assets/mascots/golden-star-sprites-32.webp";
 import { loadPackMascotSprite, MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "../../app/mascot/FloatingMascot";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import { walletService } from "../../core/wallet/walletService";
 import { useWorldCamera } from "../../shared/world/useWorldCamera";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
+
+// La geometría de cada mundo sigue en la aplicación; su ilustración se descarga.
+const cityOfChampionsWorld = giantCreativeRoom;
+const valleyOfPawprintsWorld = giantCreativeRoom;
+const valleyOfErasWorld = giantCreativeRoom;
+const artWorld = giantCreativeRoom;
+const pirateWorld = giantCreativeRoom;
+const basketballWorld = giantCreativeRoom;
+const pastryWorld = giantCreativeRoom;
+const magicSchoolWorld = giantCreativeRoom;
+const spaceWorld = giantCreativeRoom;
+const footballConceptWorld = giantCreativeRoom;
+const magicKingdomWorld = giantCreativeRoom;
+const speedWorld = giantCreativeRoom;
 
 const destinations = [
   { id: "video", to: "/record/video", title: "Cine de los recuerdos", short: "Vídeo", x: 14.5, y: 29 },
@@ -214,6 +217,7 @@ type InstallPromptEvent = Event & {
 
 export default function HomePage() {
   const { activeProfile, logout } = useProfiles();
+  const { getResources, isInstalled } = useRemotePacks();
   const navigate = useNavigate();
   const playerRef = useRef<HTMLDivElement>(null);
   const playerSpriteRef = useRef<HTMLSpanElement>(null);
@@ -226,21 +230,23 @@ export default function HomePage() {
   const [mascotVisible, setMascotVisible] = useState(() => localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
   const [playerMascot, setPlayerMascot] = useState({ url: starSprite, label: "Solete", columns: 8 });
   const activePackId = activeProfile?.activePackId ?? "base";
-  const conceptWorld = conceptWorlds[activePackId];
-  const worldBackground = conceptWorld?.background ?? (activePackId === "animalesDivertidos"
+  const effectivePackId = isInstalled(activePackId) ? activePackId : "base";
+  const remoteResources = getResources(effectivePackId);
+  const conceptWorld = conceptWorlds[effectivePackId];
+  const worldBackground = remoteResources.home ?? conceptWorld?.background ?? (effectivePackId === "animalesDivertidos"
     ? valleyOfPawprintsWorld
-    : activePackId === "dinosaurios" ? valleyOfErasWorld : activePackId === "futbol" ? cityOfChampionsWorld : giantCreativeRoom);
+    : effectivePackId === "dinosaurios" ? valleyOfErasWorld : effectivePackId === "futbol" ? cityOfChampionsWorld : giantCreativeRoom);
   const worldDestinations = destinations.map((destination) => conceptWorld
     ? { ...destination, ...conceptWorld.zones[destination.id] }
-    : activePackId === "animalesDivertidos"
+    : effectivePackId === "animalesDivertidos"
     ? { ...destination, ...animalDestinations[destination.id] }
-    : activePackId === "dinosaurios" ? { ...destination, ...dinosaurDestinations[destination.id] }
-      : activePackId === "futbol" ? { ...destination, ...footballDestinations[destination.id] } : destination);
+    : effectivePackId === "dinosaurios" ? { ...destination, ...dinosaurDestinations[destination.id] }
+      : effectivePackId === "futbol" ? { ...destination, ...footballDestinations[destination.id] } : destination);
   const activeObstacles = conceptWorld
     ? worldDestinations.map(({ x, y }) => ({ x, y, rx: 9, ry: 10 }))
-    : activePackId === "animalesDivertidos"
+    : effectivePackId === "animalesDivertidos"
     ? animalValleyObstacles
-    : activePackId === "dinosaurios" ? dinosaurValleyObstacles : activePackId === "futbol" ? footballCampusObstacles : roomObstacles;
+    : effectivePackId === "dinosaurios" ? dinosaurValleyObstacles : effectivePackId === "futbol" ? footballCampusObstacles : roomObstacles;
   const {
     viewportRef,
     sceneRef,
@@ -248,8 +254,8 @@ export default function HomePage() {
     panBy,
     viewportHandlers,
   } = useWorldCamera({
-    worldKey: activePackId,
-    aspectRatio: activePackId === "futbol" ? 16 / 9 : WORLD_ASPECT_RATIO,
+    worldKey: effectivePackId,
+    aspectRatio: effectivePackId === "futbol" ? 16 / 9 : WORLD_ASPECT_RATIO,
     initialFocus: { x: 42, y: 72 },
     onSceneTap: ({ x, y }) => {
       playerTarget.current = constrainToRoom({ x, y }, activeObstacles);
@@ -268,11 +274,11 @@ export default function HomePage() {
 
   useEffect(() => {
     let alive = true;
-    void loadPackMascotSprite(activeProfile?.activePackId ?? "base").then((mascot) => {
+    void loadPackMascotSprite(effectivePackId, remoteResources.mascotSprite).then((mascot) => {
       if (alive) setPlayerMascot({ url: mascot.url, label: mascot.label, columns: mascot.columns });
     });
     return () => { alive = false; };
-  }, [activeProfile?.activePackId]);
+  }, [effectivePackId, remoteResources.mascotSprite]);
 
   useEffect(() => {
     if (!activeProfile) return;

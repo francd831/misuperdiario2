@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "packs": [
+    {
+      "id": "animalesDivertidos",
+      "name": "Mundo Animal",
+      "description": "Explora el Valle de las Huellas y descubre la vida de sus animales.",
+      "version": "1.0.0",
+      "sizeBytes": 34933272,
+      "checksumSha256": "6F56F448FDCEC8C85633BAD97C7151628FD958CA9E97BFCBFB494159908188C6",
+      "manifestUrl": "https://rydvdxiulcumonhoinwr.supabase.co/storage/v1/object/public/world-packs/animalesDivertidos/1.0.0/animalesDivertidos-1.0.0-manifest.json",
+      "previewUrl": "https://rydvdxiulcumonhoinwr.supabase.co/storage/v1/object/public/world-packs/animalesDivertidos/1.0.0/animalesDivertidos-1.0.0-preview.png",
+      "archiveUrl": "https://rydvdxiulcumonhoinwr.supabase.co/storage/v1/object/public/world-packs/animalesDivertidos/1.0.0/animalesDivertidos-1.0.0.zip",
+      "priceStars": 60,
+      "free": false
+    }
+  ]
+}

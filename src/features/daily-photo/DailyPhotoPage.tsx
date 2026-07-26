@@ -17,7 +17,6 @@ import {
   updateStickerOverlay,
 } from "../../core/overlays/overlayProject";
 import type { OverlayProject } from "../../core/overlays/types";
-import { packService } from "../../core/packs/packService";
 import { getPackSceneBackgrounds } from "../../core/packs/sceneBackgrounds";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
 import { useProfiles } from "../../core/profiles/ProfileContext";
@@ -30,6 +29,7 @@ import { FrameCanvas } from "../stickers/FrameCanvas";
 import { StickerCanvas } from "../stickers/StickerCanvas";
 import { VisualToolCarousel } from "../stickers/VisualToolCarousel";
 import { SceneMascot } from "../../app/mascot/SceneMascot";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 
 const photoMascotPath = [
   { x: 8, y: 82 }, { x: 8, y: 23 }, { x: 20, y: 11 },
@@ -39,7 +39,7 @@ const photoMascotPath = [
 function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (photo: DailyPhoto) => void; onDelete: (photo: DailyPhoto) => void }) {
   const url = useObjectUrl(photo.thumbnailBlob ?? photo.blob);
   const fullUrl = useObjectUrl(photo.blob);
-  const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
+  const { packs } = useRemotePacks();
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -74,6 +74,7 @@ function PhotoThumb({ photo, onEdit, onDelete }: { photo: DailyPhoto; onEdit: (p
 export default function DailyPhotoPage() {
   const navigate = useNavigate();
   const { activeProfile } = useProfiles();
+  const { packs, getResources } = useRemotePacks();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const cameraRequestRef = useRef(0);
@@ -81,7 +82,6 @@ export default function DailyPhotoPage() {
   const [photos, setPhotos] = useState<DailyPhoto[]>([]);
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
   const [error, setError] = useState("");
-  const [packs] = useState<PackWithAssets[]>(() => packService.listPacks());
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
@@ -90,7 +90,7 @@ export default function DailyPhotoPage() {
   const cameraAspectRatio = "16 / 9";
   const capturedUrl = useObjectUrl(capturedBlob);
   const activePack = packs.find((pack) => pack.manifest.id === activeProfile?.activePackId) ?? packs[0];
-  const photoSceneBackground = getPackSceneBackgrounds(activePack?.manifest.id).photo;
+  const photoSceneBackground = getPackSceneBackgrounds(activePack?.manifest.id, getResources(activePack?.manifest.id).scenes).photo;
   const hasToday = useMemo(() => photos.some((photo) => photo.date === new Date().toISOString().slice(0, 10)), [photos]);
 
   const stopCamera = useCallback(() => {

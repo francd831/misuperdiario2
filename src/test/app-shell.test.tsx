@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App";
+import { RemotePackProvider } from "../core/packs/RemotePackContext";
 
 const profileContext = vi.hoisted(() => ({
   value: {
@@ -23,7 +24,9 @@ vi.mock("../core/profiles/ProfileContext", () => ({
 function renderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <App />
+      <RemotePackProvider>
+        <App />
+      </RemotePackProvider>
     </MemoryRouter>,
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import starSprite from "../../assets/mascots/golden-star-sprites-32.webp";
 import { loadPackMascotSprite, MASCOT_VISIBILITY_EVENT, MASCOT_VISIBILITY_KEY } from "./FloatingMascot";
 import type { MapPoint } from "./MapMascot";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 
 type SceneMascotProps = {
   profileId: string;
@@ -49,6 +50,7 @@ function storedPosition(profileId: string, sceneId: string, fallback: MapPoint) 
 }
 
 export function SceneMascot({ profileId, sceneId, path, packId = "base" }: SceneMascotProps) {
+  const { getResources } = useRemotePacks();
   const rootRef = useRef<HTMLButtonElement>(null);
   const spriteRef = useRef<HTMLSpanElement>(null);
   const position = useRef(nearestPointOnPath(storedPosition(profileId, sceneId, path[0]), path));
@@ -60,11 +62,11 @@ export function SceneMascot({ profileId, sceneId, path, packId = "base" }: Scene
 
   useEffect(() => {
     let alive = true;
-    void loadPackMascotSprite(packId).then((next) => {
+    void loadPackMascotSprite(packId, getResources(packId).mascotSprite).then((next) => {
       if (alive) setSprite({ url: next.url, columns: next.columns, label: next.label });
     });
     return () => { alive = false; };
-  }, [packId]);
+  }, [getResources, packId]);
 
   useEffect(() => {
     let request = 0;

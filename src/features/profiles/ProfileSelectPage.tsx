@@ -3,20 +3,10 @@ import { ArrowRight, ChevronLeft, ChevronRight, Delete, Plus, X } from "lucide-r
 import { Link, useNavigate } from "react-router-dom";
 import carouselFoyer from "../../assets/profiles/profile-carousel-foyer-family-control-title.png";
 import baseDoor from "../../assets/profiles/doors/door-base-v2.png";
-import animalsDoor from "../../assets/profiles/doors/door-animals-v2.png";
-import dinosaurDoor from "../../assets/profiles/doors/door-dinosaurs-v3.png";
-import artDoor from "../../assets/profiles/doors/door-arte-pintura-v2.png";
-import pirateDoor from "../../assets/profiles/doors/door-aventura-pirata-v2.png";
-import basketballDoor from "../../assets/profiles/doors/door-baloncesto-v2.png";
-import pastryDoor from "../../assets/profiles/doors/door-dulce-pasteleria-v2.png";
-import magicSchoolDoor from "../../assets/profiles/doors/door-escuela-magia-v2.png";
-import spaceDoor from "../../assets/profiles/doors/door-espacio-v2.png";
-import footballDoor from "../../assets/profiles/doors/door-futbol-v3.png";
-import magicKingdomDoor from "../../assets/profiles/doors/door-reino-magico-v2.png";
-import speedDoor from "../../assets/profiles/doors/door-super-velocidad-v2.png";
 import { useProfiles } from "../../core/profiles/ProfileContext";
 import type { Profile } from "../../core/profiles/types";
 import { ProfileAvatar } from "../../shared/ui/ProfileAvatar";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 
 type DoorDefinition = {
   url: string;
@@ -25,19 +15,8 @@ type DoorDefinition = {
 
 const baseDoorDefinition: DoorDefinition = { url: baseDoor, theme: "base" };
 
-function doorForPack(packId: string | undefined): DoorDefinition {
-  if (packId === "animalesDivertidos") return { url: animalsDoor, theme: "animals" };
-  if (packId === "dinosaurios") return { url: dinosaurDoor, theme: "dinosaurs" };
-  if (packId === "futbol") return { url: footballDoor, theme: "football" };
-  if (packId === "artePintura") return { url: artDoor, theme: "art" };
-  if (packId === "aventuraPirata") return { url: pirateDoor, theme: "pirate" };
-  if (packId === "baloncesto") return { url: basketballDoor, theme: "basketball" };
-  if (packId === "dulcePasteleria") return { url: pastryDoor, theme: "pastry" };
-  if (packId === "escuelaMagia") return { url: magicSchoolDoor, theme: "magic-school" };
-  if (packId === "espacio") return { url: spaceDoor, theme: "space" };
-  if (packId === "reinoMagico") return { url: magicKingdomDoor, theme: "magic-kingdom" };
-  if (packId === "superVelocidad") return { url: speedDoor, theme: "speed" };
-  return baseDoorDefinition;
+function doorTheme(packId?: string) {
+  return packId?.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase() ?? "base";
 }
 
 function nameSize(name: string) {
@@ -50,6 +29,7 @@ export default function ProfileSelectPage() {
   const navigate = useNavigate();
   const trackRef = useRef<HTMLDivElement>(null);
   const { children, login } = useProfiles();
+  const { getResources } = useRemotePacks();
   const [selectedProfile, setSelectedProfile] = useState<Profile>();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
@@ -138,7 +118,8 @@ export default function ProfileSelectPage() {
       <button className="profile-carousel__arrow profile-carousel__arrow--left" type="button" aria-label="Puerta anterior" onClick={() => moveCarousel(-1)}><ChevronLeft /></button>
       <div ref={trackRef} className="profile-carousel__track" role="group" aria-label="Puertas de perfiles">
         {[...children, undefined].map((profile, index) => {
-          const door = doorForPack(profile?.activePackId);
+          const remoteDoor = getResources(profile?.activePackId).profileDoor;
+          const door: DoorDefinition = remoteDoor ? { url: remoteDoor, theme: doorTheme(profile?.activePackId) } : baseDoorDefinition;
           if (!profile) return (
             <Link key={`empty-${index}`} className="profile-carousel__door profile-carousel__door--empty" data-door-theme="base" data-name-size="long" to={`/profiles/new?door=${index + 1}`} aria-label={`Crear perfil en la puerta ${index + 1}`} aria-posinset={index + 1} aria-setsize={doorCount}>
               <img src={baseDoor} alt="" aria-hidden="true" />

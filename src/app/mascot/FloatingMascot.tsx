@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { packLoader } from "../../core/packs/packLoader";
 import type { PackAsset, PackWithAssets } from "../../core/packs/types";
+import { useRemotePacks } from "../../core/packs/RemotePackContext";
 
 export type AnimatedMascotKind =
   | "star"
@@ -17,20 +18,8 @@ export type AnimatedMascotKind =
   | "cupcake"
   | "paintbrush";
 
-const spriteLoaders: Record<AnimatedMascotKind, () => Promise<string>> = {
+const spriteLoaders: Partial<Record<AnimatedMascotKind, () => Promise<string>>> = {
   star: () => import("../../assets/mascots/golden-star-sprites-32.webp").then((module) => module.default),
-  fox: () => import("../../assets/mascots/realistic-fox-sprites-28-fixed-v2.png").then((module) => module.default),
-  cat: () => import("../../assets/mascots/orange-cat-sprites-32-fixed.webp").then((module) => module.default),
-  trex: () => import("../../assets/mascots/realistic-trex-sprites-32-v2.png").then((module) => module.default),
-  football: () => import("../../assets/mascots/football-player-sprites-32.webp").then((module) => module.default),
-  basketball: () => import("../../assets/mascots/basketball-player-sprites-32.webp").then((module) => module.default),
-  astronaut: () => import("../../assets/mascots/astronaut-sprites-32.webp").then((module) => module.default),
-  parrot: () => import("../../assets/mascots/pirate-parrot-sprites-32.webp").then((module) => module.default),
-  unicorn: () => import("../../assets/mascots/unicorn-sprites-32.webp").then((module) => module.default),
-  owl: () => import("../../assets/mascots/magic-owl-sprites-32.webp").then((module) => module.default),
-  car: () => import("../../assets/mascots/racing-car-sprites-32.webp").then((module) => module.default),
-  cupcake: () => import("../../assets/mascots/cupcake-sprites-32.webp").then((module) => module.default),
-  paintbrush: () => import("../../assets/mascots/living-paintbrush-sprites-32.webp").then((module) => module.default),
 };
 
 export const MASCOT_VISIBILITY_KEY = "misuperdiario:mascot-visible";
@@ -66,9 +55,10 @@ const animatedKindByPack: Record<string, AnimatedMascotKind> = {
   artePintura: "paintbrush",
 };
 
-export function loadPackMascotSprite(packId: string) {
+export function loadPackMascotSprite(packId: string, remoteUrl?: string) {
   const kind = animatedKindByPack[packId] ?? "star";
-  return spriteLoaders[kind]().then((url) => ({
+  const loader = remoteUrl ? Promise.resolve(remoteUrl) : (spriteLoaders[kind] ?? spriteLoaders.star!)();
+  return loader.then((url) => ({
     kind,
     url,
     columns: kind === "fox" ? 7 : 8,
@@ -91,6 +81,7 @@ function readStoredPosition(profileId: string) {
 }
 
 export function FloatingMascot({ packId, profileId }: { packId: string; profileId: string }) {
+  const { getPack, getResources } = useRemotePacks();
   const rootRef = useRef<HTMLButtonElement>(null);
   const visualRef = useRef<HTMLSpanElement>(null);
   const spriteFrameRef = useRef<HTMLSpanElement>(null);
@@ -103,7 +94,7 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
   const [spriteUrl, setSpriteUrl] = useState<string>();
 
   const mascot = useMemo(() => {
-    const pack = packLoader.getPackWithAssets(packId) ?? packLoader.getPackWithAssets("base");
+    const pack = getPack(packId);
     if (!pack) return undefined;
     const config = mascotByPack[pack.manifest.id] ?? { asset: pack.stickers[0]?.id, label: pack.manifest.name };
     return {
@@ -112,17 +103,19 @@ export function FloatingMascot({ packId, profileId }: { packId: string; profileI
       label: config.label,
       animatedKind: animatedKindByPack[pack.manifest.id],
     };
-  }, [packId]);
+  }, [getPack, packId]);
 
   useEffect(() => {
     let alive = true;
     setSpriteUrl(undefined);
     if (!mascot?.animatedKind) return () => { alive = false; };
-    void spriteLoaders[mascot.animatedKind]().then((url) => {
+    const remoteUrl = getResources(packId).mascotSprite;
+    const loader = remoteUrl ? Promise.resolve(remoteUrl) : (spriteLoaders[mascot.animatedKind] ?? spriteLoaders.star!)();
+    void loader.then((url) => {
       if (alive) setSpriteUrl(url);
     });
     return () => { alive = false; };
-  }, [mascot?.animatedKind]);
+  }, [getResources, mascot?.animatedKind, packId]);
 
   useEffect(() => {
     const updateVisibility = () => setVisible(localStorage.getItem(MASCOT_VISIBILITY_KEY) !== "false");
