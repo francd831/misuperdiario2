@@ -127,7 +127,6 @@ export default function RecordPage() {
   const videoSceneBackground = sceneBackgrounds.video;
   const voiceSceneBackground = sceneBackgrounds.voice;
   const storySceneBackground = sceneBackgrounds.writing;
-  const doodleAssets = (activePack?.stickers.length ? activePack.stickers : packs.find((pack) => pack.manifest.id === "base")?.stickers ?? []).slice(0, 3);
 
   useEffect(() => {
     void storagePolicyRepository.get().then(setPolicy);
@@ -630,21 +629,17 @@ export default function RecordPage() {
 
   return (
     <section className="page-stack record-page record-page--text">
-      <form className="story-room responsive-world-scene responsive-world-scene--story" style={{ backgroundImage: `url(${storySceneBackground})` }} onSubmit={handleTextSubmit}>
+      <form className="story-room responsive-world-scene responsive-world-scene--story" data-pack={activePack?.manifest.id ?? "base"} style={{ backgroundImage: `url(${storySceneBackground})` }} onSubmit={handleTextSubmit}>
         {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="text" path={sceneMascotPaths.text} packId={activePack?.manifest.id} />}
         <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
-        <section className="story-room__previous" aria-label={previousTextEntry ? "Página anterior del diario" : `Dibujo del pack ${activePack?.manifest.name ?? "básico"}`}>
+        <section className="story-room__previous" aria-label={previousTextEntry ? "Página anterior del diario" : "Página izquierda del diario"}>
           {previousTextEntry ? (
             <>
               <time>{new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long" }).format(new Date(previousTextEntry.createdAt))}</time>
               <h2>{previousTextEntry.title || "Mi página anterior"}</h2>
               <p>{previousTextEntry.note}</p>
             </>
-          ) : (
-            <div className="story-room__doodle" aria-hidden="true">
-              {doodleAssets.map((asset, index) => <img key={asset.id} className={`story-room__doodle-item--${index + 1}`} src={asset.url} alt="" />)}
-            </div>
-          )}
+          ) : null}
         </section>
         <div className="story-room__page">
           <p className="story-room__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</p>
