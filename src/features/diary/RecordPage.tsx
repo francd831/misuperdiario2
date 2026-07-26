@@ -276,7 +276,7 @@ export default function RecordPage() {
       return;
     }
 
-    await entryRepository.createTextEntry({
+    const savedEntry = await entryRepository.createTextEntry({
       profileId: activeProfile.id,
       title,
       note,
@@ -284,8 +284,10 @@ export default function RecordPage() {
       unlockAt: undefined,
     });
     await achievementService.syncProfile(activeProfile.id);
-
-    navigate("/diary");
+    setTextEntries((current) => [savedEntry, ...current]);
+    setTitle("");
+    setNote("");
+    setStoryHistoryIndex(-1);
   }
 
   async function startRecording() {
