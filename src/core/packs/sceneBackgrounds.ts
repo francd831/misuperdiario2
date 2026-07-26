@@ -1,7 +1,7 @@
-import cinemaBase from "../../assets/recording/cinema-memories-base-v2.webp";
-import voiceBase from "../../assets/recording/voice-studio-base.webp";
+import cinemaBase from "../../assets/recording/cinema-memories-base-v9.png";
+import voiceBase from "../../assets/recording/voice-studio-base-v2.png";
 import writingBase from "../../assets/recording/story-desk-base.webp";
-import photoBase from "../../assets/recording/photo-corner-base-v2.webp";
+import photoBase from "../../assets/recording/photo-corner-base-v11.png";
 import galleryBase from "../../assets/diary/memory-gallery-base.webp";
 import storeBase from "../../assets/store/world-boutique-base.webp";
 

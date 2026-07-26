@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Clapperboard, Film, LockKeyhole, Maximize2, Pause, Play, RotateCcw, Save, Square, Trash2, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Clapperboard, Film, LockKeyhole, Maximize2, Pause, Play, RotateCcw, Save, Square, Trash2, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { achievementService } from "../../core/achievements/achievementService";
 import { entryRepository } from "../../core/diary/entryRepository";
@@ -43,6 +43,7 @@ function formatSeconds(seconds: number) {
 function TodayVideoCard({ entry, packs, onDelete }: { entry: DiaryEntry; packs: PackWithAssets[]; onDelete: (entry: DiaryEntry) => void }) {
   const url = useObjectUrl(entry.mediaBlob);
   const [expanded, setExpanded] = useState(false);
+
   return (
     <article className="today-video-card">
       <div className="sticker-stage">
@@ -111,8 +112,8 @@ export default function RecordPage() {
   const [todayVideos, setTodayVideos] = useState<DiaryEntry[]>([]);
   const [todayAudios, setTodayAudios] = useState<DiaryEntry[]>([]);
   const [textEntries, setTextEntries] = useState<DiaryEntry[]>([]);
+  const [storyHistoryIndex, setStoryHistoryIndex] = useState(-1);
   const [memoriesOpen, setMemoriesOpen] = useState(false);
-  const [previousTextEntry, setPreviousTextEntry] = useState<DiaryEntry>();
   const [overlays, setOverlays] = useState<OverlayProject>(clearOverlays());
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | "frame" | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -165,12 +166,11 @@ export default function RecordPage() {
   useEffect(() => {
     if (!activeProfile || entryType !== "text") return;
     let alive = true;
-    setPreviousTextEntry(undefined);
+    setStoryHistoryIndex(-1);
     void entryRepository.listByProfileAndType(activeProfile.id, "text").then((entries) => {
       const now = Date.now();
       const available = entries.filter((entry) => !entry.isLocked || Boolean(entry.unlockAt && new Date(entry.unlockAt).getTime() <= now));
       if (alive) {
-        setPreviousTextEntry(available[0]);
         setTextEntries(available);
       }
     });
@@ -627,37 +627,65 @@ export default function RecordPage() {
     );
   }
 
+  const rightHistoryEntry = storyHistoryIndex >= 0 ? textEntries[storyHistoryIndex] : undefined;
+  const leftHistoryEntry = storyHistoryIndex >= 0 ? textEntries[storyHistoryIndex + 1] : textEntries[0];
+  const canGoBack = textEntries.length > 0 && storyHistoryIndex < textEntries.length - 1;
+  const canGoForward = storyHistoryIndex >= 0;
+  const storyPosition = storyHistoryIndex < 0
+    ? `${textEntries.length + 1} de ${textEntries.length + 1}`
+    : `${textEntries.length - storyHistoryIndex} de ${textEntries.length + 1}`;
+
   return (
     <section className="page-stack record-page record-page--text">
       <form className="story-room responsive-world-scene responsive-world-scene--story" data-pack={activePack?.manifest.id ?? "base"} style={{ backgroundImage: `url(${storySceneBackground})` }} onSubmit={handleTextSubmit}>
         {activeProfile && <SceneMascot profileId={activeProfile.id} sceneId="text" path={sceneMascotPaths.text} packId={activePack?.manifest.id} />}
         <button className="world-scene__back" type="button" onClick={() => navigate("/home")} aria-label="Volver a la habitación"><ArrowLeft size={22} /></button>
-        <section className="story-room__previous" aria-label={previousTextEntry ? "Página anterior del diario" : "Página izquierda del diario"}>
-          {previousTextEntry ? (
+        <section key={leftHistoryEntry?.id ?? "blank-left"} className="story-room__previous story-room__paper-transition" aria-label={leftHistoryEntry ? "Página anterior del diario" : "Página izquierda del diario"}>
+          {leftHistoryEntry ? (
             <>
-              <time>{new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long" }).format(new Date(previousTextEntry.createdAt))}</time>
-              <h2>{previousTextEntry.title || "Mi página anterior"}</h2>
-              <p>{previousTextEntry.note}</p>
+              <time>{new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long" }).format(new Date(leftHistoryEntry.createdAt))}</time>
+              <h2>{leftHistoryEntry.title || "Mi página"}</h2>
+              <p>{leftHistoryEntry.note}</p>
             </>
           ) : null}
         </section>
-        <div className="story-room__page">
-          <p className="story-room__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</p>
-          <label className="visually-hidden" htmlFor="diary-title">Título</label>
-          <input id="diary-title" className="story-room__title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Título de hoy" />
-          <label className="visually-hidden" htmlFor="diary-note">Texto</label>
-          <textarea
-            id="diary-note"
-            className="story-room__note"
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-            placeholder="Querido diario..."
-            rows={9}
-            required
-          />
+        <div key={rightHistoryEntry?.id ?? "today"} className={`story-room__page story-room__paper-transition ${rightHistoryEntry ? "story-room__page--read-only" : ""}`}>
+          {rightHistoryEntry ? (
+            <>
+              <p className="story-room__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date(rightHistoryEntry.createdAt))}</p>
+              <h2 className="story-room__history-title">{rightHistoryEntry.title || "Mi página"}</h2>
+              <p className="story-room__history-note">{rightHistoryEntry.note}</p>
+            </>
+          ) : (
+            <>
+              <p className="story-room__date">{new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</p>
+              <label className="visually-hidden" htmlFor="diary-title">Título</label>
+              <input id="diary-title" className="story-room__title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Título de hoy" />
+              <label className="visually-hidden" htmlFor="diary-note">Texto</label>
+              <textarea
+                id="diary-note"
+                className="story-room__note"
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                placeholder="Querido diario..."
+                rows={9}
+                required
+              />
+            </>
+          )}
         </div>
 
-        <div className="story-room__actions">
+        <nav className="story-room__pagination" aria-label="Navegar por las páginas del diario">
+          <button type="button" onClick={() => setStoryHistoryIndex((current) => Math.min(current + 1, textEntries.length - 1))} disabled={!canGoBack} aria-label="Ver páginas anteriores">
+            <ChevronLeft aria-hidden="true" />
+          </button>
+          <span aria-live="polite">{storyPosition}</span>
+          <button type="button" onClick={() => setStoryHistoryIndex((current) => Math.max(current - 1, -1))} disabled={!canGoForward} aria-label="Ver páginas siguientes">
+            <ChevronRight aria-hidden="true" />
+          </button>
+        </nav>
+
+        <div className={`story-room__actions ${rightHistoryEntry ? "story-room__actions--hidden" : ""}`}>
           {error && <p className="form-error">{error}</p>}
 
           <button className="story-room__save" type="submit">
