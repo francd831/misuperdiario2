@@ -34,13 +34,16 @@ export default function SettingsPage() {
   const activePack = packLoader.getPackWithAssets(activeProfile?.activePackId ?? "base") ?? packLoader.getPackWithAssets("base");
   const packName = activePack?.manifest.name ?? "Básico";
   const packTheme = activePack?.manifest.theme;
+  const settingsForeground = activePack?.manifest.id === "espacio"
+    ? "hsl(226 45% 20%)"
+    : themeColor(packTheme?.foreground, "hsl(270 24% 20%)");
   const packDecorations = (activePack?.stickers.length ? activePack.stickers : activePack?.stamps ?? []).slice(0, 3);
   const settingsStyle = {
     "--settings-primary": themeColor(packTheme?.primary, "hsl(265 75% 60%)"),
     "--settings-secondary": themeColor(packTheme?.secondary, "hsl(40 85% 58%)"),
     "--settings-accent": themeColor(packTheme?.accent, "hsl(170 65% 48%)"),
     "--settings-background": themeColor(packTheme?.background, "hsl(40 33% 98%)"),
-    "--settings-foreground": themeColor(packTheme?.foreground, "hsl(270 24% 20%)"),
+    "--settings-foreground": settingsForeground,
     "--settings-preview": activePack?.previewUrl ? `url(${activePack.previewUrl})` : "none",
     "--settings-scene": getPackSceneBackgrounds(activePack?.manifest.id).settings
       ? `url(${getPackSceneBackgrounds(activePack?.manifest.id).settings})`

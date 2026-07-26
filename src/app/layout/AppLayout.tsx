@@ -22,6 +22,7 @@ function themeVariables(pack: PackManifest | undefined): ThemeVariables {
   const accent = hsl(theme?.accent, "43 100% 67%");
   const background = hsl(theme?.background, "43 100% 94%");
   const foreground = hsl(theme?.foreground, "270 27% 19%");
+  const surfaceInk = pack?.id === "espacio" ? "hsl(226 45% 20%)" : foreground;
 
   return {
     "--theme-primary": primary,
@@ -32,7 +33,7 @@ function themeVariables(pack: PackManifest | undefined): ThemeVariables {
     "--theme-primary-soft": hslAlpha(theme?.primary, "255 83% 67%", 0.22),
     "--theme-secondary-soft": hslAlpha(theme?.secondary, "340 100% 78%", 0.34),
     "--theme-accent-soft": hslAlpha(theme?.accent, "43 100% 67%", 0.42),
-    "--ink": foreground,
+    "--ink": surfaceInk,
     "--berry": secondary,
     "--sun": accent,
     "--violet": primary,
