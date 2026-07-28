@@ -6,7 +6,7 @@ import type { PackManifest } from "./types";
 
 // Beta switch: keep every world available in local and deployed test builds.
 // Set this to false immediately before the public production release.
-export const PREVIEW_ALL_PACKS = false;
+export const PREVIEW_ALL_PACKS = true;
 
 const previewAllPacks = PREVIEW_ALL_PACKS || import.meta.env.DEV || import.meta.env.VITE_PREVIEW_ALL_PACKS === "true";
 
