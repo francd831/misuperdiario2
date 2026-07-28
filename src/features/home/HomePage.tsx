@@ -431,6 +431,8 @@ export default function HomePage() {
               type="button"
               aria-label="Salir del perfil y volver a la selección de perfiles"
               style={conceptWorld ? { left: `${conceptWorld.exit.x}%`, top: `${conceptWorld.exit.y}%`, width: "12%", height: "18%" } : undefined}
+              onPointerDown={(event) => event.stopPropagation()}
+              onPointerUp={(event) => event.stopPropagation()}
               onClick={() => void exitProfile()}
             />
             <Link
@@ -438,6 +440,8 @@ export default function HomePage() {
               to="/settings"
               aria-label="Abrir ajustes"
               style={conceptWorld ? { left: `${conceptWorld.settings.x}%`, top: `${conceptWorld.settings.y}%`, width: "12%", height: "18%" } : undefined}
+              onPointerDown={(event) => event.stopPropagation()}
+              onPointerUp={(event) => event.stopPropagation()}
             />
             {worldDestinations.map((destination) => (
               <Link

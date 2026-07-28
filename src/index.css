@@ -5867,6 +5867,7 @@ p {
 .world-exit-hotspot {
   position: absolute;
   z-index: 12;
+  display: block;
   top: 18.3%;
   left: 40%;
   width: 5.6%;
@@ -5875,6 +5876,9 @@ p {
   border-radius: 22%;
   background: transparent;
   cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transform: translate(-50%, -50%);
 }
 
@@ -5883,10 +5887,22 @@ p {
 .world-settings-hotspot {
   position: absolute;
   z-index: 12;
+  display: block;
   border-radius: 18%;
   cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
   transform: translate(-50%, -50%);
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .world-exit-hotspot::after,
+  .world-settings-hotspot::after {
+    position: absolute;
+    inset: -12%;
+    content: "";
+  }
 }
 
 .world-settings-hotspot {
